@@ -1,0 +1,52 @@
+<link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/themes/light/main.css">
+<style type="text/css">
+	.preload {
+		background-color: #000000;
+		display: none;
+		height: 100%;
+		left: 0;
+		opacity: 0.5;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: 9999;
+	}
+	.loader {
+		-webkit-animation: spin 2s linear infinite;
+		animation: spin 2s linear infinite;
+		border: 16px solid #F8F9FA;
+		border-radius: 50%;
+		border-top: 16px solid #007BFF;
+		display: none;
+		height: 120px;
+		left: 50%;
+		margin: -60px 0 0 -60px;
+		position: fixed;
+		top: 50%;
+		width: 120px;
+		z-index: 10000;
+	}
+	@-webkit-keyframes spin {
+		0% { -webkit-transform: rotate(0deg); }
+		100% { -webkit-transform: rotate(360deg); }
+	}
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+	.view-div {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+	}
+	.esri-sketch__section.esri-sketch__tool-section:last-of-type {
+		display: none;
+	}
+	.esri-sketch__section.esri-sketch__tool-section:nth-child(2) {
+		border-right: none;
+	}
+	.esri-component.esri-attribution.esri-widget {
+		display: none;
+	}
+</style>

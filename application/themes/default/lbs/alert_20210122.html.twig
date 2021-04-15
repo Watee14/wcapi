@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>รายการแจ้งเตือน</title>
+	{% include 'lbs/style_alert.html.twig' %}
+</head>
+<body>
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<form method="POST" action="{{base_url()}}alert/alert" enctype="multipart/form-data">
+				<input type="hidden" name="user_add" value="{{username}}">
+				<input type="hidden" name="check_approve" value="NO">
+				<blockquote class="blockquote">
+					<h2 class="mb-0">สร้างรายการแจ้งเตือน</h2>
+					<footer class="blockquote-footer">กรุณากรอก วัน-เวลา ที่ต้องการให้แจ้งเตือน พร้อมทั้งกำหนดขอบเขตพื้นที่</footer>
+				</blockquote>
+				<div class="row">
+					<div class="col-xl" style="margin-top:10px;">
+						<div class="tab-content">
+							<div class="form-group mb-2">
+								<label class="mt-2 mb-0 user-select-none">หัวข้อแจ้งเตือน:</label>
+								<input type="text" name="title" class="form-control mt-0" placeholder="กรุณากรอกหัวข้อ">
+								<div class="row" style="margin-top:10px;">
+									<div class="col-3">
+										<label class=mb-0 user-select-none">วันที่เริ่มต้น: </label>
+										<input type="text" name="date_start" class="datepicker_start form-control mt-0 mb-0" autocomplete="off" onchange="dateendFunction(this.value)">
+									</div>
+									<div class="col-3">
+										<label for="example-time-input" class="mb-0 user-select-none">เวลาที่เริ่มต้น</label>
+										<input class="form-control mt-0" type="time" name="time_start" value="00:00">		
+									</div>
+									<div class="col-3">
+										<label class=mb-0 user-select-none">วันที่สิ้นสุด: </label>
+										<input type="text" name="date_end" class="datepicker_end form-control mt-0 mb-0" autocomplete="off">
+									</div>
+									<div class="col-3">
+										<label for="example-time-input" class="mb-0 user-select-none">เวลาที่สิ้นสุด</label>
+										<input class="form-control mt-0" type="time" name="time_end" value="23:59">		
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="mt-0 mb-0 user-select-none">
+									<span>ข้อความ:</span>
+								</label>
+								<textarea name="message" class="form-control mt-0 mb-0" rows="6" placeholder="กรุณากรอกข้อความที่ต้องการแจ้งเตือน"></textarea>
+							</div>
+							<div class="row">
+								<div class="col-6">
+									<div class="form-group">
+										<label for="exampleFormControlSelect1">ประเภทของพื้นที่:</label>
+										<select class="form-control" name="type_location" id="exampleFormControlSelect1" aria-describedby="typeHelp">
+											<option value="all">ทั้งหมด</option>
+											<option value="current">ที่อยู่ปัจจุบัน</option>
+											<option value="home">บ้าน</option>
+											<option value="office">ที่ทำงาน</option>
+										</select>
+										<small id="typeHelp" class="form-text text-muted">ประเภทของพื้นที่ที่ต้องการให้แจ้งเตือน</small>
+									</div>
+								</div>
+								<div class="col-6"></div>
+							</div>
+							<div class="form-group">
+								<label class="mt-2 mb-0 user-select-none">สถานะการแจ้งเตือน:</label>
+								<input type="checkbox" name="status" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-on="เปิด" data-off="ปิด">
+							</div>
+						</div>
+					</div>
+					<div class="col-xl" style="margin-top:10px;">
+						<h5 style="color:#6c757d;">บริเวณที่ต้องการแจ้งเตือน</h5>
+						<hr>
+						
+							<select multiple class="selectpicker" data-live-search="true">
+								<option>ทั้งหมด</option>
+								<option>กรุงเทพมหานคร</option>
+								<option>สมุทรสาคร</option>
+								<option>นนทบุรี</option>
+								<option>เชียงใหม่</option>
+								<option>ตลาดแพกุ้งมหาชัย</option>
+								<option>มหาชัยเมืองใหม่</option>
+							</select>
+							<button type="button" class="btn btn-success" data-toggle="modal" data-target=".bd-example-modal-xl">เพิ่มกลุ่ม</button>
+					</div>
+				</div>
+				<hr>
+				<button type="submit" name="add_camping" id="btn_send_sms" class="btn btn-primary mt-2 mb-0">
+					<i class="fas fa-check"></i>
+					<span>ยืนยัน</span>
+				</button>
+
+				<button type="button" id="btn_send_sms" class="btn btn-danger mt-2 mb-0" style="margin-left:25px;" data-toggle="modal" data-target="#reset_modal">
+					<i class="fas fa-undo"></i>
+					<span>ยกเลิก</span>
+				</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Cancel Confirm Modal -->
+	<div class="modal fade" id="reset_modal" tabindex="-1" role="dialog" aria-labelledby="reset_modalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="reset_modalLabel">ยกเลิกข้อมูล</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					คุณต้องการยกเลิกข้อมูลใช่หรือไม่?
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+					<a href="{{base_url()}}alert/list_alert" class="btn btn-primary">ยืนยัน</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Add Group Modal -->
+	<div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="myLargeModalLabel">เพิ่มกลุ่ม</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group row">
+						<label for="NAMEGROUP" class="col-sm-2 col-form-label">ชื่อกลุ่ม</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="NAMEGROUP">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label for="BOUNDARY_LATLON" class="col-sm-2 col-form-label">ละติจูด, ลองติจูด</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="BOUNDARY_LATLON">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label for="BOUNDARY_GROUP" class="col-sm-2 col-form-label">ขอบเขต</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" rows="3" id="BOUNDARY_GROUP"></textarea>
+						</div>
+					</div>
+					<div id="viewDiv" style="height: 380px;width: 100%;margin-top: 15px;"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+					<button type="button" class="btn btn-primary">ยืนยัน</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script_alert.html.twig' %}
+	<script>
+		
+	</script>
+</body>
+</html>

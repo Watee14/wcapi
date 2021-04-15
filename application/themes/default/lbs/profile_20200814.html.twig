@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>{{title}}</title>
+	{% include 'lbs/style.html.twig' %}
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker-4.17.47.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/prompt-style-font.css">
+	<style type="text/css">
+		.bd-placeholder-img{font-size:1.125rem;text-anchor:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+		input[type="file"],.datetimepicker{cursor:pointer}
+		@media (min-width:768px){.bd-placeholder-img-lg{font-size:3.5rem}}
+		.lh-condensed{line-height:1.25}
+	</style>
+</head>
+<body class="bg-light mt-5 mb-5"{% if functions == 'create' %} onload="policy_toggle()"{% endif %}>
+	<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+		<div class="container">
+			<span class="navbar-brand user-select-none pt-0 pb-0" href="#"><img src="{{base_url()}}assets/icon/rtp-logo-sm.png" height="40"> {{title}}</span>
+		</div>
+	</nav>
+	<form class="needs-validation" method="POST" novalidate>
+		<div class="container pt-5 pb-5">
+			<div class="row">
+				<div class="col">
+					<div class="alert alert-{{status is defined and status == 1 ? 'success' : 'danger'}} alert-dismissible fade show {{status is defined ? 'd-block' : 'd-none'}} mt-3 mb-3" role="alert">
+						<span class="alert-message">{{message}}</span>
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="mb-3">
+						{% if functions == 'create' %}
+							<label class="user-select-none">คำแนะนำในการสมัครใช้งาน / Introduce for register.</label>
+						{% endif %}
+						<ul class="mb-0">
+							<li class="user-select-none">กรุณากรอกข้อมูลตามความเป็นจริง / Please give us the truth information.</li>
+							<li class="user-select-none">ในช่องที่มีเครื่องหมาย <span class="text-danger">*</span> เป็นช่องที่บังคับในการกรอกข้อมูล / Sign <span class="text-danger">*</span> required fields.</li>
+						</ul>
+					</div>
+					<div class="accordion" id="accordion_01">
+						<div class="card">
+							<div class="card-header p-0 bg-danger" id="heading_01">
+								<h4 class="h4 mb-0">
+									<button class="btn btn-link btn-block text-left text-decoration-none text-white" type="button" data-toggle="collapse" data-target="#collapse_01" aria-expanded="true" aria-controls="collapse_01">
+										<i class="fas fa-sign-in-alt"></i>
+										<span>ข้อมูลสำหรับลงชื่อเข้าใช้ / Login information</span>
+										<span class="clearfix">
+											<div class="float-right">
+												<i class="fas fa-minus"></i>
+											</div>
+										</span>
+									</button>
+								</h4>
+							</div>
+							<div id="collapse_01" class="collapse show" aria-labelledby="heading_01" data-parent="#accordion_01">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											{% if functions == 'create' %}
+												<label for="citizen_phone_number" class="user-select-none">หมายเลขโทรศัพท์ / Phone number: <small class="text-danger">*</small></label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<div class="input-group-text">
+															<i class="fas fa-phone"></i>
+														</div>
+													</div>
+													<input type="text" id="citizen_phone_number" name="citizen_phone_number" class="form-control" placeholder="ตัวอย่าง / Example: 0912345678" value="{{citizen.citizen_phone_number}}" maxlength="20" required>
+													<div id="citizen_phone_number_feedback" class="invalid-feedback user-select-none">กรุณากรอกหมายเลขโทรศัพท์ / Please fill phone number.</div>
+												</div>
+											{% elseif functions == 'update' %}
+												<label for="citizen_phone_number" class="user-select-none">หมายเลขโทรศัพท์ / Phone number: </label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<div class="input-group-text">
+															<i class="fas fa-phone"></i>
+														</div>
+													</div>
+													<input type="text" id="citizen_phone_number" class="form-control-plaintext" value="{{citizen.citizen_phone_number}}" maxlength="20" disabled>
+													<input type="hidden" name="citizen_phone_number" class="form-control" value="{{citizen.citizen_phone_number}}" maxlength="20" required>
+												</div>
+											{% endif %}
+										</div>
+										<div class="col-lg-8 mb-3">
+											<label for="citizen_email" class="user-select-none">อีเมล / Email: <small class="text-danger">*</small></label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<div class="input-group-text">
+														<i class="fas fa-at"></i>
+													</div>
+												</div>
+												<input type="email" id="citizen_email" name="citizen_email" class="form-control" placeholder="ตัวอย่าง / Example: you@email.com" value="{{citizen.citizen_email}}" maxlength="50" required>
+											</div>
+											<div id="citizen_email_feedback" class="invalid-feedback user-select-none">กรุณากรอกอีเมล / Please fill email.</div>
+										</div>
+									</div>
+									{% if functions == 'create' %}
+										<div class="form-row">
+											<div class="col-lg mb-3">
+												<label for="citizen_password" class="user-select-none">รหัสผ่าน / Password: <small class="text-danger">*</small></label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<div class="input-group-text">
+															<i class="fas fa-key"></i>
+														</div>
+													</div>
+													<input type="password" id="citizen_password" name="citizen_password" class="form-control" placeholder="ตัวอย่าง / Example: 0000" maxlength="4" required>
+												</div>
+												<div id="citizen_password_feedback" class="invalid-feedback user-select-none">กรุณากรอกรหัสผ่าน / Please fill password.</div>
+												<div class="invalid-feedback user-select-none password-miss-match">กรุณากรอกรหัสผ่านให้ตรงกัน / Please fill password match with confirm.</div>
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_password_confirm" class="user-select-none">ยืนยันรหัสผ่าน / Confirm password: <small class="text-danger">*</small></label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<div class="input-group-text">
+															<i class="fas fa-key"></i>
+														</div>
+													</div>
+													<input type="password" id="citizen_password_confirm" class="form-control" maxlength="4" required>
+												</div>
+												<div id="citizen_password_confirm_feedback" class="invalid-feedback user-select-none">กรุณายืนยันรหัสผ่าน / Please confirm password.</div>
+												<div class="invalid-feedback user-select-none password-miss-match">กรุณากรอกรหัสผ่านให้ตรงกัน / Please fill password match with confirm.</div>
+											</div>
+										</div>
+									{% elseif functions == 'update' %}
+										<div class="form-row">
+											<div class="col-lg mb-3">
+												<label for="citizen_password_old" class="user-select-none">รหัสผ่านปัจจุบัน / Current password: </label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<div class="input-group-text">
+															<i class="fas fa-key"></i>
+														</div>
+													</div>
+													<input type="password" id="citizen_password_old" name="citizen_password_old" class="form-control" maxlength="4">
+												</div>
+												<div id="citizen_password_old_feedback" class="invalid-feedback user-select-none">กรุณากรอกรหัสผ่านปัจจุบัน / Please fill current password.</div>
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_password" class="user-select-none">รหัสผ่านใหม่ / New password: </label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<div class="input-group-text">
+															<i class="fas fa-key"></i>
+														</div>
+													</div>
+													<input type="password" id="citizen_password" name="citizen_password" class="form-control" placeholder="ตัวอย่าง / Example: 0000" maxlength="4">
+												</div>
+												<div id="citizen_password_feedback" class="invalid-feedback user-select-none">กรุณากรอกรหัสผ่านใหม่ / Please fill new password.</div>
+												<div class="invalid-feedback user-select-none password-miss-match">กรุณากรอกรหัสผ่านให้ตรงกัน / Please fill password match with confirm.</div>
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_password_confirm" class="user-select-none">ยืนยันรหัสผ่านใหม่ / Confirm new password: </label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<div class="input-group-text">
+															<i class="fas fa-key"></i>
+														</div>
+													</div>
+													<input type="password" id="citizen_password_confirm" class="form-control" maxlength="4">
+												</div>
+												<div id="citizen_password_confirm_feedback" class="invalid-feedback user-select-none">กรุณายืนยันรหัสผ่าน / Please confirm password.</div>
+												<div class="invalid-feedback user-select-none password-miss-match">กรุณากรอกรหัสผ่านให้ตรงกัน / Please fill password match with confirm.</div>
+											</div>
+										</div>
+										<div class="form-row">
+											<small class="form-text text-muted user-select-none">หากไม่ต้องการเปลี่ยนรหัสผ่านให้เว้นข้อมูลส่วนนี้ไว้ / Leave this blank, if you don't want to change password.</small>
+										</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="accordion" id="accordion_02">
+						<div class="card">
+							<div class="card-header p-0 bg-danger" id="heading_02">
+								<h4 class="h4 mb-0">
+									<button class="btn btn-link btn-block text-left text-decoration-none text-white" type="button" data-toggle="collapse" data-target="#collapse_02" aria-expanded="true" aria-controls="collapse_02">
+										<i class="fas fa-portrait"></i>
+										<span>ข้อมูลส่วนตัว / Personal information</span>
+										<span class="clearfix">
+											<div class="float-right">
+												<i class="fas fa-minus"></i>
+											</div>
+										</span>
+									</button>
+								</h4>
+							</div>
+							<div id="collapse_02" class="collapse show" aria-labelledby="heading_02" data-parent="#accordion_02">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_title" class="user-select-none">คำนำหน้าชื่อ / Prefix:</label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_title_mr" name="citizen_title" class="custom-control-input" value="1"{% if citizen.citizen_title == '1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_title_mr">นาย / Mr.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_title_mrs" name="citizen_title" class="custom-control-input" value="2"{% if citizen.citizen_title == '2' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_title_mrs">นาง / Mrs.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_title_ms" name="citizen_title" class="custom-control-input" value="3"{% if citizen.citizen_title == '3' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_title_ms">นางสาว / Ms.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_title_other" name="citizen_title" class="custom-control-input" value="-1"{% if citizen.citizen_title == '-1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_title_other">อื่นๆ / Other</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_name" class="user-select-none">ชื่อ / First name: <small class="text-danger">*</small></label>
+											<input type="text" id="citizen_name" name="citizen_name" class="form-control" value="{{citizen.citizen_name}}" maxlength="50" required>
+											<div id="citizen_name_feedback" class="invalid-feedback user-select-none">กรุณากรอกชื่อ / Please fill first name.</div>
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_middle" class="user-select-none">ชื่อกลาง / Middle name: </label>
+											<input type="text" id="citizen_middle" name="citizen_middle" class="form-control" value="{{citizen.citizen_middle}}" maxlength="50">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_surname" class="user-select-none">นามสกุล / Last name: </label>
+											<input type="text" id="citizen_surname" name="citizen_surname" class="form-control" value="{{citizen.citizen_surname}}" maxlength="50">
+										</div>
+										<div class="col-lg mb-3">
+											<label class="user-select-none">วันเดือนปีเกิด / Date of birth:</label>
+											<input type="text" id="citizen_birthday" name="citizen_birthday" class="form-control datetimepicker left bottom" value="{{citizen.info.citizen_birthday}}" autocomplete="off">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg-6 mb-3">
+											<label for="citizen_gender" class="user-select-none">เพศ / Gender:</label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_gender_m" name="citizen_gender" class="custom-control-input" value="M"{% if citizen.info.citizen_gender == 'M' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_gender_m">ชาย / Male</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_gender_fme" name="citizen_gender" class="custom-control-input" value="F"{% if citizen.info.citizen_gender == 'F' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_gender_fme">หญิง / Female</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_gender_tgdr" name="citizen_gender" class="custom-control-input" value="-1"{% if citizen.info.citizen_gender == '-1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_gender_tgdr">อื่นๆ / Other</label>
+												</div>
+											</div>
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_height" class="user-select-none">ส่วนสูง (ซม.) / Height (cm.): </label>
+											<input type="number" id="citizen_height" name="citizen_height" class="form-control" placeholder="ตัวอย่าง / Example: 170" value="{{citizen.info.citizen_height}}" min="1" max="9999">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_weight" class="user-select-none">น้ำหนัก (กก.) / Weight (kgs.): </label>
+											<input type="number" id="citizen_weight" name="citizen_weight" class="form-control" placeholder="ตัวอย่าง / Example: 65" value="{{citizen.info.citizen_weight}}" min="1" max="9999">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg-6 mb-3">
+											<label for="citizen_blood" class="user-select-none">หมู่โลหิต / Blood type: </label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_a" name="citizen_blood" class="custom-control-input" value="A"{% if citizen.info.citizen_blood == 'A' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_blood_a">A</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_b" name="citizen_blood" class="custom-control-input" value="B"{% if citizen.info.citizen_blood == 'B' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_blood_b">B</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_ab" name="citizen_blood" class="custom-control-input" value="AB"{% if citizen.info.citizen_blood == 'AB' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_blood_ab">AB</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_o" name="citizen_blood" class="custom-control-input" value="O"{% if citizen.info.citizen_blood == 'O' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_blood_o">O</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_other" name="citizen_blood" class="custom-control-input" value="-1"{% if citizen.info.citizen_blood == '-1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_blood_other">อื่นๆ / Other</label>
+												</div>
+											</div>
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_religion" class="user-select-none">ศาสนา / Religion: </label>
+											<input type="text" id="citizen_religion" name="citizen_religion" class="form-control" value="{{citizen.info.citizen_religion}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_scar" class="user-select-none">ตำหนิ / Scar: </label>
+											<input type="text" id="citizen_scar" name="citizen_scar" class="form-control" value="{{citizen.info.citizen_scar}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg-6 mb-3">
+											<label for="citizen_handicapped" class="user-select-none">เป็นผู้พิการ / Handicapped: </label>
+											<div class="mt-2">
+												<div class="custom-control custom-checkbox custom-control-inline">
+													<input type="checkbox" id="citizen_handicapped" name="citizen_handicapped" class="custom-control-input" value="Y"{% if citizen.info.citizen_handicapped == 'Y' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_handicapped">ใช่ / Yes</label>
+												</div>
+											</div>
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_nationality" class="user-select-none">สัญชาติ / Nationality: </label>
+											<input type="text" id="citizen_nationality" name="citizen_nationality" class="form-control" value="{{citizen.info.citizen_nationality}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_citizenship" class="user-select-none">เชื้อชาติ / Citizenship: </label>
+											<input type="text" id="citizen_citizenship" name="citizen_citizenship" class="form-control" value="{{citizen.info.citizen_citizenship}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg-6 mb-3">
+											<label for="citizen_id" class="user-select-none">เลขประจำตัวประชาชน: </label>
+											<input type="text" id="citizen_id" name="citizen_id" class="form-control" placeholder="ตัวอย่าง: 0000000000000" value="{{citizen.citizen_id}}" maxlength="20">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_passport" class="user-select-none">Passport number: </label>
+											<input type="text" id="citizen_passport" name="citizen_passport" class="form-control" value="{{citizen.info.citizen_passport}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label class="user-select-none">ภาพประจำตัว / Profile photo: </label>
+											<div class="input-group">
+												<div class="custom-file">
+													<input type="file" id="citizen_photo" name="citizen_photo" class="custom-file-input" accept="image/*">
+													<label class="custom-file-label" for="citizen_photo">เลือกไฟล์ / Choose file</label>
+												</div>
+												<div class="input-group-append">
+													<button class="btn btn-secondary" type="button" onclick="empty_url()"><i class="far fa-times-circle"></i></button>
+												</div>
+											</div>
+											<div class="mt-0 mb-3">
+												<img id="citizen_photo_preview" class="w-100 mx-auto d-block"{% if citizen.citizen_photo != '' %} src="{{citizen.info.citizen_photo}}"{% endif %}>
+											</div>
+											<ul class="mb-0">
+												<li><small class="form-text text-muted user-select-none">ควรตั้งชื่อไฟล์เป็นภาษาอังกฤษ / Please use file name in English.</small></li>
+												<li><small class="form-text text-muted user-select-none">ท่านสามารถแนบเอกสาร ที่มีนามสกุลไฟล์ในลักษณะดังต่อไปนี้ .jpg., .png โดยขนาดไฟล์ไม่ควรเกิน 1,024 kb. / You can attachment .jpg, .png and size file should less than 1,024 kb.</small></li>
+												<li><small class="form-text text-muted user-select-none">หากต้องการจะลบไฟล์แนบ ให้คลิกที่ไอคอน <i class="far fa-times-circle"></i> / If you want to delete file, you can click icon <i class="far fa-times-circle"></i></small></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="accordion" id="accordion_03">
+						<div class="card">
+							<div class="card-header p-0 bg-danger" id="heading_03">
+								<h4 class="h4 mb-0">
+									<button class="btn btn-link btn-block text-left text-decoration-none text-white" type="button" data-toggle="collapse" data-target="#collapse_03" aria-expanded="true" aria-controls="collapse_03">
+										<i class="far fa-address-card"></i>
+										<span>ข้อมูลที่อยู่ติดต่อ / Contact information</span>
+										<span class="clearfix">
+											<div class="float-right">
+												<i class="fas fa-plus"></i>
+											</div>
+										</span>
+									</button>
+								</h4>
+							</div>
+							<div id="collapse_03" class="collapse" aria-labelledby="heading_03" data-parent="#accordion_03">
+								<div class="card-body">
+									<h6 class="h6 mb-2 user-select-none">ที่อยู่ตามทะเบียนบ้าน / Permanent address</h6>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_h_no" class="user-select-none">อพาร์ตเมนท์/อาคาร/ชั้น/บ้านเลขที่ / Apt/Bldg/Floor/House no.: </label>
+											<input type="text" id="citizen_pmnt_h_no" name="citizen_pmnt_h_no" class="form-control" value="{{citizen.address.citizen_pmnt_h_no}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_vle_no" class="user-select-none">หมู่ที่ / Village no.: </label>
+											<input type="text" id="citizen_pmnt_vle_no" name="citizen_pmnt_vle_no" class="form-control" value="{{citizen.address.citizen_pmnt_vle_no}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_vle" class="user-select-none">หมู่บ้าน / Village: </label>
+											<input type="text" id="citizen_pmnt_vle" name="citizen_pmnt_vle" class="form-control" value="{{citizen.address.citizen_pmnt_vle}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_lane" class="user-select-none">ตรอก/ซอย / Alley/Lane: </label>
+											<input type="text" id="citizen_pmnt_lane" name="citizen_pmnt_lane" class="form-control" value="{{citizen.address.citizen_pmnt_lane}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_road" class="user-select-none">ถนน / Road: </label>
+											<input type="text" id="citizen_pmnt_road" name="citizen_pmnt_road" class="form-control" value="{{citizen.address.citizen_pmnt_road}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_sdt" class="user-select-none">แขวง/ตำบล / Sub-district: </label>
+											<input type="text" id="citizen_pmnt_sdt" name="citizen_pmnt_sdt" class="form-control" value="{{citizen.address.citizen_pmnt_sdt}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_dt" class="user-select-none">เขต/อำเภอ / District: </label>
+											<select id="citizen_pmnt_dt" name="citizen_pmnt_dt" class="custom-select d-block">
+												<option value="1" selected>พระนคร</option>
+											</select>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_pve" class="user-select-none">จังหวัด / Province/City: </label>
+											<select id="citizen_pmnt_pve" name="citizen_pmnt_pve" class="custom-select d-block">
+												<option value="1" selected>กรุงเทพมหานครฯ</option>
+											</select>
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_cty" class="user-select-none">ประเทศ / Country: </label>
+											<select id="citizen_pmnt_cty" name="citizen_pmnt_cty" class="custom-select d-block">
+												<option value="1" selected>ประเทศไทย</option>
+											</select>
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_pmnt_pce" class="user-select-none">รหัสไปรษณีย์ / Post code: </label>
+											<input type="text" id="citizen_pmnt_pce" name="citizen_pmnt_pce" class="form-control" value="{{citizen.address.citizen_pmnt_pce}}">
+										</div>
+									</div>
+									<hr class="mt-0 mb-3">
+									<h6 class="h6 mb-2 user-select-none">ที่อยู่ปัจจุบัน / Current address</h6>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<div class="">
+												<div class="custom-control custom-checkbox">
+													<input type="checkbox" id="citizen_use_pmnt_addr" name="citizen_use_pmnt_addr" class="custom-control-input" data-toggle="collapse" data-target="#collapse_use_pmnt_addr" aria-expanded="false" aria-controls="collapse_use_pmnt_addr"{% if citizen.address.citizen_use_pmnt_addr == 1 %} {% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_use_pmnt_addr">ใช้ที่อยู่ตามทะเบียนบ้าน / Use permanent address</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="collapse show in" id="collapse_use_pmnt_addr">
+										<div class="form-row">
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_h_no" class="user-select-none">อพาร์ตเมนท์/อาคาร/ชั้น/บ้านเลขที่ / Apt/Bldg/Floor/House no.: </label>
+												<input type="text" id="citizen_crt_h_no" name="citizen_crt_h_no" class="form-control" value="{{citizen.address.citizen_crt_h_no}}">
+											</div>
+										</div>
+										<div class="form-row">
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_vle_no" class="user-select-none">หมู่ที่ / Village no.: </label>
+												<input type="text" id="citizen_crt_vle_no" name="citizen_crt_vle_no" class="form-control" value="{{citizen.address.citizen_crt_vle_no}}">
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_vle" class="user-select-none">หมู่บ้าน / Village: </label>
+												<input type="text" id="citizen_crt_vle" name="citizen_crt_vle" class="form-control" value="{{citizen.address.citizen_crt_vle}}">
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_lane" class="user-select-none">ตรอก/ซอย / Alley/Lane: </label>
+												<input type="text" id="citizen_crt_lane" name="citizen_crt_lane" class="form-control" value="{{citizen.address.citizen_crt_lane}}">
+											</div>
+										</div>
+										<div class="form-row">
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_road" class="user-select-none">ถนน / Road: </label>
+												<input type="text" id="citizen_crt_road" name="citizen_crt_road" class="form-control" value="{{citizen.address.citizen_crt_road}}">
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_sdt" class="user-select-none">แขวง/ตำบล / Sub-district: </label>
+												<input type="text" id="citizen_crt_sdt" name="citizen_crt_sdt" class="form-control" value="{{citizen.address.citizen_crt_sdt}}">
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_dt" class="user-select-none">เขต/อำเภอ / District: </label>
+												<select id="citizen_crt_dt" name="citizen_crt_dt" class="custom-select d-block">
+													<option value="1" selected>พระนคร</option>
+												</select>
+											</div>
+										</div>
+										<div class="form-row">
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_pve" class="user-select-none">จังหวัด / Province/City: </label>
+												<select id="citizen_crt_pve" name="citizen_crt_pve" class="custom-select d-block">
+													<option value="1" selected>กรุงเทพมหานครฯ</option>
+												</select>
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_cty" class="user-select-none">ประเทศ / Country: </label>
+												<select id="citizen_crt_cty" name="citizen_crt_cty" class="custom-select d-block">
+													<option value="1" selected>ประเทศไทย</option>
+												</select>
+											</div>
+											<div class="col-lg mb-3">
+												<label for="citizen_crt_pce" class="user-select-none">รหัสไปรษณีย์ / Post code: </label>
+												<input type="text" id="citizen_crt_pce" name="citizen_crt_pce" class="form-control" value="{{citizen.address.citizen_crt_pce}}">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="accordion" id="accordion_04">
+						<div class="card">
+							<div class="card-header p-0 bg-danger" id="heading_04">
+								<h4 class="h4 mb-0">
+									<button class="btn btn-link btn-block text-left text-decoration-none text-white" type="button" data-toggle="collapse" data-target="#collapse_04" aria-expanded="true" aria-controls="collapse_04">
+										<i class="fas fa-address-card"></i>
+										<span>บุคคลที่ติดต่อกรณีฉุกเฉิน / Person to contact in emergency</span>
+										<span class="clearfix">
+											<div class="float-right">
+												<i class="fas fa-plus"></i>
+											</div>
+										</span>
+									</button>
+								</h4>
+							</div>
+							<div id="collapse_04" class="collapse" aria-labelledby="heading_04" data-parent="#accordion_04">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="contact_name" class="user-select-none">ชื่อ / First name: </label>
+											<input type="text" id="contact_name" name="contact_name" class="form-control" value="{{citizen.contact_name}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="contact_surname" class="user-select-none">นามสกุล / Last name: </label>
+											<input type="text" id="contact_surname" name="contact_surname" class="form-control" value="{{citizen.contact_surname}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="contact_phone_number" class="user-select-none">หมายเลขโทรศัพท์ / Phone number: </label>
+											<input type="text" id="contact_phone_number" name="contact_phone_number" class="form-control" value="{{citizen.contact_phone_number}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="contact_occupation" class="user-select-none">อาชีพ / Occupation: </label>
+											<input type="text" id="contact_occupation" name="contact_occupation" class="form-control" value="{{citizen.info.contact_occupation}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="contact_relationship" class="user-select-none">ความสำพันธ์ / Relationship: </label>
+											<input type="text" id="contact_relationship" name="contact_relationship" class="form-control" value="{{citizen.info.contact_relationship}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="contact_address" class="user-select-none">สถานที่ติดต่อ / Contact address: </label>
+											<input type="text" id="contact_address" name="contact_address" class="form-control" value="{{citizen.info.contact_address}}">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="accordion" id="accordion_05">
+						<div class="card">
+							<div class="card-header p-0 bg-danger" id="heading_05">
+								<h4 class="h4 mb-0">
+									<button class="btn btn-link btn-block text-left text-decoration-none text-white" type="button" data-toggle="collapse" data-target="#collapse_05" aria-expanded="true" aria-controls="collapse_05">
+										<i class="fas fa-users"></i>
+										<span>ข้อมูลครอบครัว / Family information</span>
+										<span class="clearfix">
+											<div class="float-right">
+												<i class="fas fa-plus"></i>
+											</div>
+										</span>
+									</button>
+								</h4>
+							</div>
+							<div id="collapse_05" class="collapse" aria-labelledby="heading_05" data-parent="#accordion_05">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_marital" class="user-select-none">สถานะภาพครอบครัว / Marital status: </label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_single" name="citizen_marital" class="custom-control-input" value="1"{% if citizen.info.citizen_marital == '1' or citizen.info.citizen_marital == '' %} checked{% endif %}>
+													<label class="custom-control-label" for="citizen_blood_single">โสด / Single</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_married" name="citizen_marital" class="custom-control-input" value="2"{% if citizen.info.citizen_marital == '2' %} checked{% endif %}>
+													<label class="custom-control-label" for="citizen_blood_married">สมรส / Married</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_devorced" name="citizen_marital" class="custom-control-input" value="3"{% if citizen.info.citizen_marital == '3' %} checked{% endif %}>
+													<label class="custom-control-label" for="citizen_blood_devorced">อย่า / Devorced</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_blood_widowed" name="citizen_marital" class="custom-control-input" value="-1"{% if citizen.info.citizen_marital == '-1' %} checked{% endif %}>
+													<label class="custom-control-label" for="citizen_blood_widowed">หม้าย / Widowed</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<hr class="mt-0 mb-3">
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_ft_title" class="user-select-none">บิดา / Father: </label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_ft_title_mr" name="citizen_ft_title" class="custom-control-input" value="1"{% if citizen.info.citizen_ft_title == '1' or citizen.info.citizen_ft_title == '' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_ft_title_mr">นาย / Mr.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_ft_title_other" name="citizen_ft_title" class="custom-control-input" value="-1"{% if citizen.info.citizen_ft_title == '-1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_ft_title_other">อื่นๆ / Other</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_ft_name" class="user-select-none">ชื่อ / First name: </label>
+											<input type="text" id="citizen_ft_name" name="citizen_ft_name" class="form-control" value="{{citizen.info.citizen_ft_name}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_ft_surname" class="user-select-none">นามสกุล / Last name: </label>
+											<input type="text" id="citizen_ft_surname" name="citizen_ft_surname" class="form-control" value="{{citizen.info.citizen_ft_surname}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_ft_birthday" class="user-select-none">วันเดือนปีเกิด / Date of birth:</label>
+											<input type="text" id="citizen_ft_birthday" name="citizen_ft_birthday" class="form-control datetimepicker left top" value="{{citizen.info.citizen_ft_birthday}}" autocomplete="off">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_ft_occupation" class="user-select-none">อาชีพ / Occupation:</label>
+											<input type="text" id="citizen_ft_occupation" name="citizen_ft_occupation" class="form-control" value="{{citizen.info.citizen_ft_occupation}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_ft_status" class="user-select-none">สถานะ / Status:</label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_ft_status_al" name="citizen_ft_status" class="custom-control-input" value="1"{% if citizen.info.citizen_ft_status == '1' or citizen.info.citizen_ft_status == '' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_ft_status_al">มีชีวิตอยู่ / Alive</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_ft_status_pa" name="citizen_ft_status" class="custom-control-input" value="2"{% if citizen.info.citizen_ft_status == '2' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_ft_status_pa">ถึงแก่กรรม / Pass away</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<hr class="mt-0 mb-3">
+									<div class="form-row">
+										<div class="col-lg-8 mb-3">
+											<label for="citizen_mt_title" class="user-select-none">มารดา / Mother: </label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_mt_title_mrs" name="citizen_mt_title" class="custom-control-input" value="2"{% if citizen.info.citizen_mt_title == '2' or citizen.info.citizen_mt_title == '' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_mt_title_mrs">นาง / Mrs.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_mt_title_ms" name="citizen_mt_title" class="custom-control-input" value="3"{% if citizen.info.citizen_mt_title == '3' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_mt_title_ms">นางสาว / Ms.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_mt_title_other" name="citizen_mt_title" class="custom-control-input" value="-1"{% if citizen.info.citizen_mt_title == '-1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_mt_title_other">อื่นๆ / Other</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_mt_name" class="user-select-none">ชื่อ / First name: </label>
+											<input type="text" id="citizen_mt_name" name="citizen_mt_name" class="form-control" value="{{citizen.info.citizen_mt_name}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_mt_surname" class="user-select-none">นามสกุล / Last name: </label>
+											<input type="text" id="citizen_mt_surname" name="citizen_mt_surname" class="form-control" value="{{citizen.info.citizen_mt_surname}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_mt_birthday" class="user-select-none">วันเดือนปีเกิด / Date of birth:</label>
+											<input type="text" id="citizen_mt_birthday" name="citizen_mt_birthday" class="form-control datetimepicker left top" value="{{citizen.info.citizen_mt_birthday}}" autocomplete="off">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_mt_occupation" class="user-select-none">อาชีพ / Occupation:</label>
+											<input type="text" id="citizen_mt_occupation" name="citizen_mt_occupation" class="form-control" value="{{citizen.info.citizen_mt_occupation}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_mt_status" class="user-select-none">สถานะ / Status:</label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_mt_status_al" name="citizen_mt_status" class="custom-control-input" value="1"{% if citizen.info.citizen_mt_status == '1' or citizen.info.citizen_mt_status == '' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_mt_status_al">มีชีวิตอยู่ / Alive</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_mt_status_pa" name="citizen_mt_status" class="custom-control-input" value="2"{% if citizen.info.citizen_mt_status == '2' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_mt_status_pa">ถึงแก่กรรม / Pass away</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<hr class="mt-0 mb-3">
+									<div class="form-row">
+										<div class="col-lg-8 mb-3">
+											<label for="citizen_sp_title" class="user-select-none">คู่สมรส / Spouse: </label>
+											<div class="mt-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_sp_title_mr" name="citizen_sp_title" class="custom-control-input" value="1"{% if citizen.info.citizen_sp_title == '1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_sp_title_mr">นาย / Mr.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_sp_title_mrs" name="citizen_sp_title" class="custom-control-input" value="2"{% if citizen.info.citizen_sp_title == '2' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_sp_title_mrs">นาง / Mrs.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_sp_title_ms" name="citizen_sp_title" class="custom-control-input" value="3"{% if citizen.info.citizen_sp_title == '3' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_sp_title_ms">นางสาว / Ms.</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_sp_title_other" name="citizen_sp_title" class="custom-control-input" value="-1"{% if citizen.info.citizen_sp_title == '-1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_sp_title_other">อื่นๆ / Other</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_sp_name" class="user-select-none">ชื่อ / First name: </label>
+											<input type="text" id="citizen_sp_name" name="citizen_sp_name" class="form-control" value="{{citizen.info.citizen_sp_name}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_sp_surname" class="user-select-none">นามสกุล / Last name: </label>
+											<input type="text" id="citizen_sp_surname" name="citizen_sp_surname" class="form-control" value="{{citizen.info.citizen_sp_surname}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_sp_birthday" class="user-select-none">วันเดือนปีเกิด / Date of birth:</label>
+											<input type="text" id="citizen_sp_birthday" name="citizen_sp_birthday" class="form-control datetimepicker left top" value="{{citizen.info.citizen_sp_birthday}}" autocomplete="off">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_sp_occupation" class="user-select-none">อาชีพ / Occupation:</label>
+											<input type="text" id="citizen_sp_occupation" name="citizen_sp_occupation" class="form-control" value="{{citizen.info.citizen_sp_occupation}}">
+										</div>
+									</div>
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_sp_status" class="user-select-none">สถานะ / Status:</label>
+											<div class="sp-2">
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_sp_status_al" name="citizen_sp_status" class="custom-control-input" value="1"{% if citizen.info.citizen_sp_status == '1' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_sp_status_al">มีชีวิตอยู่ / Alive</label>
+												</div>
+												<div class="custom-control custom-radio custom-control-inline">
+													<input type="radio" id="citizen_sp_status_pa" name="citizen_sp_status" class="custom-control-input" value="2"{% if citizen.info.citizen_sp_status == '2' %} checked{% endif %}>
+													<label class="custom-control-label user-select-none" for="citizen_sp_status_pa">ถึงแก่กรรม / Pass away</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="accordion" id="accordion_06">
+						<div class="card">
+							<div class="card-header p-0 bg-danger" id="heading_06">
+								<h4 class="h4 mb-0">
+									<button class="btn btn-link btn-block text-left text-decoration-none text-white" type="button" data-toggle="collapse" data-target="#collapse_06" aria-expanded="true" aria-controls="collapse_06">
+										<i class="fas fa-briefcase"></i>
+										<span>ข้อมูลการทำงาน / Worrk information</span>
+										<span class="clearfix">
+											<div class="float-right">
+												<i class="fas fa-plus"></i>
+											</div>
+										</span>
+									</button>
+								</h4>
+							</div>
+							<div id="collapse_06" class="collapse" aria-labelledby="heading_06" data-parent="#accordion_06">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="col-lg mb-3">
+											<label for="citizen_work_org" class="user-select-none">สถานที่ทำงาน / Organization: </label>
+											<input type="text" id="citizen_work_org" name="citizen_work_org" class="form-control" value="{{citizen.info.citizen_work_org}}">
+										</div>
+										<div class="col-lg mb-3">
+											<label for="citizen_work_pos" class="user-select-none">ตำแหน่ง / Position: </label>
+											<input type="text" id="citizen_work_pos" name="citizen_work_pos" class="form-control" value="{{citizen.info.citizen_work_pos}}">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="d-none invisible">
+						<input type="hidden" id="address" name="address" class="form-control" value="{{citizen.address}}">
+						<input type="hidden" id="citizen_address" name="citizen_address" class="form-control" value="{{citizen.citizen_address}}">
+						<input type="hidden" id="citizen_current_lat" name="citizen_current_lat" class="form-control" value="{{citizen.citizen_current_lat}}">
+						<input type="hidden" id="citizen_current_lon" name="citizen_current_lon" class="form-control" value="{{citizen.citizen_current_lon}}">
+						<input type="hidden" id="citizen_home_addr" name="citizen_home_addr" class="form-control" value="{{citizen.address.citizen_home_addr}}">
+						<input type="hidden" id="citizen_home_lat" name="citizen_home_lat" class="form-control" value="{{citizen.address.citizen_home_lat}}">
+						<input type="hidden" id="citizen_home_lon" name="citizen_home_lon" class="form-control" value="{{citizen.address.citizen_home_lon}}">
+						<input type="hidden" id="citizen_home_no" name="citizen_home_no" class="form-control" value="{{citizen.address.citizen_home_no}}">
+						<input type="hidden" id="citizen_telephone" name="citizen_telephone" class="form-control" value="{{citizen.citizen_telephone}}">
+						<input type="hidden" id="citizen_telephone_office" name="citizen_telephone_office" class="form-control" value="{{citizen.citizen_telephone_office}}">
+						<input type="hidden" id="citizen_work_addr" name="citizen_work_addr" class="form-control" value="{{citizen.address.citizen_work_addr}}">
+						<input type="hidden" id="citizen_work_lat" name="citizen_work_lat" class="form-control" value="{{citizen.address.citizen_work_lat}}">
+						<input type="hidden" id="citizen_work_lon" name="citizen_work_lon" class="form-control" value="{{citizen.address.citizen_work_lon}}">
+						<input type="hidden" id="citizen_work_no" name="citizen_work_no" class="form-control" value="{{citizen.address.citizen_work_no}}">
+						<input type="hidden" id="created_date" name="created_date" class="form-control" value="{{citizen.created_date}}">
+						<input type="hidden" id="device_name" name="device_name" class="form-control" value="{{citizen.device_name}}">
+						<input type="hidden" id="device_token" name="device_token" class="form-control" value="{{citizen.device_token}}">
+						<input type="hidden" id="info" name="info" class="form-control" value="{{citizen.info}}">
+						<input type="hidden" id="is_blacklist" name="is_blacklist" class="form-control" value="{{citizen.is_blacklist}}">
+						<input type="hidden" id="is_vip" name="is_vip" class="form-control" value="{{citizen.is_vip}}">
+						<input type="hidden" id="modified_date" name="modified_date" class="form-control" value="{{citizen.modified_date}}">
+						{% if functions == 'create' %}
+							<input type="hidden" id="user_create" name="user_create" class="form-control" value="{{citizen.user_create}}">
+						{% endif %}
+						<input type="hidden" id="user_modify" name="user_modify" class="form-control" value="{{citizen.user_modify}}">
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer class="fixed-bottom bg-light pt-1 pb-1 border-top">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<div class="clearfix">
+							<div class="float-sm-left text-center text-sm-left">
+								{% if functions == 'create' %}
+									<a class="btn btn-link btn-lg text-decoration-none pl-0 pr-0" href="{{base_url()}}lbs/signin"><small>ลงชื่อเข้าใช้ / Sign in</small></a>
+								{% elseif functions == 'update' %}
+									<a class="btn btn-link btn-lg text-decoration-none pl-0 pr-0" href="{{base_url()}}lbs/signout"><small>ลงชื่อออกจากระบบ / Logout</small></a>
+								{% endif %}
+							</div>
+							<div class="float-sm-right text-center text-sm-right">
+								{% if functions == 'create' %}
+									<button class="btn btn-primary btn-lg" type="button" data-toggle="modal" data-target="#modal_confirm"><i class="fas fa-chevron-circle-right"></i> ดำเนินการต่อ / Continue</button>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<div id="modal_confirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_label" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header bg-primary">
+						{% if functions == 'create' %}
+							<h5 id="modal_confirm_label" class="modal-title text-white">ยืนยันการสมัครใช้งาน / Register confirmation</h5>
+						{% elseif functions == 'update' %}
+							<h5 id="modal_confirm_label" class="modal-title text-white">ยืนยันการอัพเดทข้อมูล / Update confirmation</h5>
+						{% endif %}
+						<a type="button" class="close" data-dismiss="modal" aria-label="Close" title="ปิด">
+							<span aria-hidden="true">&times;</span>
+						</a>
+					</div>
+					<div class="modal-body d-block justify-content-start">
+						<div class="clearfix">
+							<div class="float-left">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times-circle"></i> ยกเลิก / Cancel</button>
+							</div>
+							<div class="float-right">
+								<button type="submit" class="btn btn-success"><i class="far fa-check-circle"></i> ยืนยัน / Confirm</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div id="modal_term_and_policy" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal_term_and_policy_label" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-danger">
+					<h5 id="modal_term_and_policy_label" class="modal-title text-white user-select-none">ข้อกำหนดและนโยบาย / Term and policy</h5>
+				</div>
+				<div class="modal-body">
+					{% include 'lbs/policy.html.twig' %}
+				</div>
+				<div class="modal-footer d-block justify-content-start">
+					<div class="clearfix">
+						<div class="float-left">
+							<div class="custom-control custom-checkbox mt-2">
+								<input type="checkbox" class="custom-control-input" id="chk_term_and_policy">
+								<label class="custom-control-label" for="chk_term_and_policy">ฉันยอมรับข้อกำหนดและนโยบาย / I accept term and policy</label>
+							</div>
+						</div>
+						<div class="float-right">
+							<button type="button" id="btn_term_and_policy" class="btn btn-primary disabled" data-dismiss="modal" disabled><i class="far fa-check-circle"></i> ตกลง / Accept</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/bootstrap-datetimepicker/js/moment.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript">
+		var invalid=false;
+		//Example starter JavaScript for disabling form submissions if there are invalid fields
+		(function(){
+			'use strict'
+			window.addEventListener('load',function(){
+				//Fetch all the forms we want to apply custom Bootstrap validation styles to
+				var forms=document.getElementsByClassName('needs-validation')
+				var p_no=document.getElementById('citizen_phone_number')
+				var p_no_fb=document.getElementById('citizen_phone_number_feedback')
+				var email=document.getElementById('citizen_email')
+				var email_fb=document.getElementById('citizen_email_feedback')
+				var pwd_o_fb=document.getElementById('citizen_password_old_feedback')
+				var pwd_o=document.getElementById('citizen_password_old')
+				var pwd_o_fb=document.getElementById('citizen_password_old_feedback')
+				var pwd=document.getElementById('citizen_password')
+				var pwd_fb=document.getElementById('citizen_password_feedback')
+				var pwd_cf=document.getElementById('citizen_password_confirm')
+				var pwd_cf_fb=document.getElementById('citizen_password_confirm_feedback')
+				var pwd_m_fbs=document.getElementsByClassName('password-miss-match')
+				var c_name=document.getElementById('citizen_name')
+				var c_name_fb=document.getElementById('citizen_name_feedback')
+				//Loop over them and prevent submission
+				Array.prototype.filter.call(forms,function(form){
+					form.addEventListener('submit',function(event){
+						if(form.checkValidity()===false||pwd.value!=pwd_cf.value){
+							event.preventDefault()
+							event.stopPropagation()
+							if(p_no.value==''){
+								p_no.classList.add('is-invalid')
+								p_no.classList.remove('is-valid')
+								p_no_fb.classList.add('d-block')
+							}
+							if(email.value==''){
+								email.classList.add('is-invalid')
+								email.classList.remove('is-valid')
+								email_fb.classList.add('d-block')
+							}
+							if(pwd_o&&pwd_o.value==''){
+								pwd_o.classList.add('is-invalid')
+								pwd_o.classList.remove('is-valid')
+								pwd_o_fb.classList.add('d-block')
+							}
+							if(pwd.value==''){
+								pwd.classList.add('is-invalid')
+								pwd.classList.remove('is-valid')
+								pwd_fb.classList.add('d-block')
+							}
+							if(pwd_cf.value==''){
+								pwd_cf.classList.add('is-invalid')
+								pwd_cf.classList.remove('is-valid')
+								pwd_cf_fb.classList.add('d-block')
+							}
+							if(pwd.value!=pwd_cf.value){
+								pwd.classList.add('is-invalid')
+								pwd.classList.remove('is-valid')
+								pwd_cf.classList.add('is-invalid')
+								pwd_cf.classList.remove('is-valid')
+								Array.prototype.filter.call(pwd_m_fbs,function(pwd_m_fb){
+									pwd_m_fb.classList.add('d-block')
+								})
+							}
+							if(c_name.value==''){
+								c_name.classList.add('is-invalid')
+								c_name.classList.remove('is-valid')
+								c_name_fb.classList.add('d-block')
+							}
+							$('#modal_confirm').modal('hide')
+							invalid=true
+						}
+						else{
+							invalid=false
+						}
+						if(p_no.value!=''){
+							p_no.classList.remove('is-invalid')
+							p_no.classList.add('is-valid')
+							p_no_fb.classList.remove('d-block')
+							invalid=false
+						}
+						if(email.value!=''){
+							email.classList.remove('is-invalid')
+							email.classList.add('is-valid')
+							email_fb.classList.remove('d-block')
+							invalid=false
+						}
+						if(pwd_o&&pwd_o.value!=''){
+							pwd_o.classList.remove('is-invalid')
+							pwd_o.classList.add('is-valid')
+							pwd_o_fb.classList.remove('d-block')
+							invalid=false
+						}
+						if(pwd.value!=''){
+							pwd.classList.remove('is-invalid')
+							pwd.classList.add('is-valid')
+							pwd_fb.classList.remove('d-block')
+						}
+						if(pwd_cf.value!=''){
+							pwd_cf.classList.remove('is-invalid')
+							pwd_cf.classList.add('is-valid')
+							pwd_cf_fb.classList.remove('d-block')
+						}
+						if(pwd.value!=''&&pwd_cf.value!=''&&pwd.value==pwd_cf.value){
+							pwd.classList.remove('is-invalid')
+							pwd.classList.add('is-valid')
+							pwd_cf.classList.remove('is-invalid')
+							pwd_cf.classList.add('is-valid')
+							Array.prototype.filter.call(pwd_m_fbs,function(pwd_m_fb){
+								pwd_m_fb.classList.remove('d-block')
+							})
+							invalid=false
+						}
+						if(pwd_o.value!=''){
+							c_name.classList.remove('is-invalid')
+							c_name.classList.add('is-valid')
+							c_name_fb.classList.remove('d-block')
+							invalid=false
+						}
+						//form.classList.add('was-validated')
+					},false)
+				})
+			},false)
+		}())
+		function empty_url(){
+			$("#citizen_photo").val(null);
+			$('#citizen_photo_preview').removeAttr('src');
+		}
+		function get_form_data($form){
+			var unindexed_array=$form.serializeArray();
+			var indexed_array={};
+			$.map(unindexed_array,function(n,i){
+				if(n['value']!=''&&n['value']!=null)
+					indexed_array[n['name']]=n['value'];
+			});
+			return indexed_array;
+		}
+		function policy_toggle(){
+			$("#modal_term_and_policy").modal({
+				backdrop:"static",
+				focus:true,
+				keyboard:false,
+				show:true
+			});
+		}
+		function read_url(input){
+			if(input.files&&input.files[0]){
+				var reader=new FileReader();
+				reader.onload=function(event){
+					$('#citizen_photo_preview').attr('src',event.target.result);
+				}
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
+		$(function(){
+			// $("form").on("submit",function(event){
+			// 	event.preventDefault();
+			// 	$('button[type="submit"] .far').removeClass('fa-check-circle').addClass('fa-spinner');
+			// 	$(".alert-message").html(null);
+			// 	$(".alert").removeClass("d-none").addClass("d-block").removeClass("alert-danger").removeClass("alert-success");
+			// 	if(invalid==false){
+			// 		$('[name="citizen_telephone"]').val($('[name="citizen_phone_number"]').val());
+			// 		$('[name="citizen_home_addr"]').val($('[name="citizen_address"]').val());
+			// 		var $form=$(this);
+			// 		var jd=get_form_data($form);
+			// 		$.ajax({
+			// 			contentType:"application/json;charset=utf-8",
+			// 			data:JSON.stringify(jd),
+			// 			dataType:"json",
+			// 			headers:{Authorization:"bXlabkZsMWZXVFhDK2NsMWgvMm9GZz09"},
+			// 			method:"POST",
+			// 			url:"https://203.170.193.91/191ws/V2/subScribe",
+			// 		}).done(function(msg){
+			// 			if(msg.status==0){
+			// 				$(".alert").removeClass("alert-danger").addClass("alert-success");
+			// 				$(".alert-message").html("สมัครใช้งานเสร็จเรียบร้อยแล้ว");
+			// 			}
+			// 			else{
+			// 				$(".alert").removeClass("alert-success").addClass("alert-danger");
+			// 				$(".alert-message").html("สมัครใช้งานไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+			// 			}
+			// 		}).fail(function(jqXHR,textStatus){
+			// 			$(".alert").removeClass("alert-success").addClass("alert-danger");
+			// 			$(".alert-message").html("สมัครใช้งานไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+			// 		}).always(function(){
+			// 			window.scrollTo(0,0);
+			// 			$('button[type="submit"] .far').addClass('fa-check-circle').removeClass('fa-spinner');
+			// 			$("#modal_confirm").modal("hide");
+			// 		});
+			// 	}
+			// });
+			$('[data-toggle="collapse"]').on("click",function(){
+				$(this).find("svg").toggleClass("fa-minus fa-plus");
+			});
+			$("#chk_term_and_policy").on("change",function(){
+				if($(this).prop("checked")==true){
+					$("#btn_term_and_policy").attr("disabled",false).removeClass("disabled");
+				}
+				else if($(this).prop("checked")==false){
+					$("#btn_term_and_policy").attr("disabled",true).addClass("disabled");
+				}
+			});
+			$("#citizen_photo").change(function(){
+				read_url(this);
+			});
+			$(".datetimepicker.left.bottom").datetimepicker({
+				format:"DD/MM/YYYY",
+				useCurrent:false,
+				widgetPositioning:{
+					horizontal:"left",
+					vertical:"bottom",
+				},
+			});
+			$(".datetimepicker.left.top").datetimepicker({
+				format:"DD/MM/YYYY",
+				useCurrent:false,
+				widgetPositioning:{
+					horizontal:"left",
+					vertical:"top",
+				},
+			});
+			$(".datetimepicker").on('keydown keypress keyup',function(event){
+				event.preventDefault();
+			});
+		});
+		// $(window).load(function(){
+		// 	$('input[type="checkbox"]').trigger("change");
+		// 	$('input[type="radio"]').trigger("change");
+		// });
+	</script>
+</body>
+</html>

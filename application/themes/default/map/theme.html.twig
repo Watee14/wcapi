@@ -1,0 +1,90 @@
+{#
+ #-----------------------------------------------------------------------
+ # EDITOR 	: Apiwat Rodchuajeen (P'JANE), Wisarud Techa (CHAMP)
+ # CONTACT 	: +66858655102, wisarud_t@callvoice.co.th
+ # DATE 	: 07-05-2018
+ #-----------------------------------------------------------------------
+ #} {% if el is defined and el is not empty and el == TRUE %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{#{{MAPTYPE == 2 ? 'MappointAsia' : 'Longdo'}}#}แผนที่</title>
+	<link href="{{base_url()}}assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href="{{base_url()}}assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="{{base_url()}}assets/css/style-metro.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+	<link href="{{base_url()}}assets/css/style.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+	<link href="{{base_url()}}assets/css/style-responsive.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+	<link href="{{base_url()}}assets/css/themes/light.css{{VERSIONING}}" rel="stylesheet" type="text/css" id="style_color"> {% if MAPTYPE == 2 %}
+	<link href="{{base_url()}}assets/plugins/openlayers/css/ol.css" rel="stylesheet" type="text/css"> {% elseif MAPTYPE == 3 %}
+	<link href="{{base_url()}}assets/plugins/map/longdo/css/style.css" rel="stylesheet" type="text/css">
+	<link href="{{base_url()}}assets/plugins/map/longdo/css/jquery-ui.css" rel="stylesheet" type="text/css"> {% endif %}
+	<link href="{{base_url()}}assets/css/style-custom.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+	<link href="{{base_url()}}assets/css/form-wizard.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+</head>
+<body> {% endif %}
+{% if fn == 'case' or fn == 'dispatch' or fn == 'case-status' or fn == 'case-monitor-a' or fn == 'case-monitor-b' or fn == 'case-monitor-c' or MAPTYPE == 3 %}
+	{% if MAPTYPE == 2 %}
+		{% if fn == 'case' %}
+			<a class="btn btn-sm" onclick="resetData()" role="button">Reset</a>
+		{% elseif fn == 'dispatch' or fn == 'case-status' or fn == 'case-monitor-a' or fn == 'case-monitor-b' or fn == 'case-monitor-c' %}
+			<a class="btn btn-sm" onclick="getCaseStatus()" role="button">Get Data</a>
+		{% endif %}
+	{% elseif MAPTYPE == 3 %}
+		{% if (fn == 'case' or fn == 'plan-create') and mb != TRUE %}
+			<div style="left:50%;position:absolute">
+				<div id="filters" style="height:auto;left:-50%;margin:5px;position:relative;width:auto;z-index:256">
+					{% if fn == 'case' %} {#
+						Search: <input type="text" id="q" onkeyup="searchLocation()"> #}
+						<div class="form-inline">
+							<div class="form-group" style="margin-bottom:0!important">
+								<label class="control-label" style="margin-top:0;margin-bottom:5px">
+									<span class="glyphicon glyphicon-map-marker small"></span>
+									<span class="small">ค้นหาสถานที่:</span>
+								</label>
+								<div class="input-group">
+									<input type="text" id="q" class="form-control input-sm" placeholder="ใส่ชื่อสถานที่ หรือชื่อถนน" onkeyup="searchLocation()" style="font-size:12px!important;margin-top:0">
+									<a class="glyphicon glyphicon-remove form-control-feedback text-muted small" aria-hidden="true" role="button" onclick="$('#q').val(null);$('#q').focus();" style="pointer-events:auto;right:43px;top:0!important;z-index:1000" title="ล้างข้อมูล"></a>
+									<a class="input-group-addon btn blue" role="button" onclick="searchLocation()" style="border:0!important">
+										<span class="glyphicon glyphicon-search small"></span>
+									</a>
+								</div>
+							</div>
+						</div>
+					{% elseif fn == 'plan-create' %}
+						<a onclick="saveData()" role="button">Save Data</a>
+					{% endif %}
+				</div>
+			</div>
+		{% endif %}
+	{% endif %}
+	{% if MAPTYPE == 1 or MAPTYPE == 2 or (MAPTYPE == 3 and fn != 'case-monitor-a' and fn != 'case-monitor-c') %}
+		<div id="desc"{% if MAPTYPE == 3 and fn != 'tracking' %} style="display:none"{% endif %}></div>
+	{% endif %}
+{% elseif fn == 'plan-create' or fn == 'plan-view' or fn == 'tracking' %}
+	{% if MAPTYPE == 2 %}
+		{% if fn == 'plan-create' %}
+			<a class="btn btn-sm" onclick="resetline()" role="button">Reset</a>
+		{% endif %}
+		{% if fn == 'plan-create' or fn == 'tracking' %}
+			<a class="btn btn-sm" onclick="getData()" role="button">Get Data</a>
+		{% endif %}
+		<div id="getLine"></div>
+	{% endif %}
+{% endif %}
+<div id="map" class="map"></div>
+{% if MAPTYPE == 2 %}
+	{% if fn == 'dispatch' or fn == 'case-monitor-a' or fn == 'case-monitor-b' or fn == 'case-monitor-c' %}
+		<div id="popup"></div>
+	{% endif %}
+{% endif %} {% if el is defined and el is not empty and el == TRUE %}
+	<script src="{{base_url()}}assets/plugins/jquery-1.12.4.min.js" type="text/javascript"></script> {% if MAPTYPE == 2 %}
+	<script src="{{base_url()}}assets/plugins/openlayers/js/ol.js" type="text/javascript"></script> {% elseif MAPTYPE == 3 %}
+	<script src="{{base_url()}}assets/plugins/map/longdo/js/jquery-3.1.1.js" type="text/javascript"></script>
+	<script src="{{base_url()}}assets/plugins/map/longdo/js/html2canvas.js" type="text/javascript"></script>
+	<script src="{{_SECURE}}api.longdo.com/map/?key={{MAPCONF.longdo.key}}" type="text/javascript"></script>
+	<script src="{{base_url()}}assets/plugins/map/longdo/js/jquery-ui.js" type="text/javascript"></script> {% endif %}
+	<script src="{{base_url()}}assets/js/bootstrap.min.js" type="text/javascript"></script>
+	{% include 'map/api.html.twig' %}
+</body>
+</html> {% endif %}

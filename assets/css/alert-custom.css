@@ -1,0 +1,24 @@
+﻿.modal-dialog-error .modal-header { background-color: #d2322d; }
+
+.modal-dialog-error .modal-header .modal-title { color: #ffffff; }
+
+.modal-dialog-error .modal-header h4 {
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+/*.modal-dialog-info .modal-header { background-color: #eeeeee; }*/
+.modal-dialog-info .modal-header h4 {
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+/*.modal-dialog-confirm .modal-header { background-color: #333333; }*/
+.modal-dialog-confirm .modal-header h4 {
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+/*.modal-dialog-error .modal-header h4,
+.modal-dialog-info .modal-header h4,
+.modal-dialog-confirm .modal-header h4 { padding: 5px; }*/

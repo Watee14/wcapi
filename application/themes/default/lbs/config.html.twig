@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Hexagon config</title>
+	{% include 'lbs/style.html.twig' %}
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/select2-4.0.13/dist/css/select2.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/select2-bootstrap4-theme/dist/select2-bootstrap4.min.css">
+	<style type="text/css">
+		body{height:100%;margin:0}
+		[disabled]{cursor:not-allowed}
+		.modal-static.fade{transition:opacity 0s}
+		.select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice{float:none;margin-right:0}
+	</style>
+</head>
+<body>
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xl">
+					<div class="row">
+						<div class="col">
+							<div class="form-group mt-0 mb-2">
+								<div class="clearfix">
+									<div class="float-left">
+										<h5 class="h5 form-text user-select-none">เงื่อนไขการวิเคราะห์เหตุวงกว้าง</h5>
+									</div>
+									<div class="float-right">
+										{% include 'lbs/navigation.html.twig' %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12 col-md-12 col-lg-6 col-xl-9">
+							<div class="form-group mt-0 mb-3">
+								<div class="form-row">
+									<div class="col">
+										<div class="clearfix">
+											<div class="float-left">
+												<button type="button" id="btn_new" class="btn btn-secondary">
+													<i class="fas fa-plus"></i>
+													<span>New</span>
+												</button>
+											</div>
+											<div class="float-right">
+												<button type="button" id="btn_reload" class="btn btn-secondary">
+													<i class="fas fa-sync-alt"></i>
+													<span>Reset</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group mt-0 mb-3">
+								<div class="form-row">
+									<div class="col">
+										<select id="eventTypeGrp_id" class="form-control">
+											<option readonly></option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="form-group mt-0 mb-3">
+								<div class="form-row">
+									<div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+										<label for="eventGroup_Code" class="mt-0 mb-1 user-select-none">รหัสเหตุวงกว้าง: </label>
+										<select id="eventGroup_Code" name="eventGroup_Code" class="form-control">
+											<option readonly></option>
+										</select>
+									</div>
+									<div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+										<label for="eventGroup" class="mt-0 mb-1 user-select-none">ชื่อเหตุวงกว้าง: </label>
+										<input type="text" id="eventGroup" name="eventGroup" class="form-control mt-0 mb-0" placeholder="ระบุชื่อกลุ่มประเภทเหตุ">
+									</div>
+								</div>
+							</div>
+							<div class="form-group mt-0 mb-3">
+								<div class="form-row">
+									<div class="col">
+										<label for="eventType" class="mt-0 mb-1 user-select-none">เงื่อนไขประเภทเหตุ: </label>
+										<select id="eventType" name="eventType" class="form-control" multiple></select>
+									</div>
+								</div>
+							</div>
+							<div class="form-group mt-0 mb-0">
+								<div class="form-row">
+									<div class="col">
+										<input type="hidden" id="id" name="id">
+										<div class="clearfix">
+											<div class="float-left">
+												<button type="button" id="btn_add" class="btn btn-primary mt-0 mb-0 d-none" data-toggle="modal" data-target="#modal_add">
+													<span>Add</span>
+												</button>
+												<button type="button" id="btn_update" class="btn btn-primary mt-0 mb-0 d-none" data-toggle="modal" data-target="#modal_update">
+													<span>Update</span>
+												</button>
+											</div>
+											<div class="float-right">
+												<button type="button" id="btn_delete" class="btn btn-danger mt-0 mb-0 d-none" data-toggle="modal" data-target="#modal_delete">
+													<span>Delete</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-12 col-md-12 col-lg-6 col-xl-3 border-left">
+							<strong class="mt-0 mb-0 user-select-none">เงื่อนไขเหตุวงกว้าง</strong>
+							<div style="height:2px"></div>
+							<div class="form-group mt-0 mb-3">
+								<div class="form-row">
+									<div class="col">
+										<label for="HEX_DISTANCE" class="mt-0 mb-1 user-select-none">ระยะห่างระหว่างเหตุ (กม.): </label>
+										<input type="number" id="HEX_DISTANCE" name="HEX_DISTANCE" class="form-control mt-0 mb-0" placeholder="Enter distance" min="0">
+									</div>
+								</div>
+							</div>
+							<div class="form-group mt-0 mb-3">
+								<div class="form-row">
+									<div class="col">
+										<label for="HEX_BACKWARD_TIME" class="mt-0 mb-1 user-select-none">อยู่ในช่วงเวลา (นาที): </label>
+										<input type="number" id="HEX_BACKWARD_TIME" name="HEX_BACKWARD_TIME" class="form-control mt-0 mb-0" placeholder="Enter backward time" min="0">
+									</div>
+								</div>
+							</div>
+							<hr>
+							<div class="form-group mt-0 mb-3">
+								<strong class="mt-0 mb-0 user-select-none">วิเคราะห์เหตุแบบประเภทกลุ่ม</strong>
+								<div class="form-row">
+									<div class="col">
+										<label for="HEX_MAX_EVENT_CROSS" class="mt-0 mb-1 user-select-none">มีประเภทเหตุอย่างน้อย: </label>
+										<input type="number" id="HEX_MAX_EVENT_CROSS" name="HEX_MAX_EVENT_CROSS" class="form-control mt-0 mb-0" placeholder="Enter max event cross" min="0">
+									</div>
+								</div>
+							</div>
+							<div class="form-group mt-0 mb-3">
+								<div class="form-row">
+									<div class="col">
+										<label for="HEX_MAX_EVENT_CROSS_COUNT" class="mt-0 mb-1 user-select-none">จำนวนเหตุ: </label>
+										<input type="number" id="HEX_MAX_EVENT_CROSS_COUNT" name="HEX_MAX_EVENT_CROSS_COUNT" class="form-control mt-0 mb-0" placeholder="Enter max event cross count" min="0">
+									</div>
+								</div>
+							</div>
+							<hr>
+							<div class="form-group mt-0 mb-3">
+								<strong class="mt-0 mb-0 user-select-none">วิเคราะห์เหตุแบบประเภทเดี่ยว</strong>
+								<div class="form-row">
+									<div class="col">
+										<label for="HEX_MAX_EVENT_TYPE" class="mt-0 mb-1 user-select-none">จำนวนเหตุ: </label>
+										<input type="number" id="HEX_MAX_EVENT_TYPE" name="HEX_MAX_EVENT_TYPE" class="form-control mt-0 mb-0" placeholder="Enter max event type" min="0">
+									</div>
+								</div>
+							</div>
+							<div class="form-group mt-0 mb-0">
+								<div class="form-row">
+									<div class="col">
+										<div class="clearfix">
+											<div class="float-right">
+												<button type="button" id="btn_update_global" class="btn btn-info mt-0 mb-0" data-toggle="modal" data-target="#modal_update_global">
+													<span>Update</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div style="height:2px"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="position-relative" aria-live="polite" aria-atomic="true">
+				<div id="response_msg" class="position-fixed ml-3 mb-3" style="left:0;bottom:0"></div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_add" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<h5 class="modal-title text-white">Confirm adding</h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group mb-0">
+						<div class="clearfix">
+							<div class="float-left">
+								<button type="button" class="btn btn-secondary mt-0 mb-0" data-dismiss="modal">
+									<i class="fas fa-times"></i>
+									<span>Cancel</span>
+								</button>
+							</div>
+							<div class="float-right">
+								<button type="button" id="btn_add_confirm" class="btn btn-success mt-0 mb-0">
+									<i class="fas fa-check"></i>
+									<span>Confirm</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_update" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<h5 class="modal-title text-white">Confirm updating</h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group mb-0">
+						<div class="clearfix">
+							<div class="float-left">
+								<button type="button" class="btn btn-secondary mt-0 mb-0" data-dismiss="modal">
+									<i class="fas fa-times"></i>
+									<span>Cancel</span>
+								</button>
+							</div>
+							<div class="float-right">
+								<button type="button" id="btn_update_confirm" class="btn btn-success mt-0 mb-0">
+									<i class="fas fa-check"></i>
+									<span>Confirm</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_delete" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-danger">
+					<h5 class="modal-title text-white">Confirm deleting</h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group mb-0">
+						<div class="clearfix">
+							<div class="float-left">
+								<button type="button" class="btn btn-secondary mt-0 mb-0" data-dismiss="modal">
+									<i class="fas fa-times"></i>
+									<span>Cancel</span>
+								</button>
+							</div>
+							<div class="float-right">
+								<button type="button" id="btn_delete_confirm" class="btn btn-success mt-0 mb-0">
+									<i class="fas fa-check"></i>
+									<span>Confirm</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_update_global" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<h5 class="modal-title text-white">Confirm updating</h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group mb-0">
+						<div class="clearfix">
+							<div class="float-left">
+								<button type="button" class="btn btn-secondary mt-0 mb-0" data-dismiss="modal">
+									<i class="fas fa-times"></i>
+									<span>Cancel</span>
+								</button>
+							</div>
+							<div class="float-right">
+								<button type="button" id="btn_update_global_confirm" class="btn btn-success mt-0 mb-0">
+									<i class="fas fa-check"></i>
+									<span>Confirm</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/select2-4.0.13/dist/js/select2.full.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			$('#eventTypeGrp_id').select2({
+				placeholder:"หรือเลือกเงื่อนไขในรายการเพื่อแก้ไข/ลบ",
+				theme:'bootstrap4',
+				width:'100%',
+			});
+			$("#eventTypeGrp_id").on('change',function(){
+				$("#response_msg").html(null);
+				$('#id').val($(this).find('option:selected').attr('data-id'));
+				$('#eventGroup_Code').val($(this).val()).trigger('change');
+				$('#eventGroup').val($(this).find('option:selected').attr('data-eventgroup'));
+				var data_event_type=$(this).find('option:selected').attr('data-eventtype');
+				if(data_event_type!=undefined){
+					var selected_values=data_event_type.split(',');
+					$('#eventType').val(selected_values).trigger('change');
+				}
+				else{
+					$('#eventType').val(null).trigger('change');
+				}
+				$('#btn_add').addClass('d-none').removeClass('d-inline-block');
+				$('#btn_update').removeClass('d-none').addClass('d-inline-block');
+				$('#btn_delete').removeClass('d-none').addClass('d-inline-block');
+				$('#eventGroup_Code').attr('disabled',false).removeClass('disabled');
+				$('#eventGroup').attr('disabled',false).removeClass('disabled');
+				$('#eventType').attr('disabled',false).removeClass('disabled');
+			});
+			$("#eventGroup_Code").on('change',function(){
+				$("#eventGroup").val($(this).find("option:selected").attr("data-desc"));
+			});
+			$("#btn_reload").on('click',function(){
+				event_reload();
+			});
+			$("#btn_new").on('click',function(){
+				$("#response_msg").html(null);
+				$('#eventTypeGrp_id').val(null).trigger('change');
+				$('#id').val(null);
+				$('#eventGroup_Code').val(null).trigger('change');
+				$('#eventGroup_Code').focus();
+				$('#eventGroup').val(null).trigger('change');
+				$('#eventType').val(null).trigger('change');
+				$('#btn_add').removeClass('d-none').addClass('d-inline-block');
+				$('#btn_update').addClass('d-none').removeClass('d-inline-block');
+				$('#btn_delete').addClass('d-none').removeClass('d-inline-block');
+				$('#eventGroup_Code').attr('disabled',false).removeClass('disabled');
+				$('#eventGroup').attr('disabled',false).removeClass('disabled');
+				$('#eventType').attr('disabled',false).removeClass('disabled');
+			});
+			$('#eventGroup_Code').select2({
+				placeholder:"เลือกประเภทเหตุ",
+				theme:'bootstrap4',
+				width:'100%',
+			});
+			$('#eventType').select2({
+				maximumSelectionLength:70,
+				placeholder:"เลือกกลุ่มประเภทเหตุ",
+				theme:'bootstrap4',
+				width:'100%',
+			});
+			$("#btn_add_confirm").on('click',function(){
+				disable_form();
+				$.ajax({
+					url:"{{base_url()}}lbs/config_event/post",
+					data:{
+						//id:$('#id').val(),
+						eventGroup_Code:$('#eventGroup_Code').val(),
+						eventGroup:$('#eventGroup').val(),
+						eventType:($('#eventType').val()).toString(),
+					},
+					method:"POST",
+					dataType:"html",
+					timeout:10000,
+				}).done(function(msg){
+					var responses=JSON.parse(msg);
+					$("#response_msg").html(''+
+						'<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">'+
+							'<div class="toast-header bg-'+(responses.status==1?'success':'warning')+'">'+
+								'<strong class="mr-auto text-white">Confirm adding</strong>'+
+							'</div>'+
+							'<div class="toast-body bg-light">'+
+								'<i class="fas fa-'+(responses.status==1?'check':'times')+'"></i> '+
+								'<span>'+responses.message+'</span>'+
+							'</div>'+
+						'</div>'+
+					'');
+					event_reload();
+				}).fail(function(jqXHR,textStatus){
+					alert("Request failed: "+textStatus);
+				}).always(function(){
+					enable_form();
+					$("#modal_add").modal('hide');
+				});
+			});
+			$("#btn_update_confirm").on('click',function(){
+				disable_form();
+				$.ajax({
+					url:"{{base_url()}}lbs/config_event/put",
+					data:{
+						id:$('#id').val(),
+						eventGroup_Code:$('#eventGroup_Code').val(),
+						eventGroup:$('#eventGroup').val(),
+						eventType:($('#eventType').val()).toString(),
+					},
+					method:"POST",
+					dataType:"html",
+					timeout:10000,
+				}).done(function(msg){
+					var responses=JSON.parse(msg);
+					$("#response_msg").html(''+
+						'<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">'+
+							'<div class="toast-header bg-'+(responses.status==1?'success':'warning')+'">'+
+								'<strong class="mr-auto text-white">Confirm updating</strong>'+
+							'</div>'+
+							'<div class="toast-body bg-light">'+
+								'<i class="fas fa-'+(responses.status==1?'check':'times')+'"></i> '+
+								'<span>'+responses.message+'</span>'+
+							'</div>'+
+						'</div>'+
+					'');
+					event_reload();
+				}).fail(function(jqXHR,textStatus){
+					alert("Request failed: "+textStatus);
+				}).always(function(){
+					enable_form();
+					$("#modal_update").modal('hide');
+				});
+			});
+			$("#btn_delete_confirm").on('click',function(){
+				disable_form();
+				$.ajax({
+					url:"{{base_url()}}lbs/config_event/delete",
+					data:{
+						id:$('#id').val(),
+						//eventGroup_Code:$('#eventGroup_Code').val(),
+						//eventGroup:$('#eventGroup').val(),
+						//eventType:($('#eventType').val()).toString(),
+					},
+					method:"POST",
+					dataType:"html",
+					timeout:10000,
+				}).done(function(msg){
+					var responses=JSON.parse(msg);
+					$("#response_msg").html(''+
+						'<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">'+
+							'<div class="toast-header bg-'+(responses.status==1?'success':'warning')+'">'+
+								'<strong class="mr-auto text-white">Confirm deleting</strong>'+
+							'</div>'+
+							'<div class="toast-body bg-light">'+
+								'<i class="fas fa-'+(responses.status==1?'check':'times')+'"></i> '+
+								'<span>'+responses.message+'</span>'+
+							'</div>'+
+						'</div>'+
+					'');
+					event_reload();
+				}).fail(function(jqXHR,textStatus){
+					alert("Request failed: "+textStatus);
+				}).always(function(){
+					enable_form();
+					$("#modal_delete").modal('hide');
+				});
+			});
+			$("#btn_update_global_confirm").on('click',function(){
+				disable_form();
+				$.ajax({
+					url:"{{base_url()}}lbs/config_event_global/put",
+					data:{
+						HEX_DISTANCE:$('#HEX_DISTANCE').val(),
+						HEX_MAX_EVENT_CROSS:$('#HEX_MAX_EVENT_CROSS').val(),
+						HEX_MAX_EVENT_CROSS_COUNT:$('#HEX_MAX_EVENT_CROSS_COUNT').val(),
+						HEX_MAX_EVENT_TYPE:$('#HEX_MAX_EVENT_TYPE').val(),
+						HEX_BACKWARD_TIME:$('#HEX_BACKWARD_TIME').val(),
+					},
+					method:"POST",
+					dataType:"html",
+					timeout:10000,
+				}).done(function(msg){
+					var responses=JSON.parse(msg);
+					$("#response_msg").html(''+
+						'<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">'+
+							'<div class="toast-header bg-'+(responses.status==1?'success':'warning')+'">'+
+								'<strong class="mr-auto text-white">Confirm updating</strong>'+
+							'</div>'+
+							'<div class="toast-body bg-light">'+
+								'<i class="fas fa-'+(responses.status==1?'check':'times')+'"></i> '+
+								'<span>'+responses.message+'</span>'+
+							'</div>'+
+						'</div>'+
+					'');
+					event_reload();
+				}).fail(function(jqXHR,textStatus){
+					alert("Request failed: "+textStatus);
+				}).always(function(){
+					enable_form();
+					$("#modal_update_global").modal('hide');
+				});
+			});
+		});
+		$(window).on('load',function(){
+			event_reload();
+			$("#response_msg").html(null);
+		});
+		function disable_form(){
+			$("#response_msg").html(null);
+			$('#btn_new').attr('disabled',true).addClass('disabled');
+			$('#btn_reload').attr('disabled',true).addClass('disabled');
+			$('#eventTypeGrp_id').attr('disabled',true).addClass('disabled');
+			$('#btn_add').attr('disabled',true).addClass('disabled');
+			$('#btn_update').attr('disabled',true).addClass('disabled');
+			$('#btn_delete').attr('disabled',true).addClass('disabled');
+			$('#btn_add_confirm').attr('disabled',true).addClass('disabled');
+			$('#btn_update_confirm').attr('disabled',true).addClass('disabled');
+			$('#btn_delete_confirm').attr('disabled',true).addClass('disabled');
+			$('#HEX_DISTANCE').attr('disabled',true).addClass('disabled');
+			$('#HEX_MAX_EVENT_CROSS').attr('disabled',true).addClass('disabled');
+			$('#HEX_MAX_EVENT_CROSS_COUNT').attr('disabled',true).addClass('disabled');
+			$('#HEX_MAX_EVENT_TYPE').attr('disabled',true).addClass('disabled');
+			$('#HEX_BACKWARD_TIME').attr('disabled',true).addClass('disabled');
+			$('#btn_update_global').attr('disabled',true).addClass('disabled');
+			$('#btn_update_global_confirm').attr('disabled',true).addClass('disabled');
+		}
+		function enable_form(){
+			$('#btn_new').attr('disabled',false).removeClass('disabled');
+			$('#btn_reload').attr('disabled',false).removeClass('disabled');
+			$('#eventTypeGrp_id').attr('disabled',false).removeClass('disabled');
+			$('#btn_add').attr('disabled',false).removeClass('disabled');
+			$('#btn_update').attr('disabled',false).removeClass('disabled');
+			$('#btn_delete').attr('disabled',false).removeClass('disabled');
+			$('#btn_add_confirm').attr('disabled',false).removeClass('disabled');
+			$('#btn_update_confirm').attr('disabled',false).removeClass('disabled');
+			$('#btn_delete_confirm').attr('disabled',false).removeClass('disabled');
+			$('#HEX_DISTANCE').attr('disabled',false).removeClass('disabled');
+			$('#HEX_MAX_EVENT_CROSS').attr('disabled',false).removeClass('disabled');
+			$('#HEX_MAX_EVENT_CROSS_COUNT').attr('disabled',false).removeClass('disabled');
+			$('#HEX_MAX_EVENT_TYPE').attr('disabled',false).removeClass('disabled');
+			$('#HEX_BACKWARD_TIME').attr('disabled',false).removeClass('disabled');
+			$('#btn_update_global').attr('disabled',false).removeClass('disabled');
+			$('#btn_update_global_confirm').attr('disabled',false).removeClass('disabled');
+		}
+		function event_reload(){
+			$('#eventGroup_Code').val(null).trigger('change');
+			$('#eventGroup_Code').focus();
+			$('#eventGroup').val(null);
+			$('#eventType').val(null).trigger('change');
+			$('#eventTypeGrp_id').attr('disabled',true).addClass('disabled');
+			$('#btn_reload').attr('disabled',true).addClass('disabled');
+			$('#btn_new').attr('disabled',true).addClass('disabled');
+			$('#eventGroup_Code').attr('disabled',true).addClass('disabled');
+			$('#eventGroup').attr('disabled',true).addClass('disabled');
+			$('#eventType').attr('disabled',true).addClass('disabled');
+			$.ajax({
+				url:"{{base_url()}}lbs/config_event",
+				method:"GET",
+				dataType:"html",
+				timeout:10000,
+			}).done(function(msg){
+				var responses=JSON.parse(msg);
+				$('#eventTypeGrp_id').html('<option readonly></option>');
+				$(responses.eventTypeGrp).each(function(index,element){
+					$('#eventTypeGrp_id').append('<option value="'+element.eventGroup_Code+'" data-id="'+element.id+'" data-eventgroup="'+element.eventGroup+'" data-eventtype="'+element.eventType+'">'+element.eventGroup_Code+' - '+element.eventGroup+' - '+element.eventType+'</option>');
+				});
+				$('#eventGroup_Code').html('<option readonly></option>');
+				$('#eventType').html(null);
+				$(responses.hex_TypeSubtypes).each(function(index,element){
+					$('#eventGroup_Code').append('<option value="'+element.typeCode+'" data-desc="'+element.description+'">'+element.typeCode+' - '+element.description+'</option>');
+					$('#eventType').append('<option value="'+element.typeCode+'">'+element.typeCode+' - '+element.description+'</option>');
+				});
+				$(responses.config).each(function(index,element){
+					$('#'+element.id).val(element.value);
+				});
+			}).fail(function(jqXHR,textStatus){
+				alert("Request failed: "+textStatus);
+			}).always(function(){
+				$('#eventTypeGrp_id').attr('disabled',false).removeClass('disabled');
+				$('#btn_reload').attr('disabled',false).removeClass('disabled');
+				$('#btn_new').attr('disabled',false).removeClass('disabled');
+				$('#btn_add').addClass('d-none').removeClass('d-inline-block');
+				$('#btn_update').addClass('d-none').removeClass('d-inline-block');
+				$('#btn_delete').addClass('d-none').removeClass('d-inline-block');
+			});
+		}
+	</script>
+</body>
+</html>

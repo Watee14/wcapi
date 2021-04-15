@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>รายการแจ้งเตือน</title>
+	{% include 'lbs/style_alert.html.twig' %}
+</head>
+<body>
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<blockquote class="blockquote">
+				<h2 class="mb-0">รายการแจ้งเตือน</h2>
+			</blockquote>
+			<hr>
+			<div class="row">
+				<div class="col-12">
+					<a href="{{base_url()}}alert/alert" class="btn btn-primary" style="margin-bottom:15px;"><i class="fas fa-plus"></i> เพิ่มรายการ</a>
+					<a href="{{base_url()}}alert/approve_alert" class="btn btn-primary" style="margin-bottom:15px;"><i class="fas fa-user-check"></i> อนุมัติสิทธิ์</a>
+					<table id="table_alert" class="table table-striped table-bordered" style="width:100%">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>หัวข้อที่แจ้งเตือน</th>
+								<th>ช่วงเวลาที่แจ้งเตือน</th>
+								<th>สถานะ</th>
+								<th>การอนุมัติ</th>
+								<th>บัญชีที่สร้าง</th>
+								<th>ตัวเลือก</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for res in data %}
+								<tr>
+									<td>{{loop.index}}</td>
+									<td>{{res.Title}}</td>
+									<td>{{res.StartDate|date("d/m/Y H:i")}} น. - {{res.EndDate|date("d/m/Y H:i")}} น.</td>
+									<td>
+										{% if res.IsActive == 1 %}
+											เปิด
+										{% else %}
+											ปิด
+										{% endif %}
+									</td>
+									<td>
+										{% if res.IsApprove == 0 %}
+											<i class="fas fa-times" style="color:#6c757d;"></i> รออนุมัติ
+										{% else %}
+											<i class="fas fa-check" style="color:#28a745;"></i> อนุมัติแล้ว
+										{% endif %}
+									</td>
+									<td>{{res.CreateBy}}</td>
+									<td align="center">
+										<a href="{{base_url()}}alert/detail_alert/{{res.ID}}" style="color:#28a745;" data-toggle="tooltip" title="รายละเอียด"><i class="fas fa-search"></i></a>
+										<a href="{{base_url()}}alert/edit_alert/{{res.ID}}" style="color:#ffc107;margin-left:10px;margin-right:10px;" data-toggle="tooltip" title="แก้ไข"><i class="fas fa-edit"></i></a>
+										<span data-toggle="modal" data-target=".delete_modal" id="{{res.ID}}" onclick="delFunction(this.id)">
+											<a href="#" style="color:#dc3545;" data-toggle="tooltip" title="ลบ"><i class="fas fa-trash"></i></a>
+										</span>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+    				</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade delete_modal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="deleteModalLabel">ลบรายการแจ้งเตือน</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" name="id_cam" id="id_cam">
+					คุณต้องการลบรายการแจ้งเตือนนี้ใช่หรือไม่?
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+					<a href="#" onclick="condelFunction()" class="btn btn-primary">ยืนยัน</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		function delFunction(id) {
+			$("#id_cam").val( id );
+		}
+
+		function condelFunction() {
+			var id = document.getElementById("id_cam").value;
+			var url = '{{base_url()}}alert/del_alert/'+id;
+			location.href = url;
+		}
+	</script>
+	{% include 'lbs/script_alert.html.twig' %}
+</body>
+</html>

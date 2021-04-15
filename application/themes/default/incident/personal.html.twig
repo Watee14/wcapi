@@ -1,0 +1,176 @@
+{#
+ #-----------------------------------------------------------------------
+ # EDITOR 	: Wisarud Techa (CHAMP)
+ # CONTACT 	: +66858655102, wisarud_t@callvoice.co.th
+ # DATE 	: 26-06-2018
+ #-----------------------------------------------------------------------
+ #}
+<div id="form_personal">
+	<div class="form-horizontal{{avsh is defined ? ' horizontal-avsh' : ''}}">
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>กลุ่มบุคคล:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_group in personal_groups if personal_groups is defined and personal_groups is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_group.personal_group_code == query_value.personal.personal_group_code ? ' active' : ''}}"><input type="radio" name="personal_group" value="{{personal_group.personal_group_code}}"{% if personal_group.personal_group_code == query_value.personal.personal_group_code %} checked{% endif %}><span>{{personal_group.personal_group_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<hr class="hr-sm">
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>ชื่อ-นามสกุล:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}"> {% if avsh is not defined %}
+				<div class="input-group"> {% endif %}
+					<input type="text" class="form-control input-sm" id="personal_name" value="{{query_value.personal.personal_name}}" autocomplete="off" placeholder="ระบุชื่อ-นามสกุล"> {% if avsh is not defined %}
+					<a role="button" class="input-group-addon" data-toggle="modal" data-target="#modal_additional_persons">
+						<span class="glyphicon glyphicon-search" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="ค้นหา"></span>
+					</a>
+					<a role="button" class="input-group-addon" data-toggle="tooltip" data-placement="bottom" id="additional_persons_add" title="เพิ่ม">
+						<i class="fa fa-plus" aria-hidden="true"></i>
+					</a>
+				</div>
+				<span class="help-block small" style="display:none"><span class="text-danger">ระบุกลุ่มบุคคล และข้อมูลลักษณะบุคคล</span></span> {% endif %}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>เพศ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_sex in personal_sexes if personal_sexes is defined and personal_sexes is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_sex.personal_sex_code == query_value.personal.personal_sex_code ? ' active' : ''}}"><input type="radio" name="personal_sex" value="{{personal_sex.personal_sex_code}}"{% if personal_sex.personal_sex_code == query_value.personal.personal_sex_code %} checked{% endif %}><span>{{personal_sex.personal_sex_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>สีผิว:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_skin in personal_skins if personal_skins is defined and personal_skins is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_skin.personal_skin_code == query_value.personal.personal_skin_code ? ' active' : ''}}"><input type="radio" name="personal_skin" value="{{personal_skin.personal_skin_code}}"{% if personal_skin.personal_skin_code == query_value.personal.personal_skin_code %} checked{% endif %}><span>{{personal_skin.personal_skin_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>อายุ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_age in personal_ages if personal_ages is defined and personal_ages is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_age.personal_age_code == query_value.personal.personal_age_code ? ' active' : ''}}"><input type="radio" name="personal_age" value="{{personal_age.personal_age_code}}"{% if personal_age.personal_age_code == query_value.personal.personal_age_code %} checked{% endif %}><span>{{personal_age.personal_age_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>ทรงผม:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_hair in personal_hairs if personal_hairs is defined and personal_hairs is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_hair.personal_hair_code == query_value.personal.personal_hair_code ? ' active' : ''}}"><input type="radio" name="personal_hair" value="{{personal_hair.personal_hair_code}}"{% if personal_hair.personal_hair_code == query_value.personal.personal_hair_code %} checked{% endif %}><span>{{personal_hair.personal_hair_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>รูปร่าง:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_shape in personal_shapes if personal_shapes is defined and personal_shapes is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_shape.personal_shape_code == query_value.personal.personal_shape_code ? ' active' : ''}}"><input type="radio" name="personal_shape" value="{{personal_shape.personal_shape_code}}"{% if personal_shape.personal_shape_code == query_value.personal.personal_shape_code %} checked{% endif %}><span>{{personal_shape.personal_shape_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>ส่วนสูง:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_tall in personal_talls if personal_talls is defined and personal_talls is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_tall.personal_tall_code == query_value.personal.personal_tall_code ? ' active' : ''}}"><input type="radio" name="personal_tall" value="{{personal_tall.personal_tall_code}}"{% if personal_tall.personal_tall_code == query_value.personal.personal_tall_code %} checked{% endif %}><span>{{personal_tall.personal_tall_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>เชื้อชาติ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-6' : 'col-md-12 col-lg-12'}}">
+				<div class="btn-group" data-toggle="buttons">
+					{% for personal_nationality in personal_nationalities if personal_nationalities is defined and personal_nationalities is not empty %}
+						<label class="btn btn-sm font-md btn-default btn-slt{{personal_nationality.personal_nationality_code == query_value.personal.personal_nationality_code ? ' active' : ''}}"><input type="radio" name="personal_nationality" value="{{personal_nationality.personal_nationality_code}}"{% if personal_nationality.personal_nationality_code == query_value.personal.personal_nationality_code %} checked{% endif %}><span>{{personal_nationality.personal_nationality_name}}</span></label>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="col-xs-12 col-xs-offset-0 col-sm-12 col-sm-offset-0 {{is_mobile != TRUE ? 'col-md-4 col-md-offset-2 col-lg-5 col-lg-offset-0' : 'col-md-12 col-md-offset-0 col-lg-12 col-lg-offset-0'}}">
+				<input type="text" class="form-control input-sm" id="personal_nationality_other" value="{{query_value.personal.personal_nationality_other}}" autocomplete="off" placeholder="อื่นๆ: ระบุเชื้อชาติ">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>รอยสัก:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<select class="form-control input-sm" id="personal_tattoo_code">
+					<option readonly></option>
+					{% for personal_tattoo in personal_tattoos if personal_tattoos is defined and personal_tattoos is not empty %}
+						<option value="{{personal_tattoo.personal_tattoo_code}}"{% if personal_tattoo.personal_tattoo_code == query_value.personal.personal_tattoo_code %} selected{% endif %}>{{personal_tattoo.personal_tattoo_name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<label class="col-xs-12 col-xs-offset-0 col-sm-12 col-sm-offset-0 {{is_mobile != TRUE ? 'col-md-1 col-md-offset-1 col-lg-1 col-lg-offset-0' : 'col-md-12 col-md-offset-0 col-lg-12 col-lg-offset-0'}} control-label label-sm"><b>ลักษณะ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<input type="text" class="form-control input-sm" id="personal_tattoo_style" value="{{query_value.personal.personal_tattoo_style}}" autocomplete="off" placeholder="ระบุลักษณะรอยสัก">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>แผลเป็น:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<select class="form-control input-sm" id="personal_scar_code">
+					<option readonly></option>
+					{% for personal_scar in personal_scars if personal_scars is defined and personal_scars is not empty %}
+						<option value="{{personal_scar.personal_scar_code}}"{% if personal_scar.personal_scar_code == query_value.personal.personal_scar_code %} selected{% endif %}>{{personal_scar.personal_scar_name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<label class="col-xs-12 col-xs-offset-0 col-sm-12 col-sm-offset-0 {{is_mobile != TRUE ? 'col-md-1 col-md-offset-1 col-lg-1 col-lg-offset-0' : 'col-md-12 col-md-offset-0 col-lg-12 col-lg-offset-0'}} control-label label-sm"><b>ลักษณะ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<input type="text" class="form-control input-sm" id="personal_scar_style" value="{{query_value.personal.personal_scar_style}}" autocomplete="off" placeholder="ระบุลักษณะแผลเป็น">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>พิการ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<select class="form-control input-sm" id="personal_defective_code">
+					<option readonly></option>
+					{% for personal_defective in personal_defectives if personal_defectives is defined and personal_defectives is not empty %}
+						<option value="{{personal_defective.personal_defective_code}}"{% if personal_defective.personal_defective_code == query_value.personal.personal_defective_code %} selected{% endif %}>{{personal_defective.personal_defective_name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<label class="col-xs-12 col-xs-offset-0 col-sm-12 col-sm-offset-0 {{is_mobile != TRUE ? 'col-md-1 col-md-offset-1 col-lg-1 col-lg-offset-0' : 'col-md-12 col-md-offset-0 col-lg-12 col-lg-offset-0'}} control-label label-sm"><b>ลักษณะ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<input type="text" class="form-control input-sm" id="personal_defective_style" value="{{query_value.personal.personal_defective_style}}" autocomplete="off" placeholder="ระบุลักษณะความพิการ">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>สำเนียง:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<select class="form-control input-sm" id="personal_accent_code">
+					<option readonly></option>
+					{% for personal_accent in personal_accents if personal_accents is defined and personal_accents is not empty %}
+						<option value="{{personal_accent.personal_accent_code}}"{% if personal_accent.personal_accent_code == query_value.personal.personal_accent_code %} selected{% endif %}>{{personal_accent.personal_accent_name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<label class="col-xs-12 col-xs-offset-0 col-sm-12 col-sm-offset-0 {{is_mobile != TRUE ? 'col-md-1 col-md-offset-1 col-lg-1 col-lg-offset-0' : 'col-md-12 col-md-offset-0 col-lg-12 col-lg-offset-0'}} control-label label-sm"><b>ลักษณะ:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-4 col-lg-5' : 'col-md-12 col-lg-12'}}">
+				<input type="text" class="form-control input-sm" id="personal_accent_style" value="{{query_value.personal.personal_accent_style}}" autocomplete="off" placeholder="ระบุลักษณะสำเนียง">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-2 col-lg-1' : 'col-md-12 col-lg-12'}} control-label label-sm"><b>รายละเอียด:</b></label>
+			<div class="col-xs-12 col-sm-12 {{is_mobile != TRUE ? 'col-md-10 col-lg-11' : 'col-md-12 col-lg-12'}}">
+				<textarea class="form-control input-sm" id="personal_detail" autocomplete="off" placeholder="ระบุรายละเอียด" rows="2">{{query_value.personal.personal_detail}}</textarea>
+			</div>
+		</div>
+	</div>
+</div>

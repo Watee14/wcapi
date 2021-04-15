@@ -1,0 +1,164 @@
+<link href="{{base_url()}}assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/plugins/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/style-metro.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/style.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/style-responsive.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/themes/light.css{{VERSIONING}}" rel="stylesheet" type="text/css" id="style_color"> {% if MAPTYPE == 2 %}
+<link href="{{base_url()}}assets/plugins/openlayers/css/ol.css" rel="stylesheet" type="text/css"> {% elseif MAPTYPE == 3 %}
+<link href="{{base_url()}}assets/plugins/map/longdo/css/style.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/plugins/map/longdo/css/jquery-ui.css" rel="stylesheet" type="text/css"> {% endif %}
+<link href="{{base_url()}}assets/css/style-custom.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<div class="container-fluid container-frame form-191">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<h3 class="page-title">บันทึกชื่อประเภท</h3>
+		</div>
+		
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="validate-alert"> </div>
+			<form>
+				<div class="row">
+					<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+						<div class="form-group">
+							<label>รหัสประเภทสถานที่:</label>
+							<input type="text" class="form-control" id="poi_type_code">
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+						<div class="form-group">
+							<label>ประเภทสถานที่:</label>
+							<input type="text" class="form-control" id="poi_type_name">
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+						<div class="form-group">
+							<label>สัญลักษณ์:</label>
+							<input type="file" class="form-control" id="map_type_icon">
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="form-group">
+							 
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="form-group">
+							<a role="button" class="btn" href="{{base_url()}}mapPoi/mapType/list">ย้อนกลับ</a>
+							<a role="button" class="btn" onclick="javascript:location.reload();">เริ่มใหม่</a>
+							<a data-toggle="modal" data-target=".record-manage" class="btn blue pull-right"  >บันทึก</a>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="modal fade record-manage modal-frame" tabindex="-1" role="dialog" aria-labelledby="record-manage-label" id="modalwindow">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+				<h4 class="modal-title" id="record-manage-label"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<div class="form-group">
+								<button class="btn pull-left" data-dismiss="modal" id="cancel">ยกเลิก</button>
+								<button class="btn green pull-right" id="save">ยืนยัน</button>
+							</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="{{base_url()}}assets/plugins/jquery-1.12.4.min.js" type="text/javascript"></script> {% if MAPTYPE == 3 %}
+<script src="{{base_url()}}assets/plugins/map/longdo/js/jquery-3.1.1.js" type="text/javascript"></script> {% endif %}
+<script src="{{base_url()}}assets/js/jquery.ui.widget.js" type="text/javascript"></script>
+<script src="{{base_url()}}assets/js/bootstrap.min.js" type="text/javascript"></script> {% if MAPTYPE == 2 %}
+<script src="{{base_url()}}assets/plugins/openlayers/js/ol.js" type="text/javascript"></script> {% elseif MAPTYPE == 3 %}
+<script src="{{base_url()}}assets/plugins/map/longdo/js/html2canvas.js" type="text/javascript"></script>
+<script src="{{_SECURE}}api.longdo.com/map/?key={{MAPCONF.longdo.key}}" type="text/javascript"></script>
+<script src="{{base_url()}}assets/plugins/map/longdo/js/jquery-ui.js" type="text/javascript"></script> {% endif %}
+<script type="text/javascript">
+
+	//$('.validate-alert').fadeOut('fast');
+	$(document).ready(function() {
+		$('.record-manage').on('show.bs.modal', function(e) {
+			$("#cancel").show();
+	    	$("#save").show();
+			$(this).find('.modal-title').html('บันทึกชื่อไม่เป็นทางการ ' + $('#poi_type_name').val());
+		});
+	});
+
+	$('#cancel').on('click', function() {
+		$('#modalwindow').modal('hide');
+	});
+ 
+
+	$('#save').on('click', function() {
+	   // var poi_type_code = $("#poi_type_code").val() ;
+	   	$("#cancel").hide();
+	    $("#save").hide();
+	    $('#record-manage-label').html( 'Loading...' );
+	    var poi_type_code = $("#poi_type_code").val() ;
+	    var poi_type_name = $("#poi_type_name").val() ;
+	    var file_data = $('#map_type_icon').prop('files')[0];   
+	    var form_data = new FormData();                  
+	    form_data.append('file', file_data);
+	    form_data.append('poi_type_name', poi_type_name);
+	    form_data.append('poi_type_code', poi_type_code);
+	    //alert(form_data);   
+	    if(  poi_type_code=='' || poi_type_name==''){
+	      	msgDialog( 'Invalid Type/name '  , 'alert-danger' );
+	      	$('#modalwindow').modal('hide');
+	      	$("#poi_type_name").prop('required',true);
+	    }       
+	    //var ds = {   "poi_type_name" : poi_type_name   }    
+	     
+	    //console.log(ds);
+	    $.ajax({
+	        url: '{{base_url()}}mapPoi/mapType_action/create/'+ encodeURI(poi_type_code)   , // point to server-side PHP script 
+	        dataType: 'text',  // what to expect back from the PHP script, if anything
+	       	cache: false,
+	        contentType: false,
+	        processData: false,
+	        data: form_data ,                         
+	        type: 'post',
+	        success: function(result){
+	            //alert(php_script_response); // display response from the PHP script, if any
+            	obj = $.parseJSON(result); 
+	            //console.log(obj['message'] ) ;
+	            //$('#record-manage-label').html( obj['message'] );
+	            $('#modalwindow').modal('hide');
+	            if(obj['status']==0){
+	            	$("#poi_type_name").val('') ;
+	            	$("#map_type_icon").val('') ;
+	            	$("#poi_type_code").val('') ;
+	            	msgDialog( obj['message']  , 'alert-success' );
+	            }else{
+	            	msgDialog( obj['message']  , 'alert-danger' );
+	            }
+	        }
+	     });
+	});
+
+
+	
+	function msgDialog(msg , typeBlog){
+		$('.validate-alert').html('' +
+			'<div class="alert alert-dismissible" role="alert">' +
+				'<a role="button" class="close" data-dismiss="alert" aria-label="Close"></a>' +
+				'<span>'+ msg +'</span>' +
+			'</div>' +
+		'');
+		$('.validate-alert').fadeIn('fast');
+		$('.validate-alert').find('.alert').addClass( typeBlog );
+		/*var myVar = setInterval(function(){ 
+			$('.validate-alert').fadeOut('fast');
+			clearInterval(myVar);
+		}, 3000);*/
+	}
+</script>  

@@ -1,0 +1,390 @@
+{#
+ #-----------------------------------------------------------------------
+ # EDITOR 	: Apiwat Rodchuajeen (P'JANE), Wisarud Techa (CHAMP)
+ # CONTACT 	: +66858655102, wisarud_t@callvoice.co.th
+ # DATE 	: 22-05-2018
+ #-----------------------------------------------------------------------
+ #} {% if is_internal is not defined %}
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-metro.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-responsive.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/themes/light.css{{VERSIONING}}" id="style_color">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/map/longdo/css/style.css">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/map/longdo/css/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-custom.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/toggle/bootstrap-toggle.min.css{{VERSIONING}}">
+<style type="text/css"></style> {% endif %}
+<style type="text/css">
+#desc {
+    position: fixed;
+    right: 0;
+    margin-top: 50px;
+    margin-right: 10px;
+
+    z-index: 1;
+    width: 300px;
+    height: 350px;
+    background-color: #ffffff;
+    overflow: auto;
+    font-size: 12px ;
+}
+#desc table{ 
+    font-size: 12px ;
+    margin-left: 10px;
+}
+#filters {
+    position:fixed ;
+    z-index: 1;
+    padding: 5px;
+    margin: 5px auto;
+    margin-left: 30%;
+    width: 300px;
+    height: 30px;
+    background-color: #ffffff;
+   
+}
+
+</style>
+
+<div class="container-fluid container-frame form-191">
+	<div class="row">
+		<div id="filters"> <button onclick="$('#desc').show();">Show</button> <button onclick="$('#desc').hide();">Hide</button>
+ 		</div> 
+		 
+		<div id="desc">
+		    สถานีตำรวจ : <select id="pStation">  </select> <br>
+		    พิกัด : <input type="text" id="ll_P">
+		    <table width="95%" border="0">
+		      <tr><td colspan="2"><hr></td></tr>
+		      <tr>
+		        <td colspan="2">Information</td>
+		      </tr>
+		      <tr><td colspan="2"><hr></td></tr>
+		      <tr>
+		        <td style="width:30%">area_code :</td>
+		        <td><input type="text" id="area_code" readonly></td>
+		      </tr>
+		      <tr>
+		        <td>name :</td>
+		        <td><input type="text" id="name" readonly></td>
+		      </tr>
+		      <tr>
+		        <td>color : </td>
+		        <td><input type="color" id="colorP"> <input type="text" id="color" maxlength="8" size="8" ></td>
+		      </tr>
+		      <tr>
+		        <td>latlng : </td>
+		        <td><textarea id="latlng" rows="5" cols="24" ></textarea></td>
+		      </tr>
+		      <tr><td colspan="2"><hr></td></tr>
+		      <tr>
+		        <td colspan="2"><button onclick="saveArea();">Save</button></td>
+		      </tr>
+		    </table>
+		   
+		  </div> 
+		<div id="map"></div>
+	</div>
+</div>
+
+
+<script type="text/javascript" src="{{base_url()}}assets/plugins/jquery-1.12.4.min.js"></script> {% if MAPTYPE == 3 %}
+<script type="text/javascript" src="{{base_url()}}assets/plugins/map/longdo/js/jquery-3.1.1.js"></script> {% endif %}
+<script type="text/javascript" src="{{base_url()}}assets/js/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="{{base_url()}}assets/js/bootstrap.min.js"></script> {% if MAPTYPE == 2 %}
+<script type="text/javascript" src="{{base_url()}}assets/plugins/openlayers/js/ol.js"></script> {% elseif MAPTYPE == 3 %}
+<script type="text/javascript" src="{{base_url()}}assets/plugins/map/longdo/js/html2canvas.js"></script>
+<script type="text/javascript" src="{{_SECURE}}api.longdo.com/map/?key={{MAPCONF.longdo.key}}"></script>
+<script type="text/javascript" src="{{base_url()}}assets/plugins/map/longdo/js/jquery-ui.js"></script> {% endif %}
+<script type="text/javascript" src="{{base_url()}}assets/toggle/bootstrap-toggle.min.js"></script> 
+<script>
+        var base_url = '{{base_url()}}';
+        var map;
+        var marker ;
+        var areaNumber=0 ;
+        var zoomArea = [] ;
+        var areaCode = [] ;
+        var areaStd = [] ;
+        
+
+        function init() {
+            // กำหนดขนาดแผนที่
+            resize();
+            window.addEventListener('resize', resize);
+
+            map = new longdo.Map({
+                layer: [
+                    longdo.Layers.GRAY,
+                    longdo.Layers.TRAFFIC
+                ],
+                zoom: 12,
+                placeholder: document.getElementById('map'),
+                lastView: false
+            });
+
+            map.Event.bind('click', function(overlay) {
+               //alert('');
+               /* clearMarker();
+
+                var lonLat = map.location(longdo.LocationMode.Pointer); 
+
+                desc = "<pre>";
+                desc += "LonLat: " + lonLat['lon'] + " , " + lonLat['lat'];
+
+                addMarker(lonLat['lon'], lonLat['lat'], '', 'marker.png');
+                markCircle(lonLat['lon'], lonLat['lat']);
+                getNearBy(lonLat);*/
+
+
+            });
+             map.Event.bind('overlayClick', function(overlay) {
+              console.log("AreaID: "+overlay.title); 
+              //console.log( overlay.location() );
+              try{
+                var dy = areaStd[ overlay.title ]  ;
+                var dx = areaCode[ overlay.title ]  ;
+                var xx = JSON.stringify( overlay.location() ) ;
+                console.log(dx);
+                $('#area_code').val(dy['area_code']);
+                $('#name').val(dy['name']);
+                $('#color').val(dy['color']);
+                $('#colorP').val("#"+dy['color']);
+                $('#latlng').val( xx ) ;
+              }catch(err){ }
+              //alert(overlay.message);
+               /* clearMarker();
+                var lonLat = map.location(longdo.LocationMode.Pointer); 
+                addMarker(lonLat['lon'], lonLat['lat'], '', 'marker.png');
+                markCircle(lonLat['lon'], lonLat['lat']);
+                getNearBy(lonLat);
+                getAddress(lonLat) ;*/
+               
+            });
+            //renderArea();
+            /*map.Event.bind('overlayChange', function(obj) {
+                  console.log( obj ) ;
+
+                  if(map.Ui.Toolbar.activeTool() == null && drawing && obj.editable) {
+
+                  if (map.getShapeType(obj) == 'Polyline' || map.getShapeType(obj) == 'Polygon') {
+                      console.log(obj);       
+                  }
+                }
+              });*/
+
+        }
+
+        function addMarker(lon, lat, desc, icon) {
+
+            //var marker1 = new longdo.Marker({ lon: lon, lat: lat });
+            marker = new longdo.Marker({
+                lon: lon,
+                lat: lat
+            }, {
+                title: desc['name'],
+                icon: {
+                    url: 'icons/' + icon  ,
+                    //offset: { x: 12, y: 45 }
+                },
+                detail: desc['detail'],
+                //visibleRange: { min: 7, max: 8 },
+                //draggable: true,
+                weight: longdo.OverlayWeight.Top
+            });
+            map.Overlays.add(marker);
+
+        }
+
+ 
+
+        function renderArea(){ 
+          $.ajax({
+              url: base_url + "assets/map/data.txt?x="+Date(),
+              //url: "xmlTojson.php" ,
+              data: {}
+          }).done(function(data) { 
+              res = data;
+              obj = $.parseJSON(res); 
+              var area = [] ; 
+              //console.log(obj);
+              $.each(obj['data'], function(key, value) { 
+                  areaStd[ value['area_code'] ] = value ;
+                  area = '';
+                  var latlon = value['latlng'].split('|');
+                  var latlon_2 = [];
+                  $.each(latlon, function(k, v) {
+                      var ll = v.split(',');
+                    
+                      //var ll2 = { lon : parseFloat(ll[1]) ,  lat  : parseFloat(ll[0]) };
+                      var ll2 = { lon : parseFloat(ll[0]) ,  lat  : parseFloat(ll[1]) };
+                      latlon_2.push(ll2);
+                  });
+                  //console.log(latlon_2);
+                  var hex = hexToRgb(value['bg_color']) ;
+                  var geom2 = new longdo.Polygon( latlon_2, 
+                    { 
+                      title: value['area_code']+"" ,
+                      //title: '' ,
+                      detail: '',
+                      label: value['name']  ,
+                      lineWidth: 0.7,
+                      lineColor: 'rgba('+ hex.r + ',' + hex.g + ','+ hex.b +', 0.8)',
+                      fillColor: 'rgba('+ hex.r + ',' + hex.g + ','+ hex.b +', 0.4)',
+                      editable: true,
+                    });
+                  //console.log(geom2);
+                  map.Overlays.add(geom2);
+                  areaNumber++;
+
+              })
+     
+
+          });
+
+          
+        }
+ 
+ 
+        $(document).ready(function () {
+            $('#q').on('autocompleteselect', function () {
+                var desc = '' ;
+                //console.log(zoomArea[this.value] );
+                var ds = zoomArea[this.value] ;
+                map.location({ lon:ds['lon'], lat:ds['lat'] }, true);
+                $.each(ds, function(key, value) {
+                  desc += key+": "+value+'<br>' ;
+                }); 
+                $('#desc').html('You selected: <br>' + desc );
+            }).change();
+        });
+
+        function searchLocation(){
+          $.ajax({
+              url: "data/search.data.php",
+              data: {"q":$("#q").val() }
+          }).done(function(data) {
+              res = data;
+              obj = $.parseJSON(res); 
+              var dx = [] ;
+              $.each(obj['data'], function(key, value) { 
+                
+                dx.push(value['name']);
+                zoomArea[value['name']] = value ;
+              })
+              //console.log(dx);
+              $( "#q" ).autocomplete({
+                source: dx
+              });
+          });
+
+          
+          
+        }
+
+        function resize() {
+            var style = document.getElementById('map').style
+            style.height = (window.innerHeight - 68) + 'px';
+            style.width = (window.innerWidth - 8) + 'px';
+        }
+
+        function hexToRgb(hex) {
+          //console.log(hex);
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+        function getPolice(){
+          $.ajax({
+              url: base_url+"information/JSONView/police_station",
+              //data: {"q":$("#q").val() }
+          }).done(function(data) {
+              //console.log(data);
+              res = data;
+              obj = $.parseJSON(res); 
+              var pStation = '<option value="" disabled selected>เลือกประเภทข้อมูล</option>';
+              $.each(obj , function(key, value) { 
+                areaCode[ value['police_station_code'] ] = value ; 
+                //dx.push(value['name']);
+                //zoomArea[value['name']] = value ;
+                var x = '';
+                if(value['police_station_lat']==''){
+                  x = 'disabled selected';
+
+                }
+                pStation += '<option value="' +  value['police_station_code'] + '" '+x+'>' +value['police_station_code'] + ' : ' + value['police_station_name'] + '</option>' ;
+              }) 
+
+              $('#pStation').html(pStation);
+              //console.log(pStation);
+ 
+          });
+
+          
+      }
+
+      $( "#pStation" ).change(function( ) {
+          var dx = areaCode[this.value]  ;
+          console.log( areaCode[this.value]  );
+          map.location({
+            lon: dx['police_station_lon'],
+            lat: dx['police_station_lat']
+          }, true);
+          map.zoom(13);
+      });
+      $( "#ll_P" ).change(function( ) {
+          var str = $('#ll_P').val().split(','); 
+          //console.log(str[0]);
+          //13.72264,100.52931
+          map.location({
+            lon: str[1],
+            lat: str[0]
+          }, true);
+          map.zoom(13);
+      });
+      $( "#colorP" ).change(function( ) {
+        var str = $('#colorP').val().replace("#", ""); 
+          $('#color').val( str ) ;
+      });
+
+      $( "#color" ).change(function( ) {
+          //var str = $('#color').val().replace("#", ""); 
+          $('#colorP').val( "#"+$('#color').val() ) ;
+      });
+
+
+      function saveArea(){
+          var dx = {} ;
+          dx['area_code'] = $('#area_code').val() ;
+          dx['name'] = $('#name').val() ;
+          dx['color'] = $('#color').val() ;
+          dx['latlng'] = $('#latlng').val() ;
+          console.log(dx);
+          if(dx['area_code']=="" || dx['name']=='' || dx['color']==''  || dx['latlng']==''){
+              alert('No Data');
+              return ;
+          }
+          $.ajax({
+            type: "POST", 
+              //url: base_url+"data/saveArea.php",
+              url: base_url+"MapPoi/saveArea",
+              data: dx,
+ 
+          }).done(function(data) {
+              console.log(data);
+              res = data;
+              obj = $.parseJSON(res); 
+              alert( obj['message'] );
+  
+          });
+      }
+
+        init();
+        renderArea();
+        getPolice(); 
+    </script>

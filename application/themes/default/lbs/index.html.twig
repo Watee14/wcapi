@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>191 POC Simulation</title>
+	{% include 'lbs/style.html.twig' %}
+	<style type="text/css"></style>
+</head>
+<body>
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col">
+					<div class="clearfix">
+						<div class="float-left">
+							<div class="list-group">
+								{% for idx in def_index if def_index is defined and def_index is not empty %}
+									<a href="{{idx.href}}" class="list-group-item list-group-item-action border-0">{{idx.text}}</a>
+								{% endfor %}
+							</div>
+						</div>
+						<div class="float-right">
+							{% include 'lbs/navigation.html.twig' %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript">
+		$(function(){});
+	</script>
+</body>
+</html>

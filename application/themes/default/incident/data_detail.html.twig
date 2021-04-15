@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>รายละเอียด</title>
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-metro.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-responsive.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/themes/light.css{{VERSIONING}}" id="style_color">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-custom.css{{VERSIONING}}">
+	<style type="text/css">
+		.panel-group .panel .panel-heading {
+			border: 1px solid #ddd !important;
+		}
+	</style>
+	{{FONT_SIZING}}
+</head>
+<body{% if FONT_SIZING == '' %} class="mobile-frame"{% endif %}>
+	<div class="container-fluid container-frame">
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="panel-group" id="accordion_case_detail" role="tablist" aria-multiselectable="true">
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="accordion_case_detail_heading">
+							<h4 class="panel-title">
+								<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_case_detail" data-target="#collapse_case_detail" aria-expanded="true" aria-controls="collapse_case_detail" style="padding:10px 15px!important">
+									<strong><i class="fa fa-bars" aria-hidden="true"></i> รายละเอียด</strong>
+								</a>
+							</h4>
+						</div>
+						<div id="collapse_case_detail" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_case_detail_heading">
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">{{case_detail}}</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/js/bootstrap.min.js"></script>
+</body>
+</html>

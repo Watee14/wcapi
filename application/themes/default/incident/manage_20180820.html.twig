@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{{page_title}}</title>
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-metro.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-responsive.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/themes/light.css{{VERSIONING}}" id="style_color">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker-4.17.47.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/datatables/media/css/dataTables.bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/map/longdo/css/style.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/map/longdo/css/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/select2-bootstrap-theme/dist/select2-bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/toggle/bootstrap-toggle.min.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-custom.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/form-wizard.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/loading.css{{VERSIONING}}">
+	{{FONT_SIZING}}
+</head>
+<body{% if FONT_SIZING == '' %} class="mobile-frame"{% endif %}>
+	{% if functions == 'edit' %}
+		<div class="overlay loading"></div>
+	{% endif %}
+	<form class="form-191" id="form_case" name="form_case" method="post" autocomplete="off">
+		<div class="container-fluid container-frame">
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-non-fixed">
+					<div class="validate-alert">
+						{% if validation_errors is defined %}
+							<div class="alert alert-{{alert_sign}} alert-dismissible alert-sm" role="alert">
+								<a role="button" class="close" data-dismiss="alert" aria-label="Close"></a>
+								<span>{{validation_errors}}</span>
+							</div>
+						{% endif %}
+					</div>
+					<div class="row">
+						<div class="col-xs-12 col-sm-4 col-md-5 col-lg-6">
+							<div class="row">
+								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="panel-group" id="accordion_incident" role="tablist" aria-multiselectable="true">
+										<div class="panel panel-default">
+											<div class="panel-heading" role="tab" id="accordion_incident_heading">
+												<h4 class="panel-title">
+													<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_incident" data-target="#collapse_incident" aria-expanded="true" aria-controls="collapse_incident">
+														<strong><i class="fa fa-bars" aria-hidden="true"></i> {{functions == 'edit' ? 'รายการเหตุ' : page_title}}</strong>
+													</a>
+												</h4>
+											</div>
+											<div id="collapse_incident" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_incident_heading">
+												<div class="panel-body">
+													<div class="row">
+														<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+															<div class="form-group">
+																<label>หมายเลขเหตุ:</label>
+																<input type="text" class="form-control input-lg" id="case_id" name="case_id" value="{{query_value.case_id}}" autocomplete="off" readonly required maxlength="20">
+																<span class="help-block small"></span>
+															</div>
+														</div>
+														<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+															<div class="form-group">
+																<label>ประเภทเหตุ:</label>
+																<select class="form-control input-lg control-step-0" id="casetype_code" name="casetype_code">
+																	<option readonly></option>
+																	{% for casetype in casetypes if casetypes is defined and casetypes is not empty %}
+																		<option value="{{casetype.casetype_code}}" data-priority="{{casetype.priority}}">{{casetype.casetype_code}} - {{casetype.casetype_name}}</option>
+																	{% endfor %}
+																</select>
+																<input type="hidden" id="priority" name="priority" value="0" autocomplete="off" readonly maxlength="10">
+																<span class="help-block small"></span>
+															</div>
+														</div>
+														<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+															<div class="form-group{{functions == 'create' ? ' non-margin' : ''}}">
+																<label>รายละเอียดเหตุ:</label>
+																<span class="text-muted pull-right small counter"></span>
+																<textarea class="form-control input-lg control-step-0" id="case_detail" name="case_detail" autocomplete="off" placeholder="ระบุรายละเอียดเหตุ" rows="2" maxlength="4000"></textarea>
+																<span class="help-block small"></span>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="panel-group" id="accordion_caller" role="tablist" aria-multiselectable="true">
+										<div class="panel panel-default">
+											<div class="panel-heading" role="tab" id="accordion_caller_heading">
+												<h4 class="panel-title">
+													<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_caller" data-target="#collapse_caller" aria-expanded="true" aria-controls="collapse_caller">
+														<strong><i class="fa fa-bars" aria-hidden="true"></i> ข้อมูลผู้แจ้ง</strong>
+													</a>
+												</h4>
+											</div>
+											<div id="collapse_caller" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_caller_heading">
+												<div class="panel-body">
+													<div class="row">
+														<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+															<div class="form-group">
+																<label>ชื่อ-นามสกุลผู้แจ้ง:</label>
+																<input type="text" class="form-control input-lg control-step-2" id="citizen_fullname" name="citizen_fullname" value="{{query_value.first_name != '' ? [query_value.first_name, query_value.last_name != '' ? [' ', query_value.last_name]|join : '']|join : 'ชื่อ-นามสกุลผู้แจ้ง'}}" autocomplete="off" maxlength="50" placeholder="ระบุชื่อ-นามสกุลผู้แจ้ง">
+																<input type="hidden" id="phone_number" name="phone_number" value="{{query_value.phone_number}}" autocomplete="off" readonly maxlength="20">
+																<span class="help-block small"></span>
+															</div>
+														</div>
+													</div>
+													<div class="row">
+														<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+															<div class="form-group">
+																<label>วันเวลาที่รับแจ้ง:</label>
+																<input type="text" class="form-control input-lg datetimepicker control-step-2" id="created_date" name="created_date" value="{{query_value.created_date}}" autocomplete="off" placeholder="ระบุวันเวลาที่รับแจ้ง" readonly>
+																<span class="help-block small"></span>
+															</div>
+														</div>
+														<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+															<div class="form-group">
+																<label>วันเวลาที่เกิดเหตุ:</label>
+																<input type="text" class="form-control input-lg datetimepicker control-step-2" id="started_date" name="started_date" value="{{query_value.started_date}}" autocomplete="off" placeholder="ระบุวันเวลาที่เกิดเหตุ">
+																<span class="help-block small"></span>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="case_lat" name="case_lat" value="{{query_value.case_lat}}" autocomplete="off" readonly maxlength="30">
+								<input type="hidden" id="case_lon" name="case_lon" value="{{query_value.case_lon}}" autocomplete="off" readonly maxlength="30">
+								<input type="hidden" id="case_location_address" name="case_location_address" value="{{query_value.case_location_address}}" autocomplete="off" readonly maxlength="4000">
+								<input type="hidden" id="command_code" name="command_code" value="{{query_value.command_code}}" autocomplete="off" readonly maxlength="20">
+								<input type="hidden" id="police_station_code" name="police_station_code" value="{{query_value.police_station_code}}" autocomplete="off" readonly maxlength="10">
+							</div>
+						</div>
+						<div class="col-xs-12 col-sm-8 col-md-7 col-lg-6">
+							<div class="form-group group-sm">
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+										<div id="desc" hidden>ถนน: <input type="text" id="road"><br>เขต: <input type="text" id="district"><br>แขวง: <input type="text" id="subdistrict"><br>จังหวัด: <input type="text" id="province"><br>รหัสไปรษณีย์: <input type="text" id="postcode"></div>
+										<div id="map"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-fixed -bottom -left footing -lg">
+			<div class="form-group">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="pull-right">
+							<a class="btn btn-lg btn-xl blue" data-toggle="modal" data-target="#modal_opencase" data-store="open" data-backdrop="static" data-keyboard="false" role="button">{{functions == 'create' ? 'รับแจ้ง' : 'ปรับปรุงข้อมูล'}}</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade modal-frame modal-191" id="modal_opencase" tabindex="-1" role="dialog" aria-labelledby="modal_opencase_label">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header bg-primary">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+						<h4 class="modal-title" id="modal_opencase_label"></h4>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+								<button type="button" data-dismiss="modal" class="btn btn-lg pull-left">ยกเลิก</button>
+								<button type="submit" class="btn btn-lg pull-right green" id="btn_submit">ยืนยัน</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div class="modal fade record-manage modal-frame" tabindex="-1" role="dialog" aria-labelledby="record-manage-label" id="modalwindow">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+					<h4 class="modal-title" id="record-manage-label"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<div class="form-group">
+								<button class="btn pull-left" data-dismiss="modal" id="cancel">ยกเลิก</button>
+								<button class="btn green pull-right" id="save">ยืนยัน</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/map/longdo/js/jquery-3.1.1.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/bootstrap-datetimepicker/js/moment.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/bootstrap-datetimepicker/js/moment-with-locales.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js{{VERSIONING}}"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/map/longdo/js/html2canvas.js"></script>
+	<script type="text/javascript" src="{{_MAP_SERVER}}?key={{_MAP_KEY}}"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/map/longdo/js/jquery-ui.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/select2/dist/js/select2.full.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/select2/dist/js/i18n/th.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/toggle/bootstrap-toggle.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/map/stdScript.js{{VERSIONING}}"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/map/opencaseScript.js{{VERSIONING}}"></script>
+	<script type="text/javascript">
+		var base_url = "{{base_url()}}";
+		var functions = "{{functions}}";
+		var lonLat = {'lat': "{{query_value.case_lat}}", 'lon': "{{query_value.case_lon}}"};
+		var modules = "{{modules}}";
+		var police_stations = JSON.parse('{{police_stations}}');
+		function form_submition(form_id, btn_id, modal_id) {
+			modal_initial(btn_id, modal_id);
+			$('div.overlay.loading').fadeIn('fast');
+			$('#' + form_id).validate({
+				'errorClass': 'small text-danger text-error',
+				'errorElement': 'span',
+				'errorPlacement': function(error, element) {
+					$('#' + modal_id).modal('hide');
+					error.insertAfter(element.parents('.form-group').find('.help-block'));
+					if (form_id == 'form_case' && element.prop('id') == 'case_location_type') {
+						$('input#q').parent().find('span.help-block').html('&nbsp;');
+					}
+					$('a[data-target="#main_information"]').tab('show');
+					$('div.overlay.loading').fadeOut('fast');
+				},
+				'showErrors': function(errorMap, errorList) {
+					this.defaultShowErrors();
+					$('div.overlay.loading').fadeOut('fast');
+					var action_pro_error = '';
+					$.each($('.post-question').find('fieldset .form-steps'), function(idx, obj) {
+						if ($(obj).find('span').hasClass('text-error')) {
+							action_pro_error += (parseInt($(obj).find('span.text-error').parent().index()) + 1) + ', ';
+						}
+					});
+					if (action_pro_error != '') {
+						action_pro_error = 'โปรดระบุข้อ' + action_pro_error;
+						$('.case-question').find('abbr.initialism').parent().find('.help-block').html(action_pro_error.slice(0, -2));
+					}
+				},
+				'submitHandler': function(form) {
+					$('.validate-alert').fadeOut('fast');
+					$('.form-group').removeClass('has-error');
+					$('.help-block').html(null);
+					$('.case-question').find('abbr.initialism').parent().find('.help-block').html(null);
+					modal_loading(btn_id);
+					$.ajax({
+						url: form.action,
+						type: form.method,
+						data: $(form).serialize(),
+					}).done(function(msg) {
+						if (JSON.parse(msg)['message'] != null && JSON.parse(msg)['data'] == null) {
+							$('.validate-alert').html('' +
+								'<div class="alert alert-dismissible alert-sm" role="alert">' +
+									'<a role="button" class="close" data-dismiss="alert" aria-label="Close"></a>' +
+									'<span>' + JSON.parse(msg)['message'] + '</span>' +
+								'</div>' +
+							'');
+							if (JSON.parse(msg)['status'] == 1 || JSON.parse(msg)['status'] == true) {
+								$('.validate-alert').find('.alert').addClass('alert-success');
+							}
+							else {
+								$('.validate-alert').find('.alert').addClass('alert-danger');
+							}
+							$('.validate-alert').fadeIn('fast');
+						}
+						else if (JSON.parse(msg)['message'] == null && JSON.parse(msg)['data'] != null) {
+							if (JSON.parse(msg)['status'] == 1 || JSON.parse(msg)['status'] == true) {
+								if (functions == 'create') {
+									$.each(JSON.parse(msg)['data'], function(key, value) {
+										$('#' + key).parent().find('input, select, textarea').val(null);
+									});
+								}
+							}
+							else {
+								$.each(JSON.parse(msg)['data'], function(key, value) {
+									if (value != '') {
+										$('#' + key).parent().addClass('has-error');
+									}
+									else {
+										$('#' + key).parent().removeClass('has-error');
+									}
+									$('#' + key).parent().find('.help-block').html(value != '' ? value : null);
+								});
+							}
+						}
+					}).fail(function(jqXHR, textStatus) {}).always(function() {
+						modal_initial(btn_id, modal_id);
+						$('div.overlay.loading').fadeOut('fast');
+					});
+				},
+			});
+		}
+		function modal_initial(this_button, this_modal) {
+			$('button[data-dismiss="modal"]').show();
+			$('#' + this_button).html('ยืนยัน');
+			$('#' + this_button).removeClass('disabled');
+			$('#' + this_modal).modal('hide');
+		}
+		function modal_loading(this_button) {
+			$('button[data-dismiss="modal"]').hide();
+			$('#' + this_button).html('<i class="fa fa-spinner fa-pulse fa-fw"></i> กำลังทำรายการ');
+			$('#' + this_button).addClass('disabled');
+		}
+		init(14);
+		renderArea();
+		clearMarker();
+		if (lonLat['lon'] != '' && lonLat['lat'] != '') {
+			addMarker(lonLat['lon'], lonLat['lat'], {"type": "case"}, 'marker.png');
+			markCircle(lonLat['lon'], lonLat['lat']);
+		}
+		function getAddress(this_lonLat) {
+			$('input#case_lat').val(this_lonLat['lat'] != 'undefined' ? this_lonLat['lat'] : '');
+			$('input#case_lon').val(this_lonLat['lon'] != 'undefined' ? this_lonLat['lon'] : '');
+		}
+		function getPolices(this_police_station) {
+			$.each(police_stations, function(key, value) {
+				if (value.police_station_code == this_police_station) {
+					$('input#command_code').val(value.command_code);
+					$('input#police_station_code').val(value.police_station_code);
+				}
+			});
+		}
+		$(document).ready(function() {
+			/**
+			 *-----------------------------------------------------------------------
+			 * NOMALIZATION
+			 *-----------------------------------------------------------------------
+			 */
+			// Input type number
+			// $('input[type="number"]').on('keydown keypress keyup', function(event) {
+			// 	if ($(this).val() < 0 || !/^\d+$/.test($(this).val())) {
+			// 		$(this).val(1);
+			// 	}
+			// 	$(this).val(parseInt($(this).val()));
+			// });
+			//-----------------------------------------------------------------------//
+			// Datetimepicker
+			$('.datetimepicker').on('keydown keypress keyup', function(event) {
+				event.preventDefault();
+			});
+			$('button, input, select, textarea').on('change checked keydown keypress keyup', function() {
+				$('div.overlay.loading').fadeOut('fast');
+			});
+			$('select').on('change checked keydown keypress keyup', function() {
+				if ($(this).val() != 'undefined') {
+					$(this).parent().find('span.small.text-danger').css('display', 'none');
+				}
+				else {
+					$(this).parent().find('span.small.text-danger').css('display', 'inline-block');
+				}
+			});
+			$('textarea').on('change checked click keydown keypress keyup', function() {
+				if ($(this).prop('maxlength') == -1) {
+					$(this).prop('maxlength', 4000);
+				}
+				$(this).parent().find('span.counter').html('จำนวนตัวอักษร: ' + $(this).val().length + ' / ' + ($(this).prop('maxlength')).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				if ($(this).hasClass('v-link-2')) {
+					$(this).removeClass('v-link-2');
+				}
+			});
+			/**
+			 *-----------------------------------------------------------------------
+			 * SELECT2
+			 *-----------------------------------------------------------------------
+			 */
+			$('select#casetype_code').select2({
+				'allowClear': true,
+				'language': 'th',
+				'placeholder': '--- ระบุประเภทเหตุ ---',
+				'theme': 'bootstrap',
+				'width': '100%',
+			});
+			$('select#casetype_code').on('change', function() {
+				$('input#priority').val($(this).val() ? $(this).find('option:selected').attr('data-priority') : '');
+			});
+			// $('select#police_station_code').on('change', function() {
+			// 	$('select#command_code').val($(this).find('option:selected').attr('data-parents') ? $(this).find('option:selected').attr('data-parents') : null);
+			// 	$('input[name="command_code"]').val($('select#command_code').val());
+			// });
+			/**
+			 *-----------------------------------------------------------------------
+			 * DATETIMEPICKER
+			 *-----------------------------------------------------------------------
+			 */
+			$('.datetimepicker').datetimepicker({
+				"format": "DD/MM/YYYY HH:mm:ss",
+				"locale": "th",
+				"sideBySide": true,
+				"useCurrent": false,
+				"widgetPositioning": {
+					"horizontal": "left",
+					"vertical": "top",
+				},
+			});
+			$('#btn_submit').on('click', function() {
+				form_submition('form_case', 'btn_submit', 'modal_opencase');
+			});
+			$('#form_case').on('keydown keypress keyup', function(e) {
+				if (e.which == 13) {
+					if (!$(this).find('textarea').is(":focus")) {
+						e.preventDefault();
+						$('#modal_opencase').modal('show');
+					}
+				}
+			});
+			$('#modal_opencase').on('show.bs.modal', function(e) {
+				$(this).find('.modal-title').html('ยืนยันการ' + (functions == 'create' ? 'แจ้ง' : 'ปรับปรุง') + 'เหตุ ' + $('#case_id').val());
+			});
+		});
+		$.validator.setDefaults({
+			ignore: []
+		});
+		$(window).on('load', function() {
+			$('[data-toggle="tooltip"]').tooltip();
+			$('textarea').each(function(index) {
+				if ($(this).prop('maxlength') == -1) {
+					$(this).prop('maxlength', 4000);
+				}
+				$(this).parent().find('span.counter').html('จำนวนตัวอักษร: ' + $(this).val().length + ' / ' + ($(this).prop('maxlength')).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				$(this).parent().find('span.counter').css('cursor', 'default');
+			});
+			$('#map_iframe_for_mobile').css('height', ($('body').height() - 0) + 'px');
+			$('select[name="casetype_code"]').trigger('change');
+			$('#map').css('width', '100%');
+		});
+		$(window).on('resize', function() {
+			$('#map').css('width', '100%');
+		});
+	</script>
+</body>
+</html>

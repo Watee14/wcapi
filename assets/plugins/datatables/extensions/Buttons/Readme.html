@@ -1,0 +1,22 @@
+<h1 id="buttons">Buttons</h1>
+<p>The Buttons extension for DataTables provides a common set of options, API methods and styling to display buttons on a page that will interact with a DataTable. Modules are also provided for data export, printing and column visibility control.</p>
+<h1 id="installation">Installation</h1>
+<p>To use Buttons the primary way to obtain the software is to use the <a href="//datatables.net/download">DataTables downloader</a>. You can also include the individual files from the <a href="//cdn.datatables.net">DataTables CDN</a>. See the <a href="http://datatables.net/extensions/buttons/">documentation</a> for full details.</p>
+<h2 id="npm-and-bower">NPM and Bower</h2>
+<p>If you prefer to use a package manager such as NPM or Bower, distribution repositories are available with software built from this repository under the name <code>datatables.net-buttons</code>. Styling packages for Bootstrap, Foundation and other styling libraries are also available by adding a suffix to the package name.</p>
+<p>Please see the DataTables <a href="//datatables.net/download/npm">NPM</a> and <a href="//datatables.net/download/bower">Bower</a> installation pages for further information. The <a href="//datatables.net/manual/installation">DataTables installation manual</a> also has details on how to use package managers with DataTables.</p>
+<h1 id="basic-usage">Basic usage</h1>
+<p>Buttons is initialised using the <code>buttons</code> option in the DataTables constructor, giving an array of the buttons that should be shown. Further options can be specified using this option as an object - see the documentation for details. For example:</p>
+<pre><code class="lang-js">$(document).ready( function () {
+    $(&#39;#example&#39;).DataTable( {
+        buttons: [ &#39;csv&#39;, &#39;excel&#39;, &#39;pdf&#39;, &#39;print&#39; ]
+    } );
+} );
+</code></pre>
+<h1 id="documentation-support">Documentation / support</h1>
+<ul>
+<li><a href="https://datatables.net/extensions/buttons/">Documentation</a></li>
+<li><a href="http://datatables.net/forums">DataTables support forums</a></li>
+</ul>
+<h1 id="github">GitHub</h1>
+<p>If you fancy getting involved with the development of Buttons and help make it better, please refer to its <a href="https://github.com/DataTables/Buttons">GitHub repo</a></p>

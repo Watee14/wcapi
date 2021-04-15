@@ -1,0 +1,620 @@
+<html lang="en" class="fixed js flexbox flexboxlegacy csstransforms csstransforms3d no-overflowscrolling no-mobile-device custom-scroll" style=""><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event simulator</title>
+
+    <!-- Lib CSS -->
+    <link rel="stylesheet" href="/assets/lib/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/lib/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/lib/magnific-popup/magnific-popup.css">
+
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="/assets/css/theme.css?v=GuE4Bt7snuVXOgHPpNrrcsFPqiz3b13KIBM4zsUBNO0">
+    <!-- Skin CSS -->
+    <link rel="stylesheet" href="/assets/css/skins/default.css">
+    <!-- Popup alert-->
+    <link rel="stylesheet" href="/assets/css/alert-custom.css">
+    <!-- MVC Grid-->
+    <link rel="stylesheet" href="/assets/lib/mvc-grid/css/mvc-grid.css?v=QP_8vBs64MctlV_9myWVy5-CS5m4SCfz4qJLNQdwPFc">
+    <!-- Head Libs -->
+    <script src="/assets/lib/modernizr/modernizr.js"></script>
+</head>
+<body>
+    <section class="body">
+        <!-- start: header -->
+        <header class="header">
+            <div class="logo-container">
+                <a href="/" class="logo">
+                    <img src="/assets/icon/hexIcon.png" style="width: 50px;">
+                    <span style="vertical-align: middle;">Event simulator</span>
+                    
+                </a>
+
+                <div class="visible-xs toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">
+                    <i class="fa fa-bars" aria-label="Toggle sidebar"></i>
+                </div>
+            </div>
+
+            <!-- start: search & user box -->
+            <div class="header-right">
+               <!--  <div id="userbox" class="userbox">
+                    <a href="#" data-toggle="dropdown">
+                        <figure class="profile-picture">
+                            <img src="/assets/images/!logged-user.jpg" alt="Joseph Doe" class="img-circle" data-lock-picture="~/assets/images/!logged-user.jpg">
+                        </figure>
+                        <div class="profile-info" data-lock-name="John Doe" data-lock-email="johndoe@okler.com">
+                            <span class="name">Sumit Suphaloes</span>
+                        </div>
+
+                        <i class="fa custom-caret"></i>
+                    </a>
+
+                    <div class="dropdown-menu">
+                        <ul class="list-unstyled">
+                            <li class="divider"></li>
+                            <li>
+                                <a role="menuitem" tabindex="-1" href="pages-user-profile.html"><i class="fa fa-user"></i> My Profile</a>
+                            </li>
+                            <li>
+                                <a role="menuitem" tabindex="-1" href="pages-signin.html"><i class="fa fa-power-off"></i> Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div> -->
+            </div>
+            <!-- end: search & user box -->
+        </header>
+        <!-- end: header -->
+
+        <div class="inner-wrapper">
+            <!-- start: sidebar -->
+            <aside id="sidebar-left" class="sidebar-left">
+
+                <div class="sidebar-header">
+                    <div class="sidebar-title">
+                       Menu
+                    </div>
+                    <div class="sidebar-toggle hidden-xs" data-toggle-class="sidebar-left-collapsed" data-target="html" data-fire-event="sidebar-left-toggle">
+                        <i class="fa fa-bars" aria-label="Toggle sidebar"></i>
+                    </div>
+                </div>
+
+                <div class="nano has-scrollbar">
+                    <div class="nano-content" tabindex="0" style="right: -26px;">
+                        <nav id="menu" class="nav-main" role="navigation">
+                            <ul class="nav nav-main">
+                                <li>
+                                    <a href="/">
+                                        <i class="fa fa-home" aria-hidden="true"></i>
+                                        <span>Home</span>
+                                    </a>
+                                </li>
+                                <li class="nav-parent">
+                                    <a>
+                                        <i class="fa fa-desktop" aria-hidden="true"></i>
+                                        <span>Scenario 8 (วงกว้าง)</span>
+                                    </a>
+                                    <ul class="nav nav-children">
+                                        <li>
+                                            <a href="/Event">
+                                                Make 20
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="nav nav-children">
+                                        <li>
+                                            <a href="/Event">
+                                                Make 10
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                <div class="nano-pane" style="display: none; opacity: 1; visibility: visible;"><div class="nano-slider" style="height: 866px; transform: translate(0px, 0px);"></div></div></div>
+            </aside>
+            <!-- end: sidebar -->
+
+            <section role="main" class="content-body">
+                <header class="page-header">
+                    <h2>Event Management</h2>
+                </header>
+
+                <!-- start: page -->
+                
+<label style="display: none"></label>
+<div class="row">
+    <div class="col-sm-4">
+        <section class="panel panel-featured panel-featured-primary">
+            <header class="panel-heading">
+                <h2 class="panel-title">
+                    <a href="#" id="btnRefreshEvent" style="text-decoration: none;">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </a>&nbsp;Event
+                </h2>
+            </header>
+            <div class="panel-body">
+                
+
+
+
+<div id="grid_event" class="mvc-grid mvc-grid-excel-mode" data-name="" data-id="0">
+    <table class="table table-selection table-bordered">
+        <thead>
+            <tr class="mvc-grid-headers">
+                <th>
+                    <span class="mvc-grid-title">All Events</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><div onclick="loadEventInfo('E20120700009')"><div class="row"><label class="control-label col-sm-4">Event ID: </label><div class="col-sm-8">E20120700009</div></div><div class="row"><label class="control-label col-sm-4">Type: </label><div class="col-sm-8">511-เหตุระเบิด</div></div><div class="row"><label class="control-label col-sm-4">Sub Type: </label><div class="col-sm-8">01-บาดเจ็บสาหัส</div></div><div class="row"><label class="control-label col-sm-4">DSPCH Grp.: </label><div class="col-sm-8">กรุงเทพมหานคร</div></div><div class="row"><label class="control-label col-sm-4">Status: </label><div class="col-sm-8">NEW</div></div></div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="mvc-grid-pager" data-total-rows="1">
+        <button type="button" class="disabled" tabindex="-1">«</button>
+        <button type="button" class="disabled" tabindex="-1">‹</button>
+        <button type="button" class="active" data-page="1">1</button>
+        <button type="button" class="disabled" tabindex="-1">›</button>
+        <button type="button" class="disabled" tabindex="-1">»</button>
+        <input class="mvc-grid-pager-rows" type="hidden" value="4">
+    </div>
+</div>
+
+            </div>
+        </section>
+    </div>
+    <div class="col-sm-8">
+        <section class="panel panel-featured panel-featured-primary">
+            <header class="panel-heading">
+                <h2 class="panel-title">Event Information</h2>
+            </header>
+            <div class="panel-body">
+                <form id="frmEvent" class="form-horizontal">
+                    <div id="holder_event_information">
+<div class="form-group">
+    <label class="col-md-3 control-label" for="AgencyEventId">Event ID</label>
+    <div class="col-md-4">
+        <input class="form-control" id="AgencyEventId" name="AgencyEventId" readonly="readonly" type="text" value="E20120700009">
+    </div>
+    <label class="col-md-2 control-label" for="StartedTime">Start Time</label>
+    <div class="col-md-3">
+        <input class="form-control" data-val="true" data-val-required="The Start Time field is required." id="StartedTime" name="StartedTime" readonly="readonly" type="text" value="07.12.2020 12:10:24">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-3 control-label" for="TypeDescription">Type Desc.</label>
+    <div class="col-md-9">
+        <input class="form-control" id="TypeDescription" name="TypeDescription" readonly="readonly" type="text" value="511-เหตุระเบิด">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-3 control-label" for="SubTypeDescription">Sub Type Desc.</label>
+    <div class="col-md-9">
+        <input class="form-control" id="SubTypeDescription" name="SubTypeDescription" readonly="readonly" type="text" value="01-บาดเจ็บสาหัส">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-3 control-label" for="EventLocation">Location</label>
+    <div class="col-md-9">
+        <textarea class="form-control" id="EventLocation" name="EventLocation" readonly="readonly">พระบรมรูปทรงม้ารัชกาลที่ 5 ถนนราชดำเนินนอก แขวงดุสิต เขตดุสิต จังหวัดกรุงเทพมหานคร 10300</textarea>
+    </div>
+</div>
+<div class="form-group" style="display: none;">
+    <label class="col-md-3 control-label" for="Contract">Contract</label>
+    <div class="col-md-4">
+        <textarea class="form-control" id="Contract" name="Contract" readonly="readonly"></textarea>
+    </div>
+    <label class="col-md-1 control-label" for="Mobile">Mobile</label>
+    <div class="col-md-4">
+        <textarea class="form-control" id="Mobile" name="Mobile" readonly="readonly"></textarea>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-12">
+        <section class="panel panel-featured mb-none">
+            <header class="panel-heading-sm">
+                <h2 class="panel-title">Patient(s)</h2>
+            </header>
+            <div class="panel-body">
+                    
+
+<div class="mvc-grid mvc-grid-excel-mode" data-name="" data-filter-mode="Excel" data-url="">
+    <table class="table-sm table-selection table-bordered">
+        <thead>
+            <tr class="mvc-grid-headers">
+                <th data-name="Name">
+                    <span class="mvc-grid-title">Name</span>
+                </th>
+                <th data-name="DateOfBirth">
+                    <span class="mvc-grid-title">Date of Birth</span>
+                </th>
+                <th data-name="Sex">
+                    <span class="mvc-grid-title">Sex</span>
+                </th>
+                <th data-name="BloodType">
+                    <span class="mvc-grid-title">Blood Type</span>
+                </th>
+                <th data-name="Allergies">
+                    <span class="mvc-grid-title">Allergies</span>
+                </th>
+                <th data-name="Remarks">
+                    <span class="mvc-grid-title">Remark</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+            </div>
+        </section>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-12">
+        <section class="panel panel-featured mb-none">
+            <header class="panel-heading-sm">
+                <h2 class="panel-title">Caller(s)</h2>
+            </header>
+            <div class="panel-body">
+                    
+
+<div class="mvc-grid mvc-grid-excel-mode" data-name="" data-filter-mode="Excel" data-url="">
+    <table class="table-sm table-selection table-bordered">
+        <thead>
+            <tr class="mvc-grid-headers">
+                <th data-name="CallerName">
+                    <span class="mvc-grid-title">Name</span>
+                </th>
+                <th data-name="CallerAddress">
+                    <span class="mvc-grid-title">Address</span>
+                </th>
+                <th data-name="CallerPhoneNo">
+                    <span class="mvc-grid-title">Phone No</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>สุดา</td>
+                <td>พระบรมรูปทรงม้า ถนน อู่ทองใน ดุสิต กรุงเทพมหานคร 10300</td>
+                <td>0993239885</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+            </div>
+        </section>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-12">
+        <section class="panel panel-featured mb-none">
+            <header class="panel-heading-sm">
+                <h2 class="panel-title">Contact(s)</h2>
+            </header>
+            <div class="panel-body">
+                    
+
+<div class="mvc-grid mvc-grid-excel-mode" data-name="" data-filter-mode="Excel" data-url="">
+    <table class="table-sm table-selection table-bordered">
+        <thead>
+            <tr class="mvc-grid-headers">
+                <th data-name="Name">
+                    <span class="mvc-grid-title">Name</span>
+                </th>
+                <th data-name="Address">
+                    <span class="mvc-grid-title">Address</span>
+                </th>
+                <th data-name="PhoneNo">
+                    <span class="mvc-grid-title">Phone No</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-3 control-label">Unit</label>
+    <div class="col-md-9">
+        <select class="form-control" id="Unit" name="Unit"><option value=""></option>
+<option selected="selected" value="E0102">E0102</option>
+</select>
+    </div>
+</div>
+<div class="form-group">
+    <label for="Comment" class="col-md-3 control-label">Comment</label>
+    <div class="col-md-9">
+        <textarea class="form-control" placeholder="Fill Comment" id="Comment" name="Comment"></textarea>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-12" style="text-align: right;">
+        <a href="#" class="btn btn-default" id="btnSubmitComment">
+            <i class="fa fa-plus"></i> Add Comment
+        </a>
+        <a href="#" class="btn btn-success" id="btnDispatch">
+            <i class="fa fa-save"></i> Dispatch
+        </a>
+        <a href="#" class="btn btn-success" id="btnClearUnit">
+            <i class="fa fa-save"></i> Clear Unit
+        </a>
+        <a href="#" class="btn btn-success" id="btnCloseEvent">
+            <i class="fa fa-ban"></i> Close
+        </a>
+    </div>
+</div>
+
+
+</div>
+                </form>
+            </div>
+        </section>
+        <section class="panel panel-featured panel-featured-primary">
+            <header class="panel-heading">
+                <h2 class="panel-title">Event Comment</h2>
+            </header>
+            <div class="panel-body">
+                <div id="holder_event_comment" style="">
+                    
+
+
+
+<div id="grid_comment" class="mvc-grid mvc-grid-excel-mode" data-name="" data-id="1">
+    <table class="table table-selection table-bordered">
+        <thead>
+            <tr class="mvc-grid-headers">
+                <th>
+                    <span class="mvc-grid-title">Comment</span>
+                </th>
+                <th>
+                    <span class="mvc-grid-title">Time</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>เหตุระเบิดในงานกาชาด มีคนเจ็บจำนวนมาก</td>
+                <td>07.12.2020 12:11:06</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="mvc-grid-pager" data-total-rows="1">
+        <button type="button" class="disabled" tabindex="-1">«</button>
+        <button type="button" class="disabled" tabindex="-1">‹</button>
+        <button type="button" class="active" data-page="1">1</button>
+        <button type="button" class="disabled" tabindex="-1">›</button>
+        <button type="button" class="disabled" tabindex="-1">»</button>
+        <div class="mvc-grid-page-sizes">
+            <select class="mvc-grid-pager-rows">
+                <option value="10" selected="">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="1000">1000</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+                <!-- end: page -->
+            </section>
+        </div>
+    </section>
+
+    <!-- Vendor -->
+    <script src="/assets/lib/jquery/jquery.js"></script>
+    <script src="/assets/lib/jquery-browser-mobile/jquery.browser.mobile.js"></script>
+    <script src="/assets/lib/bootstrap/js/bootstrap.js"></script>
+    <script src="/assets/lib/nanoscroller/nanoscroller.js"></script>
+    <script src="/assets/lib/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="/assets/lib/magnific-popup/magnific-popup.js"></script>
+    <script src="/assets/lib/jquery-placeholder/jquery.placeholder.js"></script>
+    <script src="/assets/lib/jquery-validation/jquery.validate.js"></script>
+    <script src="/assets/lib/mvc-grid/js/mvc-grid.js"></script>
+    <script src="/assets/js/bootbox.js"></script>
+    <script src="/assets/js/bootbox.locales.js"></script>
+
+    <!-- Theme Base, Components and Settings -->
+    <script src="/assets/js/theme.js"></script>
+    <!-- Theme Custom -->
+    <script src="/assets/js/theme.custom.js"></script>
+    <!-- Theme Initialization Files -->
+    <script src="/assets/js/theme.init.js"></script>
+
+    <script src="/js/jquery.validate.custom.js?v=Hg9556LqvtDT7pseG90jRRVDjtEaeXMUENT1sl676Vs"></script>
+    <script src="/js/default.modal.js?v=Z6LAUnxtcgx1HWGV8WyI0kLiD7NzKwHI5rQc_k16BqM"></script>
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
+    
+    <script type="text/javascript">
+        $("#btnRefreshEvent").click(function(evt) {
+            var grid = new MvcGrid($("#grid_event")[0]);
+            grid.reload();
+
+            evt.preventDefault();
+        });
+
+        function loadEventInfo(eventId) {
+            $("#holder_event_information").html("<div class=\"center\"><span class=\"loading\"></span></div>");
+            $("#holder_event_comment").hide();
+
+            var url = '/Event/GetEventInfo' + '?eventId=' + eventId + "&_=" + Math.random();
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                    $('#holder_event_information').html(data);
+                    bindControlEvents();
+                    loadEventComment(eventId);
+                },
+                failure: function(response) {
+                    modal.error(response.responseText);
+                },
+                error: function(response) {
+                    modal.error(response.responseText);
+                }
+            });
+        }
+
+        function loadEventComment(eventId) {
+            $("#holder_event_comment").show();
+            var grid = new MvcGrid($("#grid_comment")[0]);
+            grid.url.searchParams.set('eventId', eventId);
+            grid.reload();
+        }
+
+        function bindControlEvents() {
+            var holderEventInfo = $('#holder_event_information');
+            holderEventInfo.find("#btnDispatch").click(function(evt) {
+                dispatchUnit();
+                evt.preventDefault();
+            });
+            holderEventInfo.find("#btnClearUnit").click(function(evt) {
+                clearUnit();
+                evt.preventDefault();
+            });
+            holderEventInfo.find("#btnCloseEvent").click(function(evt) {
+                closeEvent();
+                evt.preventDefault();
+            });
+            holderEventInfo.find("#btnSubmitComment").click(function (evt) {
+                addComment();
+                evt.preventDefault();
+            });
+        }
+
+        function dispatchUnit() {
+            var msg = {
+                eventId: $("#AgencyEventId").val(),
+                unit: $("#Unit").val(),
+                comment: $("#Comment").val()
+            };
+
+            var url = '/Event/UnitDispatch';
+
+            callApi(url,
+                msg,
+                function(response) {
+                    if (response.value.completed) {
+                        modal.info(response.value.message);
+                        reloadAll();
+                    } else {
+                        modal.error(response.value.message);
+                    }
+                });
+        }
+
+        function clearUnit() {
+            var msg = {
+                eventId: $("#AgencyEventId").val(),
+                unit: $("#Unit").val(),
+                comment: $("#Comment").val()
+            };
+
+            var url = '/Event/UnitClear';
+
+            callApi(url,
+                msg,
+                function(response) {
+                    if (response.value.completed) {
+                        modal.info(response.value.message);
+                        reloadAll();
+                    } else {
+                        modal.error(response.value.message);
+                    }
+                });
+        }
+
+        function closeEvent() {
+            var msg = {
+                eventId: $("#AgencyEventId").val(),
+                comment: $("#Comment").val()
+            };
+            var url = '/Event/CloseEvent';
+
+            callApi(url,
+                msg,
+                function(response) {
+                    if (response.value.completed) {
+                        modal.info(response.value.message);
+                        reloadAll();
+                    } else {
+                        modal.error(response.value.message);
+                    }
+                });
+        }
+
+        function addComment() {
+            var msg = {
+                eventId: $("#AgencyEventId").val(),
+                comment: $("#Comment").val()
+            };
+            var url = '/Event/AddComment';
+
+            callApi(url,
+                msg,
+                function(response) {
+                    if (response.value.completed) {
+                        $("#Comment").val(null);
+                        modal.info(response.value.message);
+                        loadEventComment(msg.eventId);
+                    } else {
+                        modal.error(response.value.message);
+                    }
+                });
+        }
+
+        function callApi(url, data, fnSuccess) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    fnSuccess(response);
+                },
+                failure: function(response) {
+                    modal.error(response.responseText);
+                },
+                error: function(response) {
+                    modal.error(response.responseText);
+                }
+            });
+        }
+
+        function reloadAll() {
+            $("#btnRefreshEvent").click();
+            $('#holder_event_information').html(null);
+            $("#holder_event_comment").hide();
+        }
+    </script>
+
+
+</body></html>

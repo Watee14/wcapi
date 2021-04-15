@@ -1,0 +1,235 @@
+<script src="https://js.arcgis.com/4.18/"></script>
+<script>
+	var dataDescription = "{{data.Description}}";
+	var dataPolygon = "{{data.Polygon}}";
+	var dataPolygons = "{{data.Polygons}}";
+	var dataZoom = parseInt("{{data.Zoom}}");
+	var centroid = dataDescription != "" ? dataDescription.split(",") : [100.50169972676842, 13.753797122650278];
+	var zoom = 13;
+	var pages = "{{pages}}";
+	var mypolygon = dataPolygons != "" ? JSON.parse(dataPolygons) : (dataPolygon != "" ? JSON.parse(dataPolygon) : []);
+	// var myzoom = dataZoom <= zoom ? parseInt(zoom - dataZoom) : zoom;
+	var myzoom = zoom;
+	var geometries = [];
+	var res = [];
+	require([
+		"esri/Basemap",
+		"esri/Map",
+		"esri/layers/TileLayer",
+		"esri/layers/GraphicsLayer",
+		"esri/Graphic",
+		"esri/geometry/SpatialReference",
+		"esri/geometry/Point",
+		"esri/geometry/Polyline",
+		"esri/geometry/Polygon",
+		"esri/symbols/SimpleMarkerSymbol",
+		"esri/symbols/SimpleLineSymbol",
+		"esri/symbols/SimpleFillSymbol",
+		"esri/views/MapView",
+		"esri/widgets/Sketch",
+		"esri/widgets/Search",
+		"esri/widgets/Locate",
+		"esri/widgets/Fullscreen",
+		"esri/tasks/GeometryService",
+		"esri/tasks/support/ProjectParameters"
+	], function(
+		Basemap, 
+		Map, 
+		TileLayer, 
+		GraphicsLayer, 
+		Graphic, 
+		SpatialReference, 
+		Point, 
+		Polyline, 
+		Polygon, 
+		SimpleMarkerSymbol, 
+		SimpleLineSymbol, 
+		SimpleFillSymbol, 
+		MapView,  
+		Sketch,
+		Search, 
+		Locate, 
+		Fullscreen, 
+		GeometryService, 
+		ProjectParameters
+	) {
+		const layer = new GraphicsLayer();
+		const cvBasemap = new Basemap({
+			baseLayers: [
+				new TileLayer({
+					// url: "https://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer"
+					// url: "https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
+					// url: "https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer"
+					// url: "https://services.arcgisonline.com/arcgis/rest/services/World_Shaded_Relief/MapServer"
+					// url: "https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer"
+					// url: "https://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer"
+					url: "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
+				})
+			],
+			title: "Custom Basemap",
+			id: "cvMap"
+		});
+		const map = new Map({
+			// basemap: "dark-gray-vector",
+			// basemap: "light-gray-vector",
+			// basemap: "satellite",
+			// basemap: "streets-navigation-vector",
+			// basemap: "streets-relief-vector",
+			basemap: "topo-vector",
+			// basemap: cvBasemap,
+			layers: [layer]
+		});
+		const view = new MapView({
+			container: "view_div",
+			center: centroid,
+			map: map,
+			zoom: myzoom
+		});
+		const sketch = new Sketch({
+			availableCreateTools: ["polygon", "circle"],
+			creationMode: "single",
+			layer: layer,
+			view: view,
+			visibleElements: {
+				selectionTools: {
+					"lasso-selection": false,
+					"rectangle-selection": false,
+					"undoRedoMenu": false
+				}
+			}
+		});
+		const inSR = new SpatialReference({ wkid: 102100 });
+		const outSR = new SpatialReference({ wkid: 4326 });
+		const geometryService = new GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+		if (pages != 'DETAIL') {
+			view.ui.add(sketch, "top-right");
+			sketch.on("create", function(event) {
+				if (event.state === "start") {
+					console.log("EVENT: CREATE, STATE: START");
+					geometries = [];
+					res = [];
+					layer.removeAll();
+				}
+				else if (event.state === "active") {
+					// console.log("EVENT: CREATE, STATE: ACTIVE");
+				}
+				else if (event.state === "complete") {
+					console.log("EVENT: CREATE, STATE: COMPLETE");
+					window.scrollTo(0, 0);
+					document.getElementsByClassName("preload")[0].style.display = "block";
+					document.getElementsByClassName("loader")[0].style.display = "block";
+					document.getElementsByTagName("body")[0].style.overflow = "hidden";
+					geometries = event.graphic.geometry.rings[0];
+					$("#BOUNDARY_GROUP").val(JSON.stringify(geometries));
+					$("#BOUNDARY_DESC").val(event.graphic.geometry.centroid.longitude + "," + event.graphic.geometry.centroid.latitude);
+					coordinate_conversion(geometries[0][0], geometries[0][1]);
+				}
+				else if (event.state === "cancel") {
+					console.log("EVENT: CREATE, STATE: CANCEL");
+				}
+			});
+			sketch.on("delete", function(event) {
+				console.log("EVENT: DELETE");
+				geometries = [];
+				res = [];
+				layer.removeAll();
+				document.getElementsByClassName("preload")[0].style.display = "none";
+				document.getElementsByClassName("loader")[0].style.display = "none";
+				document.getElementsByTagName("body")[0].style.overflow = "auto";
+				$("#BOUNDARY_GROUP").val(null);
+				$("#BOUNDARY_DESC").val(null);
+				$("#BOUNDARY_LATLON").val(null);
+			});
+			sketch.on("redo", function(event) {
+				// console.log("EVENT: REDO");
+			});
+			sketch.on("undo", function(event) {
+				// console.log("EVENT: UNDO");
+			});
+			sketch.on("update", function(event) {
+				if (event.state === "start") {
+					console.log("EVENT: UPDATE, STATE: START");
+					geometries = [];
+					res = [];
+				}
+				else if (event.state === "active") {
+					// console.log("EVENT: UPDATE, STATE: ACTIVE");
+				}
+				else if (event.state === "complete") {
+					console.log("EVENT: UPDATE, STATE: COMPLETE");
+					window.scrollTo(0, 0);
+					document.getElementsByClassName("preload")[0].style.display = "block";
+					document.getElementsByClassName("loader")[0].style.display = "block";
+					document.getElementsByTagName("body")[0].style.overflow = "hidden";
+					geometries = event.graphics[0].geometry.rings[0];
+					$("#BOUNDARY_GROUP").val(JSON.stringify(geometries));
+					$("#BOUNDARY_DESC").val(event.graphics[0].geometry.centroid.longitude + "," + event.graphics[0].geometry.centroid.latitude);
+					coordinate_conversion(geometries[0][0], geometries[0][1]);
+				}
+				else if (event.aborted === true) {
+					console.log("EVENT: ABORTED");
+				}
+			});
+			const searchWidget = new Search({
+				minSuggestCharacters: 3,
+				view: view
+			});
+			view.ui.add(searchWidget, {
+				position: "bottom-left"
+			});
+			const locateWidget = new Locate({
+				view: view,
+				graphic: new Graphic({
+					symbol: { type: "simple-marker" }
+				})
+			});
+			view.ui.add(locateWidget, "top-left");
+		}
+		const fullscreen = new Fullscreen({
+			view: view
+		});
+		view.ui.add(fullscreen, "bottom-right");
+		var my_symbol = new SimpleFillSymbol({
+			color: [255, 88, 0, 0.1],
+			outline: {
+				color: [255, 88, 0],
+				width: 1
+			}
+		});
+		var my_polygon = new Polygon({
+			rings: mypolygon,
+			spatialReference: { wkid: 102100 }
+		});
+		var my_polygonGraphic = new Graphic({
+			geometry: my_polygon,
+			symbol: my_symbol
+		});
+		layer.addMany([my_polygonGraphic]);
+		function coordinate_conversion(x, y) {
+			var ip = new Point(x, y, inSR);
+			var prjParam = new ProjectParameters({
+				geometries: [ip],
+				outSpatialReference: outSR,
+				transformation: null
+			});
+			geometryService.project(prjParam).then(function(op) {
+				res.push([op[0].x, op[0].y]);
+				if (geometries.length == res.length) {
+					console.log(JSON.stringify(res));
+					$("#BOUNDARY_LATLON").val(JSON.stringify(res));
+					document.getElementsByClassName("preload")[0].style.display = "none";
+					document.getElementsByClassName("loader")[0].style.display = "none";
+					document.getElementsByTagName("body")[0].style.overflow = "auto";
+				}
+				else {
+					coordinate_processing(res.length);
+				}
+			});
+		}
+		function coordinate_processing(i) {
+			if (geometries.length > 0) {
+				coordinate_conversion(geometries[i][0], geometries[i][1]);
+			}
+		}
+	});
+</script>

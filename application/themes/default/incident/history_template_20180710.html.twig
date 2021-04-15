@@ -1,0 +1,146 @@
+{#
+ #-----------------------------------------------------------------------
+ # EDITOR 	: Wisarud Techa (CHAMP)
+ # CONTACT 	: +66858655102, wisarud_t@callvoice.co.th
+ # DATE 	: 10-07-2018
+ #-----------------------------------------------------------------------
+ #}
+<div class="modal fade modal-frame" id="modal_caselist_detail" tabindex="-1" role="dialog" aria-labelledby="modal_caselist_detail_label">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+				<h4 class="modal-title" id="modal_caselist_detail_label"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<span class="help-block loading" style="display:none"><i class="fa fa-spinner fa-pulse fa-fw"></i> กำลังโหลด...</span>
+						<span class="help-block warning" style="display:none"><i class="fa fa-exclamation"></i> ไม่พบข้อมูล</span>
+						<div class="panel-group" id="accordion_history_case" role="tablist" aria-multiselectable="true">
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="accordion_history_case_heading">
+									<h4 class="panel-title">
+										<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_history_case" data-target="#collapse_history_case" aria-expanded="true" aria-controls="collapse_history_case">
+											<strong><i class="fa fa-bars" aria-hidden="true"></i> ข้อมูลเหตุ</strong>
+										</a>
+									</h4>
+								</div>
+								<div id="collapse_history_case" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_history_case_heading">
+									<div class="panel-body">
+										<div class="row">
+											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+												<div class="table-responsive table-min table-non-margin -bottom" id="table_history_case">
+													<table class="table table-striped table-hover table-condensed table-noborder" cellspacing="0" width="100%">
+														<tbody>
+															<tr><th width="15%">หมายเลขเหตุ</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">วันเวลาที่เกิดเหตุ</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">วันเวลาที่รับแจ้ง</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">ประเภทเหตุ</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">รายละเอียดเหตุ</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">ข้อมูลเพิ่มเติม</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">สถานที่เกิดเหตุ</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">ผลการปฏิบัติ</th><td style="font-size:12px" width="85%" id="command_results"></td></tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="panel-group" id="accordion_history_citizen" role="tablist" aria-multiselectable="true">
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="accordion_history_citizen_heading">
+									<h4 class="panel-title">
+										<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_history_citizen" data-target="#collapse_history_citizen" aria-expanded="true" aria-controls="collapse_history_citizen">
+											<strong><i class="fa fa-bars" aria-hidden="true"></i> ข้อมูลผู้แจ้ง</strong>
+										</a>
+									</h4>
+								</div>
+								<div id="collapse_history_citizen" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_history_citizen_heading">
+									<div class="panel-body">
+										<div class="row">
+											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+												<div class="table-responsive table-min table-non-margin -bottom" id="table_history_citizen">
+													<table class="table table-striped table-hover table-condensed table-noborder" cellspacing="0" width="100%">
+														<tbody>
+															<tr><th width="15%">ชื่อ-นามสกุล</th><td style="font-size:12px" width="85%"></td></tr>
+															<tr><th width="15%">ข้อมูลติดต่อ</th><td style="font-size:12px" width="85%"></td></tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="panel-group" id="accordion_history_responsible" role="tablist" aria-multiselectable="true">
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="accordion_history_responsible_heading">
+									<h4 class="panel-title">
+										<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_history_responsible" data-target="#collapse_history_responsible" aria-expanded="true" aria-controls="collapse_history_responsible">
+											<strong><i class="fa fa-bars" aria-hidden="true"></i> หน่วยงานรับผิดชอบ</strong>
+										</a>
+									</h4>
+								</div>
+								<div id="collapse_history_responsible" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_history_responsible_heading">
+									<div class="panel-body">
+										<div class="row">
+											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+												<div class="table-responsive table-min table-non-margin -bottom" id="table_history_responsible">
+													<table class="table table-striped table-hover table-condensed table-noborder" cellspacing="0" width="100%">
+														<thead>
+															<tr>
+																<th class="text-center" style="font-size:12px">หน่วยงาน</th>
+																<th class="text-center" style="font-size:12px">พื้นที่ สน.</th>
+																<th class="text-center" style="font-size:12px">เขตตรวจ</th>
+																<th class="text-center" style="font-size:12px">กลุ่มสั่งการ</th>
+															</tr>
+														</thead>
+														<tbody class="text-center"></tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="panel-group" id="accordion_history_command" role="tablist" aria-multiselectable="true">
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="accordion_history_command_heading">
+									<h4 class="panel-title">
+										<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_history_command" data-target="#collapse_history_command" aria-expanded="true" aria-controls="collapse_history_command">
+											<strong><i class="fa fa-bars" aria-hidden="true"></i> ข้อมูลสั่งการ</strong>
+										</a>
+									</h4>
+								</div>
+								<div id="collapse_history_command" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_history_command_heading">
+									<div class="panel-body">
+										<div class="row">
+											<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+												<div class="table-responsive table-min table-non-margin -bottom" id="table_history_command">
+													<table class="table table-striped table-hover table-condensed table-noborder" cellspacing="0" width="100%">
+														<tbody>
+															<tr><th width="100%" colspan="2">รถที่ปฏิบัติการ</th></tr>
+															<tr><td width="100%" colspan="2" style="font-size:12px" id="command_vehicles"></td></tr>
+															<tr><th width="100%" colspan="2">ข้อความสื่อสาร</th></tr>
+															<tr><td width="100%" colspan="2" style="font-size:12px" id="command_messages"></td></tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

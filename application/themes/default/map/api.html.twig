@@ -1,0 +1,1119 @@
+{#
+ #-----------------------------------------------------------------------
+ # EDITOR 	: Apiwat Rodchuajeen (P'JANE), Wisarud Techa (CHAMP)
+ # CONTACT 	: +66858655102, wisarud_t@callvoice.co.th
+ # DATE 	: 02-05-2018
+ #-----------------------------------------------------------------------
+ #}
+<script type="text/javascript">
+	var el = "{{el}}";
+	var fn = "{{fn}}";
+	var mt = "{{MAPTYPE}}";
+	var sf = "{{sf}}";
+	var tempAddr = "{{elemAddr}}";
+	var elemAddr = tempAddr.split(",");
+		elemAddr = elemAddr.length <= 1 ? tempAddr : elemAddr;
+	var elemLats = "{{elemLats}}";
+	var elemLons = "{{elemLons}}";
+	var valsLats = "{{valsLats}}";
+	var valsLons = "{{valsLons}}";
+</script> {% if MAPTYPE == 2 %}
+<script type="text/javascript">
+	var sourceMPA = new ol.source.TileWMS({
+		url: 'http://192.168.127.1:8080/geoserver/mbtiles/wms',
+		params: {
+			'FORMAT': 'image/png',
+			'VERSION': '1.1.1',
+			tiled: true,
+			STYLES: '',
+			LAYERS: 'mbtiles:BMA 191',
+			tilesOrigin: 1186568.5997035347 + "," + 1529663.6095275125
+		}
+	});
+	var vectortile = new ol.layer.Tile({
+		source: sourceMPA,
+	});
+	var vectorOSM = new ol.layer.Tile({
+		source: new ol.source.OSM()
+	});
+	var source;
+	var resArea;
+	var sourceArea;
+	var geojsonObject;
+	var i = 0;
+	var desc = "";
+	var areaId = [];
+	var main_ds = [];
+	var colorHex = [];
+	var linePlan = new Array();
+</script> {% elseif MAPTYPE == 3 %}
+<script type="text/javascript">
+	var map;
+	var marker;
+	var areaCase = [];
+	var zoomArea = [];
+	var areaNumber = 0;
+	$(document).ready(function() {
+		$('#q').on('autocompleteselect', function() {
+			var desc = '';
+			var ds = zoomArea[this.value];
+			if (this.value == 'วัดตะพาน') {
+				$('#location_type').val(1);
+			}
+			$('#station').val(1);
+			$('#station').trigger('change');
+			map.location({ lon: ds['lon'], lat: ds['lat'] }, true);
+			$.each(ds, function(key, value) {
+				desc += key + ": " + value + '<br>';
+			});
+			$('#desc').html('You selected: <br>' + desc);
+			if (el == 1 || el == true) {
+				// window.opener.setValue(ds['address']);
+				// window.opener.setSelect(ds['name']);
+				// window.opener.setSelect('มักกะสัน');
+				window.opener.fillFormData(elemAddr, ds['address']);
+				window.opener.fillFormData(elemLats, ds['lat']);
+				window.opener.fillFormData(elemLons, ds['lon']);
+			}
+			else {
+				fillFormData(elemAddr, ds['address']);
+				fillFormData(elemLats, ds['lat']);
+				fillFormData(elemLons, ds['lon']);
+			}
+		}).change();
+		$('#location_search').on('autocompleteselect', function() {
+			map = new longdo.Map({ layer: [longdo.Layers.GRAY, longdo.Layers.TRAFFIC], zoom: 12 });
+			if (__CHILD_WINDOW_HANDLE != null) {
+				__CHILD_WINDOW_HANDLE.ProcessChildMarker(zoomArea[this.value]['lat'], zoomArea[this.value]['lon'], 'marker.png', '');
+			}
+		}).change();
+	});
+	function ProcessChildMarker(lati, long, mark, desc) {
+		map.location({ lon: long, lat: lati }, true);
+		clearMarker();
+		addMarker(long, lati, desc, mark);
+		getAddress({ lat: lati, lon: long }, { elemAddr: 'case_location_address', elemLats: 'case_lat', elemLons: 'case_lon'});
+	}
+</script> {% endif %}
+<script type="text/javascript">
+	function MappointAsia() {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/mappointasia/data/data.txt",
+			context: document.body
+		}).done(function(data) {
+			resArea = data;
+			obj = $.parseJSON(resArea);
+			var colorHex = [];
+			$.each(obj['data'], function(key, value) {
+				var latlon = value['latlng'].split('|');
+				var latlon_2 = [];
+				$.each(latlon, function(k, v) {
+					var ll = v.split(',');
+					var xx = ol.proj.fromLonLat([ parseFloat(ll[1]), parseFloat(ll[0])]);
+					latlon_2.push([xx[0], xx[1]]);
+				});
+				main_ds.push({
+					'type': 'Feature',
+					'geometry': {
+						'type': 'Polygon',
+						'coordinates': [latlon_2]
+					}
+				});
+				if (fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+					areaId[i] = value['t_id'];
+				}
+				colorHex.push((fn == 'case' || fn == 'dispatch' || fn == 'case-monitor-a' || fn == 'tracking' || fn == 'case-status' || fn == 'plan-create' || fn == 'plan-view' ? value['bg_color'] : '#cccccc'));
+				i++;
+			});
+			var geojsonObject = {
+				'type': 'FeatureCollection',
+				'crs': {
+					'type': 'name',
+					'properties': {
+						'name': 'EPSG:3857'
+					}
+				},
+				'features': main_ds
+			};
+			sourceArea = new ol.source.Vector({
+				features: (new ol.format.GeoJSON()).readFeatures(geojsonObject)
+			});
+			var vectorArea = new ol.layer.Vector({
+				source: sourceArea,
+				style: new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: '#ffcc33',
+						width: (fn == 'tracking' || fn == 'plan-create' || fn == 'plan-view' ? 2 : 1)
+					}),
+				})
+			});
+			source = new ol.source.Vector({
+			});
+			if (fn == 'case' || fn == 'dispatch' || fn == 'case-monitor-a' || fn == 'case-monitor-b' || fn == 'case-monitor-c' || fn == 'case-status') {
+				var vector = new ol.layer.Vector({
+					source: source,
+					style: new ol.style.Style({
+						fill: new ol.style.Fill({
+							color: 'rgba(255, 173, 153, ' + (fn == 'case' ? '0.1' : (fn == 'dispatch' || fn == 'case-monitor-a' ? '0.2' : '0.6')) + ')'
+						}),
+						stroke: new ol.style.Stroke({
+							color: '#ff3333',
+							width: 2
+						}),
+					})
+				});
+			}
+			else if (fn == 'tracking' || fn == 'plan-create' || fn == 'plan-view') {
+				var vector = new ol.layer.Vector({
+					source: source,
+					style: new ol.style.Style({
+						stroke: new ol.style.Stroke({
+							color: '#ff3333',
+							width: 2
+						}),
+						image: new ol.style.Icon({
+							anchor: [0.5, 1],
+							src: '{{base_url()}}assets/plugins/map/mappointasia/images/marker.gif'
+						})
+					})
+				});
+			}
+			var map = new ol.Map({
+				layers: [
+					vectorOSM, vectortile, vectorArea, vector
+				],
+				target: 'map',
+				view: new ol.View({
+					center: [11196744.376648778, 1543177.0150948742],
+					zoom: 11
+				})
+			});
+			if (fn == 'dispatch' || fn == 'case-monitor-a' || fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+				var element = document.getElementById('popup');
+				var popup = new ol.Overlay({
+					element: element,
+					positioning: 'bottom-center',
+					stopEvent: false
+				});
+				map.addOverlay(popup);
+			}
+			if (fn == 'plan-create') {
+				var draw, drawx, snap;
+				draw = new ol.interaction.Draw({
+					source: source,
+					type: 'LineString'
+				});
+				map.addInteraction(draw);
+			}
+			if (fn == 'case' || fn == 'dispatch' || fn == 'case-status' || fn == 'case-monitor-a' || fn == 'tracking' || fn == 'plan-create' || fn == 'plan-view') {
+				renderColor(sourceArea, colorHex);
+			}
+			else if (fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+				renderColor(sourceArea, colorHex, source);
+			}
+			if (fn == 'case' || fn == 'dispatch' || fn == 'case-monitor-a' || fn == 'case-monitor-b' || fn == 'case-monitor-c' || fn == 'plan-create') {
+				map.on('click', function(evt) {
+					if (fn == 'case' || fn == 'plan-create') {
+						if (fn == 'case') {
+							resetMarker(source);
+						}
+						var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+						var lon = lonlat[0];
+						var lat = lonlat[1];
+						var coordinate = evt.coordinate;
+						var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
+							coordinate, 'EPSG:3857', 'EPSG:4326'));
+						if (fn == 'case') {
+							desc = "<pre>";
+							desc += "Coordinate: " + coordinate + '<br>';
+							desc += "LatLon: " + lonlat;
+							$("#desc").html(desc);
+							source.addFeature(new ol.Feature(new ol.geom.Circle(coordinate, 2000)));
+							addMarker(coordinate, source, 'marker');
+							if (sf == '' || sf == null) {
+								getNearBy(lonLat);
+							}
+							else {
+								if (el == 1 || el == true) {
+									// window.opener.getAddress(lonLat);
+									getAddress(lonLat);
+								}
+								else {
+									getAddress(lonLat);
+								}
+							}
+						}
+						if (fn == 'plan-create' || fn == 'plan-view') {
+							linePlan[(linePlan.length + 1)] = lonlat;
+						}
+					}
+					if (fn == 'dispatch' || fn == 'case-monitor-a' || fn == 'case-monitor-b'  || fn == 'case-monitor-c') {
+						var feature = map.forEachFeatureAtPixel(evt.pixel,
+							function(feature, layer) {
+								return feature;
+							});
+						if (feature) {
+							console.log(feature);
+							var coordinate = evt.coordinate;
+							var geometry = feature.getGeometry();
+							var coord = geometry.getCoordinates();
+							popup.setPosition(coord);
+							if (fn == 'case-monitor-a') {
+								console.log(feature.namex);
+							}
+							if ((fn == 'dispatch' && feature.attr.datatype == 'case') || fn == 'case-monitor-a') {
+								var std = "<pre>Title: " + feature.attr.data.title + '<br>';
+								std += "Address: " + feature.attr.data.address + '<br>';
+								std += "Description: " + feature.attr.data.description + '<br>';
+								std += "Owner: " + feature.attr.data.owner + '<br>';
+								std += "Status: " + feature.attr.status + '<br>';
+							}
+							else if (fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+								var std = "<pre>Total: " + feature.attr.total + '<br>';
+							}
+							else {
+								var std = "<pre>Code: " + feature.attr.code + '<br>';
+								std += "User: " + feature.attr.agent + '<br>';
+							}
+							if (fn == 'case-monitor-b') {
+								$.each(feature.attr.data, function(key, value) {
+									std += " - " + value.casetype + " : " + value.total + '<br>';
+								})
+							}
+							$('#popup').popover({
+								'placement': 'top',
+								'html': true,
+								'content': std
+							});
+							$('#popup').popover('show');
+							if (fn == 'dispatch' || fn == 'case-monitor-a' || fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+								$('.popover-content').html(std);
+							}
+						}
+						else {
+							$('#popup').popover('destroy');
+						}
+					}
+				});
+			}
+			if (fn == 'tracking' || fn == 'plan-view') {
+				getLinestring(source);
+			}
+		});
+	}
+</script>
+<script type="text/javascript">
+	function init() {
+		// กำหนดขนาดแผนที่
+		resize();
+		window.addEventListener('resize', resize);
+		setMenu();
+		map = new longdo.Map({
+			layer: [
+				longdo.Layers.GRAY,
+				longdo.Layers.TRAFFIC
+			],
+			zoom: (fn == 'case-monitor-c' ? 11 : 12),
+			placeholder: document.getElementById('map'),
+			lastView: false
+		});
+		map.Event.bind('click', function(overlay) {
+			if (fn == 'case') {
+				clearMarker();
+			}
+			var lonLat = map.location(longdo.LocationMode.Pointer);
+			if (fn == 'case') {
+				desc = "<pre>";
+				desc += "LonLat: " + lonLat['lon'] + ", " + lonLat['lat'];
+				addMarker(lonLat['lon'], lonLat['lat'], '', 'marker.png');
+				if (sf == '' || sf == null) {
+					markCircle(lonLat['lon'], lonLat['lat']);
+					getNearBy(lonLat);
+				}
+				else {
+					if (el == 1 || el == true) {
+						// window.opener.getAddress(lonLat);
+						getAddress(lonLat);
+					}
+					else {
+						getAddress(lonLat);
+					}
+				}
+			}
+			if (fn == 'dispatch' || fn == 'tracking' || fn == 'case-status' || fn == 'case-monitor-a') {
+				console.log(lonLat);
+			}
+		});
+		if (fn == 'case') {
+			map.Event.bind('overlayClick', function(overlay) {
+				clearMarker();
+				var lonLat = map.location(longdo.LocationMode.Pointer);
+				addMarker(lonLat['lon'], lonLat['lat'], '', 'marker.png');
+				if (sf == '' || sf == null) {
+					markCircle(lonLat['lon'], lonLat['lat']);
+					getNearBy(lonLat);
+				}
+				else {
+					if (el == 1 || el == true) {
+						// window.opener.getAddress(lonLat);
+						getAddress(lonLat);
+					}
+					else {
+						getAddress(lonLat);
+					}
+				}
+			});
+		}
+		if (fn == 'dispatch' || fn == 'case-status' || fn == 'case-monitor-a') {
+			getCaseStatus();
+		}
+		else if (fn == 'tracking') {
+			getTracking();
+		}
+		renderArea();
+		if (fn == 'plan-view') {
+			getData();
+		}
+		else if (fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+			getCaseSummary();
+		}
+		$('#map').css('margin', '0');
+		$('#map').css('width', '100%');
+		if (fn == 'case-monitor-c') {
+			$('#map').css('height', (($('.portlet--right').height() - $('.portlet--bottom').height()) + 10) + 'px');
+		}
+		if (valsLats != '' && valsLons != '') {
+			addMarker(valsLons, valsLats, '', 'marker.png');
+		}
+	}
+	$(window).on('resize', function() {
+		setTimeout(function() {
+			$('#map').css('margin', '0');
+			$('#map').css('width', '100%');
+			if (fn == 'case-monitor-c') {
+				$('#map').css('height', (($('.portlet--right').height() - $('.portlet--bottom').height()) + 10) + 'px');
+			}
+		}, 1000);
+	});
+</script>
+<script type="text/javascript">
+	function resetData() {
+		var iter = source.getFeatures();
+		for (var i = 0; i <= (iter.length - 1); i++) {
+			source.removeFeature(iter[i]);
+		}
+		$("#desc").html((fn == 'case' ? '' : '<pre>'));
+	}
+</script>
+<script type="text/javascript">
+	function resetline() {
+		var iter = source.getFeatures();
+		for (var i = 0; i <= (iter.length - 1); i++) {
+			source.removeFeature(iter[i]);
+		}
+		getData();
+	}
+</script>
+<script type="text/javascript">
+	function getData() {
+		if (mt == 2) {
+			var iter = source.getFeatures();
+			var line = "";
+			for (var i = 0; i <= (iter.length - 1); i++) {
+				line += '<a class="btn btn-sm" onclick="deleteLine(' + i + ')" role="button">Delete ' + (fn == 'plan-create' || fn == 'plan-view' ? 'Line' : '') + ': ' + i + '</a>';
+			}
+			$("#getLine").html(line);
+		}
+		else if (mt == 3) {
+			$.ajax({
+				url: "{{base_url()}}assets/plugins/map/longdo/data/viewplan.data.php",
+				data: { }
+			}).done(function(data) {
+				$("#desc").html(data);
+				res = data;
+				obj = $.parseJSON(res);
+				obj2 = $.parseJSON(obj['latlon']);
+				var geom1 = new longdo.Polyline(obj2);
+				map.Overlays.add(geom1);
+			});
+		}
+	}
+</script>
+<script type="text/javascript">
+	function deleteLine(rec) {
+		var iter = source.getFeatures();
+		source.removeFeature(iter[rec]);
+		getData();
+	}
+</script>
+<script type="text/javascript">
+	function getLinestring(sourcex) {
+		 $.ajax({
+			url: "{{base_url()}}assets/plugins/map/mappointasia/data/" + (fn == 'plan-view' ? 'viewplan' : 'tracking') + ".data.php",
+			context: document.body
+		}).done(function(data) {
+			resLine = data;
+			obj = $.parseJSON(resLine);
+			var latlon_2 = [];
+			var i = 0;
+			$.each(obj['data'], function(key, value) {
+				try {
+					var xx = ol.proj.fromLonLat([parseFloat(value[0]), parseFloat(value[1])]);
+					latlon_2.push([xx[0], xx[1]]);
+					if (fn == 'tracking') {
+						if (i == 0) {
+							addMarker(Array(xx[0], xx[1]), sourcex, 'police_car', '');
+						}
+						if (i == (obj['data'].length - 1)) {
+							addMarker(Array(xx[0], xx[1]), sourcex, 'marker', '');
+						}
+					}
+				}
+				catch(ex) {
+				}
+				i++;
+			});
+			var feature = new ol.Feature(
+				new ol.geom.LineString(latlon_2)
+			)
+			sourcex.addFeature(feature);
+		});
+	}
+</script> {% if MAPTYPE == 2 %}
+<script type="text/javascript">
+	function getNearBy(latlon, sourcex) {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/mappointasia/data/nearby.php",
+			data: {
+				"Lat": latlon[0],
+				"Lon": latlon[1]
+			}
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			desc += "<br><--- NearBy----><br>";
+			$.each(obj, function(key, value) {
+				$.each(value, function(k, v) {
+					desc += k + ": " + v + " | ";
+				});
+				desc += "<br>";
+				var xx = ol.proj.fromLonLat([parseFloat(value['LatLon'][1]), parseFloat(value['LatLon'][0])]);
+				addMarker(Array(xx[0], xx[1]), source, value['type']);
+			})
+			$("#desc").html(desc);
+		});
+	}
+</script> {% elseif MAPTYPE == 3 %}
+<script type="text/javascript">
+	function getNearBy(latlon) {
+		var desc_nontag = '';
+		var desc_lat = '';
+		var desc_lon = '';
+		$("#desc").html('');
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/nearby.php",
+			data: {
+				"lat": latlon['lat'],
+				"lon": latlon['lon']
+			}
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			desc += "<br><--- NearBy----><br>";
+			$.each(obj['data'], function(key, value) {
+				if (value['type'] == 'poi') {
+					desc += value['id'] + ": " + value['name'] + "<br> " + value['address'];
+					desc += "<br>---------------<br>";
+					desc_nontag += value['name'] + " " + value['address'] + " ";
+					value['detail'] = value['address'] ;
+					addMarker(value['lon'], value['lat'], value, 'pin.png');
+					desc_lat = value['lat'];
+					desc_lon = value['lon'];
+				}
+			})
+			$("#desc").html(desc);
+			// window.opener.setValue(desc_nontag);
+			if (el == 1 || el == true) {
+				window.opener.fillFormData(elemAddr, desc_nontag);
+				window.opener.fillFormData(elemLats, desc_lat);
+				window.opener.fillFormData(elemLons, desc_lon);
+			}
+		});
+	}
+	function setValue(thisVal) {
+		$('#incident_address').val(null);
+		$('#incident_address').val(thisVal);
+	}
+	function setSelect(thisVal) {
+		$('#location_type').val(1);
+		$('#station').val(1);
+		$('#station').trigger('change');
+	}
+	function fillFormData(thisIDs, thisVal) {
+		$('#' + thisIDs).val(null);
+		$('#' + thisIDs).val(thisVal);
+	}
+</script> {% endif %}
+<script type="text/javascript">
+	function getCaseStatus() {
+		if (mt == 2) {
+			resetMarker(source);
+		}
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/" + (mt == 2 ? "mappointasia" : "longdo") + "/data/" + (fn == 'dispatch' ? 'viewcase' : (fn == 'case-monitor-a' ? 'case_monitor_a' : (fn == 'case-monitor-b' ? 'case_monitor_b' : (fn == 'case-monitor-c' ? 'case_monitor_c' : 'case_status')))) + ".data.php",
+			data: { "xx": "xx" , "yy" : "yy" }
+		}).done(function(data) {
+			desc = '<pre>';
+			res = data;
+			obj = $.parseJSON(res);
+			if (fn == 'dispatch') {
+				if (mt == 2) {
+					desc = '';
+					console.log(obj['LatLon'][1]);
+					var xx = ol.proj.fromLonLat([parseFloat(obj['LatLon'][1]), parseFloat(obj['LatLon'][0])]);
+					addMarker(Array(xx[0], xx[1]), source, obj['type'], obj);
+				}
+				else if (mt == 3) {
+					desc += "latlon: " + obj['lon'] + ", " + obj['lat'] + "<br>name: " + obj['detail']['name'] + "<br>Address: " + obj['detail']['address'];
+					obj['name'] = obj['detail']['name'];
+					obj['detail'] = obj['detail']['address'] + "<br>" + obj['detail']['description'] + '<br><a href="{{base_url()}}opencase/update">D25601019211000</a>';
+					addMarker(obj['lon'], obj['lat'], obj, obj['icon']);
+					markCircle(obj['lon'], obj['lat']);
+				}
+				getMDU();
+			}
+			if (fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+				desc += '<a class="btn btn-sm" onclick="getCaseStatus()" role="button" style="background:' + obj['color']['green']['icon'] + '">' + obj['color']['green']['title'] + '</a>';
+				desc += '<a class="btn btn-sm" onclick="getCaseStatus()" role="button" style="background:' + obj['color']['yellow']['icon'] + '">' + obj['color']['yellow']['title'] + '</a>';
+				desc += '<a class="btn btn-sm" onclick="getCaseStatus()" role="button" style="background:' + obj['color']['red']['icon'] + '">' + obj['color']['red']['title'] + '</a>';
+				desc += '<br>';
+			}
+			if (mt == 2 || (mt == 3 && fn == 'case-status')) {
+				$.each(obj['description'], function(key, value) {
+					console.log(key + "--" + value);
+					desc += key + ": " + value;
+					desc += "<br>";
+				})
+			}
+			$("#desc").html(desc);
+			if (fn == 'case-monitor-a' || fn == 'case-status') {
+				$.each(obj['caselist'], function(key, value) {
+					if (mt == 2) {
+						var xx = ol.proj.fromLonLat([parseFloat(value['LatLon'][1]), parseFloat(value['LatLon'][0])]);
+						addMarker(Array(xx[0], xx[1]), source, value['type'], value);
+					}
+					else if (mt == 3) {
+						var det = [];
+						det['name'] = value['detail']['name'];
+						if (fn == 'case-monitor-a') {
+							det['color'] = value['color'];
+						}
+						det['detail'] = value['detail']['address'] + "<br>" + value['detail']['description'] + '<br><a href="{{base_url()}}opencase/update">D25601019211000</a>';
+						addMarker(value['lon'], value['lat'], det, (fn == 'case-monitor-a' ? '' : value['icon']));
+					}
+				})
+			}
+			if (fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+				chkColor(sourceArea, obj['caselist'], source);
+			}
+		});
+	}
+</script>
+<script type="text/javascript">
+	function getMDU() {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/" + (mt == 2 ? "mappointasia" : "longdo") + "/data/mdu.data.php",
+			data: { "xx": "xx", "yy": "yy" }
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			$.each(obj, function(key, value) {
+				if (mt == 2) {
+					var xx = ol.proj.fromLonLat([parseFloat(value['LatLon'][1]), parseFloat(value['LatLon'][0])]);
+					addMarker(Array(xx[0], xx[1]), source, value['type'], value);
+				}
+				else if (mt == 3) {
+					value['name'] = value['plate'];
+					value['detail'] = "พนักงาน: " + value['user'];
+					addMarker(value['lon'], value['lat'], value, value['icon']);
+				}
+			})
+		});
+	}
+</script> {% if MAPTYPE == 2 %}
+<script type="text/javascript">
+	function addMarker(coordinate, sourcex, typeIcon, desc) {
+		if (fn == 'case' || fn == 'dispatch' || fn == 'case-status' || fn == 'tracking') {
+			var iconStyle = new ol.style.Style({
+				image: new ol.style.Icon({
+					opacity: 1.00,
+					src: "{{base_url()}}assets/plugins/map/mappointasia/icons/" + typeIcon + ".png"
+				}),
+			});
+		}
+		else if (fn == 'case-monitor-a') {
+			var iconStyle = new ol.style.Style({
+				image: new ol.style.Icon({
+					color: desc.color,
+					crossOrigin: 'anonymous',
+					src: "{{base_url()}}assets/plugins/map/mappointasia/icons/dot.png"
+				}),
+			});
+		}
+		else if (fn == 'case-monitor-b' || fn == 'case-monitor-c') {
+			var iconStyle = new ol.style.Style({
+				image: new ol.style.Icon({
+					color: desc.color.icon,
+					crossOrigin: 'anonymous',
+					src: "{{base_url()}}assets/plugins/map/mappointasia/icons/dot.png",
+					scale: 1.5
+				}),
+				text: new ol.style.Text({
+					font: '12px Calibri,sans-serif',
+					fill: new ol.style.Fill({ color: '#000' }),
+					stroke: new ol.style.Stroke({
+						color: '#fff',
+						width: 2
+					}),
+					text: desc.total
+				})
+			});
+		}
+		var feature = new ol.Feature(
+			new ol.geom.Point(coordinate)
+		);
+		if (fn == 'case-monitor-a' || fn == 'case-monitor-b' || fn == 'dispatch') {
+			feature.attr = desc;
+		}
+		feature.setStyle(iconStyle);
+		sourcex.addFeature(feature);
+	}
+</script> {% elseif MAPTYPE == 3 and fn != 'case-monitor-a' and fn != 'case-monitor-b' and fn != 'case-monitor-c' %}
+<script type="text/javascript">
+	function addMarker(lon, lat, desc, icon) {
+		marker = new longdo.Marker({
+			lon: lon,
+			lat: lat
+		}, {
+			title: desc['name'],
+			icon: {
+				url: '{{base_url()}}assets/plugins/map/longdo/icons/' + icon,
+			},
+			detail: desc['detail'],
+			weight: longdo.OverlayWeight.Top
+		});
+		map.Overlays.add(marker);
+	}
+</script> {% elseif MAPTYPE == 3 and (fn == 'case-monitor-a' or fn == 'case-monitor-b' or fn == 'case-monitor-c') %}
+<script type="text/javascript">
+	function addMarker(lon, lat, desc, icon) {
+		marker = new longdo.Marker({
+			lon: lon,
+			lat: lat
+		}, {
+			title: desc['name'],
+			icon: {
+				html: '<svg height="100" width="100"><circle cx="50" cy="50" r="' + (fn == 'case-monitor-a' ? '8' : '15') + '" stroke="black" stroke-width="' + (fn == 'case-monitor-a' ? '2' : '1') + '" fill="' + (fn == 'case-monitor-a' ? desc['color'] : desc['color']['icon']) + '" />' + (fn == 'case-monitor-b' || fn == 'case-monitor-c' ? '<text x="50%" y="50%" text-anchor="middle" stroke="" stroke-width="2px" dy=".3em">' + desc['total'] + '</text>' : '') + '</svg>',
+				url: '{{base_url()}}assets/plugins/map/longdo/icons/' + icon,
+			},
+			detail: desc['detail'],
+			weight: longdo.OverlayWeight.Top
+		});
+		map.Overlays.add(marker);
+	}
+</script> {% endif %}
+<script type="text/javascript">
+	function resetMarker(sourcex) {
+		var iter = sourcex.getFeatures();
+		for (var i = 0; i <= (iter.length - 1); i++) {
+			source.removeFeature(iter[i]);
+		}
+	}
+</script> {% if fn == 'case' or fn == 'dispatch' or fn == 'case-status' or fn == 'case-monitor-a' or fn == 'tracking' or fn == 'plan-create' or fn == 'plan-view' %}
+<script type="text/javascript">
+	function renderColor(sourceArea, colorHex) {
+		var xx = sourceArea.getFeatures();
+		for (var i = xx.length - 1; i >= 0; i--) {
+			var hex = hexToRgb(colorHex[i]) ;
+			xx[i].setStyle(new ol.style.Style({
+				fill: new ol.style.Fill({
+					color: 'rgba(' + hex.r + ', ' + hex.g + ', ' + hex.b + ', ' + (fn == 'case' || fn == 'tracking' || fn == 'case-status' || fn == 'plan-create' || fn == 'plan-view' ? '0.4' : '0.3') + ')'
+				}),
+				stroke: new ol.style.Stroke({
+					color: colorHex[i],
+					width: 0.2
+				}),
+			}));
+		};
+	}
+</script> {% elseif fn == 'case-monitor-b' or fn == 'case-monitor-c' %}
+<script type="text/javascript">
+	function renderColor(sourceArea, colorHex, sourcex) {
+		var xx = sourceArea.getFeatures();
+		for (var i = xx.length - 1; i >= 0; i--) {
+			var hex = hexToRgb(colorHex[i]) ;
+			xx[i].setStyle(new ol.style.Style({
+				fill: new ol.style.Fill({
+					color: 'rgba(' + hex.r + ', ' + hex.g + ', ' + hex.b + ', 0.4'
+				}),
+				stroke: new ol.style.Stroke({
+					color: colorHex[i],
+					width: 0.2
+				}),
+			}));
+		};
+	}
+</script> {% endif %}
+<script type="text/javascript">
+	function chkColor(sourceArea, caseArea, sourcex) {
+		var dup = [];
+		var xx = sourceArea.getFeatures();
+		$.each(caseArea, function(key, value) {
+			for (var i = areaId.length - 1; i >= 0; i--) {
+				console.log("ID: " + value['areaid']);
+				if (value['areaid'] == areaId[i]) {
+					console.log(i);
+					var c_bg = value['color']['bg'];
+					var hex_bg = hexToRgb(c_bg);
+					xx[i].setStyle(new ol.style.Style({
+						fill: new ol.style.Fill({
+							color: 'rgba(' + hex_bg.r + ', ' + hex_bg.g + ', ' + hex_bg.b + ', 0.7)'
+						}),
+						stroke: new ol.style.Stroke({
+							color: c_bg,
+							width: 0.2
+						}),
+					}));
+					if (dup[value['areaid']] == value['areaid']) {
+					}
+					else {
+						var aa = xx[i].getGeometry();
+						var bb = aa.getExtent();
+						var cc = ol.extent.getCenter(bb);
+						addMarker(Array(cc[0], cc[1]), sourcex, '', value);
+					}
+				}
+			}
+		})
+	}
+</script>
+<script type="text/javascript">
+	function hexToRgb(hex) {
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result ? {
+			r: parseInt(result[1], 16),
+			g: parseInt(result[2], 16),
+			b: parseInt(result[3], 16)
+		} : null;
+	}
+</script>
+<script type="text/javascript">
+	function clearMarker() {
+		var mark = map.Overlays.list();
+		var i = 0;
+		$.each(mark, function(key, value) {
+			if (fn != 'case-monitor-b' && fn != 'case-monitor-c') {
+				console.log(value instanceof longdo.Marker);
+			}
+			if (fn == 'case-monitor-b' || fn == 'case-monitor-c' || value instanceof longdo.Marker == true || value instanceof longdo.Circle == true) {
+				map.Overlays.remove(value);
+			}
+			i++;
+		})
+	}
+</script>
+<script type="text/javascript">
+	function markCircle(lon, lat) {
+		var geom3 = new longdo.Circle({
+			lon: lon,
+			lat: lat
+		}, 0.02, {
+			title: '',
+			detail: '',
+			lineWidth: 3,
+			lineColor: 'rgba(0, 255, 0, 1.0)',
+			fillColor: false,
+			editable: (fn == 'dispatch' ? false : true)
+		});
+		map.Overlays.add(geom3);
+	}
+</script> {% if fn == 'case-monitor-b' or fn == 'case-monitor-c' %}
+<script type="text/javascript">
+	function renderArea(areaCase) {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/data.txt",
+			data: {}
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			var area = [];
+			$.each(obj['data'], function(key, value) {
+				try {
+					var aio = areaCase['areaID_' + value['t_id']];
+					if (value['t_id'] == aio['areaid']) {
+						area = '';
+						var latlon = value['latlng'].split('|');
+						var latlon_2 = [];
+						$.each(latlon, function(k, v) {
+							var ll = v.split(',');
+							var ll2 = { lon: parseFloat(ll[1]), lat: parseFloat(ll[0]) };
+							latlon_2.push(ll2);
+						});
+						var hex = hexToRgb(aio['color']['bg']);
+						var geom2 = new longdo.Polygon(latlon_2, {
+							id: 'area',
+							title: value['t_name'],
+							detail: ' ',
+							label: '',
+							lineWidth: 0.2,
+							lineColor: 'rgba(' + hex.r + ', ' + hex.g + ', ' + hex.b + ', 0.8)',
+							fillColor: 'rgba(' + hex.r + ', ' + hex.g + ', ' + hex.b + ', 0.7)',
+						});
+						map.Overlays.add(geom2);
+						var center = geom2.pivot();
+						var det = [];
+						det['name'] = value['t_name'];
+						det['detail'] = aio['detail'];
+						det['color'] = aio['color'];
+						det['total'] = aio['total'];
+						addMarker(center['lon'], center['lat'], det, 'marker.png');
+					}
+				}
+				catch(err) {}
+			})
+		});
+	}
+</script> {% else %}
+<script type="text/javascript">
+	function renderArea() {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/data.txt",
+			data: {}
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			var area = [];
+			$.each(obj['data'], function(key, value) {
+				area = '';
+				var latlon = value['latlng'].split('|');
+				var latlon_2 = [];
+				$.each(latlon, function(k, v) {
+					var ll = v.split(',');
+					var ll2 = { lon: parseFloat(ll[1]), lat: parseFloat(ll[0]) };
+					latlon_2.push(ll2);
+				});
+				var hex = hexToRgb(value['bg_color']);
+				var geom2 = new longdo.Polygon(latlon_2, {
+					id: (fn == 'case' || fn == 'dispatch' || fn == 'tracking' || fn == 'case-status' || fn == 'case-monitor-a' ? 'area' : ''),
+					title: (fn == 'dispatch' || fn == 'plan-create' || fn == 'plan-view' || fn == 'tracking' || fn == 'case-status' || fn == 'case-monitor-a' ? value['t_name'] : ''),
+					detail: (fn == 'dispatch' || fn == 'tracking' || fn == 'case-status' || fn == 'case-monitor-a' ? '-' : ''),
+					label: '',
+					lineWidth: 0.2,
+					lineColor: 'rgba(' + hex.r + ', ' + hex.g + ', ' + hex.b + ', 0.8)',
+					fillColor: 'rgba(' + hex.r + ', ' + hex.g + ', ' + hex.b + (fn == 'dispatch' || fn == 'case-status' || fn == 'case-monitor-a' ? ', 0.3' : ', 0.2)'),
+				});
+				map.Overlays.add(geom2);
+				if (fn == 'case') {
+					areaNumber++;
+				}
+			})
+			if (fn == 'tracking') {
+				$('.ldroute_menu').css('width', '25%');
+				$('.ldroute_info').css('height', '32px');
+			}
+		});
+	}
+</script> {% endif %}
+<script type="text/javascript">
+	function searchLocation() {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/search.data.php",
+			data: { q: ($("#location_search").val() != 'undefined' && $("#location_search").val() != '' ? $("#location_search").val() : $("#q").val()) },
+		}).done(function(data) {
+			obj = $.parseJSON(((data.length > 0 ? data : '{}').replace(/'/g, '')).replace(/\\/g, ''));
+			var dx = [];
+			$.each(obj['data'], function(key, value) {
+				dx.push(value['name']);
+				zoomArea[value['name']] = value;
+			});
+			$("#" + ($("#location_search").val() != 'undefined' ? 'location_search' : 'q')).autocomplete({
+				source: dx,
+			});
+		}).fail(function(jqXHR, textStatus) {
+			console.log("Request failed: " + textStatus);
+		});
+	}
+	function getAddress(lonLat, elemAttr) {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/address.data.php",
+			data: {
+				"lat": lonLat['lat'],
+				"lon": lonLat['lon'],
+			}
+		}).done(function(data) {
+			res = data.length > 0 ? data : '{}';
+			obj = $.parseJSON(res);
+			var addrObjString = '';
+			addrObjString += (obj.subdistrict 	!= undefined ? 			obj.subdistrict : '');
+			addrObjString += (obj.district 		!= undefined ? ' ' + 	obj.district 	: '');
+			addrObjString += (obj.province 		!= undefined ? ' ' + 	obj.province 	: '');
+			addrObjString += (obj.postcode 		!= undefined ? ' ' + 	obj.postcode 	: '');
+			if (el == 1 || el == true) {
+				window.opener.fillFormData(!$.isEmptyObject(elemAttr) ? elemAttr.elemAddr : elemAddr, addrObjString);
+				window.opener.fillFormData(!$.isEmptyObject(elemAttr) ? elemAttr.elemLats : elemLats, lonLat['lat']);
+				window.opener.fillFormData(!$.isEmptyObject(elemAttr) ? elemAttr.elemLons : elemLons, lonLat['lon']);
+			}
+			else {
+				fillFormData(elemAddr, addrObjString);
+				fillFormData(elemLats, lonLat['lat']);
+				fillFormData(elemLons, lonLat['lon']);
+			}
+		});
+	}
+</script>
+<script type="text/javascript">
+	function resize() {
+		var style = document.getElementById('map').style
+		style.height = (window.innerHeight - 68) + 'px';
+		style.width = (window.innerWidth - 8) + 'px';
+	}
+</script>
+<script type="text/javascript">
+	function saveData() {
+		var line = map.Overlays.list();
+		var dx;
+		var i = 0;
+		$.each(line, function(key, value) {
+			if (value instanceof longdo.Polyline == true) {
+				dx = value;
+			}
+			i++;
+		});
+		var xx = JSON.stringify(dx.location());
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/createplan.data.php",
+			data: { "latlon": xx }
+		}).done(function(data) {
+			$("#desc").html(data);
+		});
+	}
+</script>
+<script type="text/javascript">
+	function getTracking() {
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/tracking.data.php",
+			data: { "xx": "xx" , "yy" : "yy" }
+		}).done(function(data) {
+			desc = '<pre>';
+			res = data;
+			obj = $.parseJSON(res);
+			var casex = obj['routing']['to'];
+			var from = [];
+			from['lat'] = casex['lat'];
+			from['lon'] = casex['lon'];
+			from['name'] = casex['detail']['name'];
+			from['icon'] = casex['icon'];
+			from['detail'] = casex['detail']['address'] + "<br>" + casex['detail']['description'];
+			var casey = obj['routing']['from'];
+			var to = [];
+			to['lat'] = casey['lat'];
+			to['lon'] = casey['lon'];
+			to['name'] = casey['plate'];
+			to['icon'] = casey['icon'];
+			to['detail'] = casey['user'];
+			routing(from, to);
+			$.each(obj['mdu'], function(key, value) {
+				value['name'] = value['plate'];
+				value['detail'] = "พนักงาน: " + value['user'];
+				addMarker(value['lon'], value['lat'], value, value['icon']);
+			})
+		});
+	}
+</script>
+<script type="text/javascript">
+	function routing(from, to) {
+		map.Route.placeholder(document.getElementById('desc'));
+		var from = new longdo.Marker({
+			lon: from['lon'],
+			lat: from['lat']
+		}, {
+			title: from['name'],
+			icon: {
+				url: "{{base_url()}}assets/plugins/map/longdo/icons/" + from['icon'],
+			},
+			detail: from['detail'],
+			weight: longdo.OverlayWeight.Top
+		});
+		map.Route.add(from);
+		var to = new longdo.Marker({
+			lon: to['lon'],
+			lat: to['lat']
+		}, {
+			title: to['name'],
+			icon: {
+				url: "{{base_url()}}assets/plugins/map/longdo/icons/" + to['icon'],
+			},
+			detail: to['detail'],
+			weight: longdo.OverlayWeight.Top
+		});
+		map.Route.add(to);
+		map.Route.search();
+	}
+</script>
+<script type="text/javascript">
+	function getCaseSummary() {
+		clearMarker();
+		$.ajax({
+			url: "{{base_url()}}assets/plugins/map/longdo/data/" + (fn == 'case-monitor-b' ? 'case_monitor_b' : 'case_monitor_c') + ".data.php",
+			data: { "xx": "xx" , "yy" : "yy" }
+		}).done(function(data) {
+			desc = '<pre>';
+			res = data;
+			obj = $.parseJSON(res);
+			desc += '<button style="background-color:' + obj['color']['green']['icon'] 	+ '">' + obj['color']['green']['title'] 	+ '</button>';
+			desc += '<button style="background-color:' + obj['color']['yellow']['icon'] + '">' + obj['color']['yellow']['title'] 	+ '</button>';
+			desc += '<button style="background-color:' + obj['color']['red']['icon'] 	+ '">' + obj['color']['red']['title'] 		+ '</button>';
+			desc += '<br>';
+			$.each(obj['description'], function(key, value) {
+				desc += key + ": " + value;
+				desc += "<br>";
+				areaCase['areaID_']
+			})
+			$.each(obj['caselist'], function(key, value) {
+				var rec = 1;
+				var xs = [];
+				xs['areaid'] = value['areaid'];
+				xs['color'] = value['color'];
+				xs['total'] = value['total'];
+				var det = 'Total: ' + value['total'] + '<br>--------------<br>';
+				$.each(value['data'], function(kk, vv) {
+					det += rec + '. ' + vv['casetype'] + ' [' + vv['total'] + ']<br>';
+					rec++;
+				})
+				xs['detail'] = det;
+				areaCase['areaID_' + value['areaid']] = xs;
+			})
+			renderArea(areaCase);
+			$("#desc").html(desc);
+		});
+	}
+</script>
+<script type="text/javascript">
+	function setMenu() {
+		delete longdo.MapTheme.ui.layerSelectorOption.th.button[2];
+		var rec = 1;
+		for (var i = longdo.MapTheme.ui.layerSelectorDropdown.length - 1; i >= 0; i--) {
+			if (rec <= 6) {
+				delete longdo.MapTheme.ui.layerSelectorDropdown[i];
+			}
+			rec++;
+		};
+	}
+</script> {% if el is defined and el is not empty and el == TRUE %} {% if MAPTYPE == 2 %}
+<script type="text/javascript">MappointAsia();</script> {% elseif MAPTYPE == 3 %}
+<script type="text/javascript">$(window).on('load', function() { init(); }); </script> {% endif %} {% endif %}
+<script type="text/javascript">
+	$(document).ready(function() {
+
+	});
+</script>

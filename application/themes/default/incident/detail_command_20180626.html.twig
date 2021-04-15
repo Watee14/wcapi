@@ -1,0 +1,87 @@
+<div class="panel-group" id="accordion_commandings1" role="tablist" aria-multiselectable="true">
+	<div class="panel panel-default">
+		<div class="panel-heading" role="tab" id="accordion_commandings1_heading">
+			<h4 class="panel-title">
+				<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_commandings1" data-target="#collapse_commandings_detail" aria-expanded="false" aria-controls="collapse_commandings_detail">
+					<strong><i class="fa fa-bars" aria-hidden="true"></i> ข้อมูลแจ้งวิทยุ </strong>
+				</a>
+			</h4>
+		</div>
+		<div id="collapse_commandings_detail" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_commandings1_heading">
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<!-- <span class="help-block loading"  ><i class="fa fa-spinner fa-pulse fa-fw"></i> กำลังโหลด...</span> -->
+						<div class="table-responsive table-min table-non-margin -bottom"  style="    font-size: 100%;">
+                            
+                            <!--<a class="badge badge-primary" data-toggle="modal" data-target="#modal_caselist_detail" data-caseid="{{query_value.case_id}}" style="color: #fff;background-color: #007bff;border-radius: .25rem !important;">รายละเอียดเหตุ</a>-->
+                            
+                             <a class=" btn btn-sm font-md btn-block_" data-toggle="modal" data-target="#modal_caselist_detail" data-caseid="{{query_value.case_id}}"  >รายละเอียดเหตุ</a>
+                            
+                            {% if query_value.need_ambulance==1 %}
+                            <b style="color:red"> ต้องการรถพยาบาล </b>
+                            {% endif %}
+                            <hr style="margin: 5px 0;">
+							{{query_value.casetype.casetype_template}}
+
+							{% set police_station_name = "" %}
+							{% for police_station in police_stations if police_stations is defined and police_stations is not empty %}
+								{% if police_station.police_station_code == query_value.police_station_code %}
+								{% set police_station_name = police_station.police_station_name %}
+								{% endif %}
+							{% endfor %}
+							{% set vehicle_ = ''  %}
+							{% for vehicle in query_value.case_type_info.vehicle|reverse %}						 
+									{% set vehicle_  =  vehicle_  ~ ' ' ~  vehicle.vehicle_type_name %}
+							{% endfor %}
+
+							{# query_value.case_type_info.vehicle[0].vehicle_type_name #}
+							 
+				
+                            {{query_value.casetype_template}}
+                             
+                            
+                            
+							{% if query_value.casetype_code ==200 %}
+
+							<!--{{police_station_name}} แจ้งเหตุ {{query_value.casetype_code}}  {{query_value.case_location_address}}<br>
+							{{query_value.case_detail}} <span class="weapon"></span>-->
+
+							{% endif %}
+
+							{% if query_value.casetype_code ==731 %}
+
+							<!--{{police_station_name}} แจ้งเหตุ {{query_value.casetype_code}}  {{query_value.case_location_address}}<br>
+							{{query_value.case_location_detail}}
+
+							{% endif %}
+
+							{% if query_value.casetype_code ==711 %}
+
+							{{police_station_name}} แจ้งเหตุ {{query_value.casetype_code}} ระหว่าง {{vehicle_}}<br>
+							{{query_value.case_detail}}<br>
+							{{query_value.case_location_detail}}-->
+
+							{% endif %}
+
+
+							{% if query_value.casetype_code ==131 %}
+							<!--{{police_station_name}} สกัดจับกุมรถ พาหนะก่อเหตุ {{query_value.casetype_code}}<br>
+							รถจักรยานยนต์ ยี่ฮ้อ Handa รุ่น Fino สีดำเแดง หมายเลขทะเบียน XX-XXX<br>
+							พาหนะคนร้าย 2 คน ก่อเหตุ {{query_value.casetype_code}} อาวุธปืน... {{query_value.case_location_address}}<br>
+							ทรัพย์สินที่คนร้ายได้ไป เป็น...ถุงเงิน...ภานในมีเงินสด 200000 บาท<br>
+							ที่สังเกต <br>
+								- คนร้ายคนที่ 1 เป็น ชาย แต่งกายเสือดำกางเกงยืน (ลักษณะ)สูง 170 ผมสั้น หมวกนิรภัยแบบเต็มใบ สีดำ  (ถามีอาวุธ ระบุมี <br>
+							อาวุธปืน )<br>
+								- คนร้ายคนที่ 2 เป็น หญิง แต่งกานเสือยืดสีฟ้า กางเกงขายาวสีดำ สูง 160 ผมยาว ไม่สวมหมวก <br>
+							หลบหนีมุ่งหน้าไปทาง ถ.บางแวกขาออก-->
+							{% endif %}
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

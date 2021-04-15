@@ -1,0 +1,31 @@
+<h1 id="scroller">Scroller</h1>
+<p>Scroller is a virtual rendering plug-in for DataTables which allows large datasets to be drawn on screen every quickly. What the virtual rendering means is that only the visible portion of the table (and a bit to either side to make the scrolling smooth) is drawn, while the scrolling container gives the visual impression that the whole table is visible. This is done by making use of the pagination abilities of DataTables and moving the table around in the scrolling container DataTables adds to the page. The scrolling container is forced to the height it would be for the full table display using an extra element.</p>
+<p>Key features include:</p>
+<ul>
+<li>Speed! The aim of Scroller for DataTables is to make rendering large data sets fast</li>
+<li>Full compatibility with DataTables&#39; deferred rendering for maximum speed</li>
+<li>Integration with state saving in DataTables (scrolling position is saved)</li>
+<li>Support for scrolling with millions of rows</li>
+<li>Easy to use</li>
+</ul>
+<h1 id="installation">Installation</h1>
+<p>To use Scroller the primary way to obtain the software is to use the <a href="//datatables.net/download">DataTables downloader</a>. You can also include the individual files from the <a href="//cdn.datatables.net">DataTables CDN</a>. See the <a href="http://datatables.net/extensions/scroller/">documentation</a> for full details.</p>
+<h2 id="npm-and-bower">NPM and Bower</h2>
+<p>If you prefer to use a package manager such as NPM or Bower, distribution repositories are available with software built from this repository under the name <code>datatables.net-scroller</code>. Styling packages for Bootstrap, Foundation and other styling libraries are also available by adding a suffix to the package name.</p>
+<p>Please see the DataTables <a href="//datatables.net/download/npm">NPM</a> and <a href="//datatables.net/download/bower">Bower</a> installation pages for further information. The <a href="//datatables.net/manual/installation">DataTables installation manual</a> also has details on how to use package managers with DataTables.</p>
+<h1 id="basic-usage">Basic usage</h1>
+<p>Scroller is initialised using the <code>scroller</code> option in the DataTables constructor - a simple boolean <code>true</code> will enable the feature. Further options can be specified using this option as an object - see the documentation for details.</p>
+<pre><code class="lang-js">$(document).ready( function () {
+    $(&#39;#example&#39;).DataTable( {
+        scroller: true
+    } );
+} );
+</code></pre>
+<p>Note that rows in the table must all be the same height. Information in a cell which expands on to multiple lines will cause some odd behaviour in the scrolling. Additionally, the table&#39;s <code>cellspacing</code> parameter must be set to 0, again to ensure the information display is correct.</p>
+<h1 id="documentation-support">Documentation / support</h1>
+<ul>
+<li><a href="https://datatables.net/extensions/scroller/">Documentation</a></li>
+<li><a href="http://datatables.net/forums">DataTables support forums</a></li>
+</ul>
+<h1 id="github">GitHub</h1>
+<p>If you fancy getting involved with the development of Scroller and help make it better, please refer to its <a href="https://github.com/DataTables/Scroller">GitHub repo</a></p>

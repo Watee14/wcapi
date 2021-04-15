@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>รายการแจ้งเตือน</title>
+	{% include 'lbs/style_alert.html.twig' %}
+	{% include 'lbs/style_esri_map.html.twig' %}
+</head>
+<body>
+	<div class="preload"></div>
+	<div class="loader"></div>
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<blockquote class="blockquote">
+				<h2 class="mb-0">รายละเอียดรายการแจ้งเตือน</h2>
+			</blockquote>
+			<div class="row">
+				<div class="col-sm-6" style="margin-top:10px;">
+					<div class="tab-content">
+						<div class="form-group mb-2">
+							<label class="mt-2 mb-0 user-select-none">หัวข้อแจ้งเตือน:</label>
+							<input type="text" name="Title" class="form-control mt-0" placeholder="กรุณากรอกหัวข้อ" value='{{data.Title}}' disabled>
+							<div class="row" style="margin-top:10px;">
+								<div class="col-3">
+									<label class="mb-0 user-select-none">วันที่เริ่มต้น:</label>
+									<input type="text" name="StartDate[]" class="datepicker form-control mt-0 mb-0" value="{{data.StartDate|date("m/d/Y")}}" disabled>
+								</div>
+								<div class="col-3">
+									<label for="example-time-input" class="mb-0 user-select-none">เวลาที่เริ่มต้น:</label>
+									<input class="form-control mt-0" type="time" name="StartDate[]" value="{{data.StartDate|date("H:i")}}" disabled>		
+								</div>
+								<div class="col-3">
+									<label class="mb-0 user-select-none">วันที่สิ้นสุด:</label>
+									<input type="text" name="EndDate[]" class="datepicker form-control mt-0 mb-0" value="{{data.EndDate|date("m/d/Y")}}" disabled>
+								</div>
+								<div class="col-3">
+									<label for="example-time-input" class="mb-0 user-select-none">เวลาที่สิ้นสุด:</label>
+									<input class="form-control mt-0" type="time" name="EndDate[]" value="{{data.EndDate|date("H:i")}}" disabled>		
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="mt-0 mb-0 user-select-none">
+								<span>ข้อความ:</span>
+							</label>
+							<textarea name="Details" class="form-control mt-0 mb-0" rows="6" placeholder="กรุณากรอกข้อความที่ต้องการแจ้งเตือน" disabled>{{data.Details}}</textarea>
+						</div>
+						<div class="row">
+							<div class="col-4">
+								<div class="form-group">
+									<label for="exampleFormControlSelect1">ประเภทของพื้นที่:</label>
+									<select class="form-control" id="exampleFormControlSelect1" aria-describedby="typeHelp" disabled>
+										<option value="all" {% if data.InLocation == "all" %}selected{% endif %}>ทั้งหมด</option>
+										<option value="current" {% if data.InLocation == "current" %}selected{% endif %}>ที่อยู่ปัจจุบัน</option>
+										<option value="home" {% if data.InLocation == "home" %}selected{% endif %}>บ้าน</option>
+										<option value="office" {% if data.InLocation == "office" %}selected{% endif %}>ที่ทำงาน</option>
+									</select>
+									<small id="typeHelp" class="form-text text-muted">พื้นที่ต้องการให้แจ้งเตือน</small>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="form-group">
+									<label for="province">จังหวัด:</label>
+									<select class="form-control" name="province" id="province" required disabled>
+										<option value="{{data.boundary.PROVINCE_ID}}" selected>{{data.boundary.PROVINCE_NAME}}</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="form-group">
+									<label for="district">เขต:</label>
+									<select class="form-control" name="district" id="district" disabled>
+										<option value="{{data.boundary.DISTRICT_ID}}" selected>{{data.boundary.DISTRICT_NAME}}</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						{% if data.Photo is defined and data.Photo != "" %}
+							<div class="row">
+								<div class="col-sm-12">
+									<label>รูปภาพที่อัปโหลด:</label>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-12" style="height:200px;">
+									<img src="data:image/png;base64,{{data.Photo}}" class="img-fluid mh-100" style="cursor: zoom-in;" data-toggle="modal" data-target="#show_img">
+								</div>
+							</div>
+						{% endif %}
+						<div class="form-group" style="margin-top:15px;">
+							<label class="user-select-none">สถานะการแจ้งเตือน:</label>
+							<input type="checkbox" {% if data.IsActive == 1 %}checked{% endif %} data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-on="เปิด" data-off="ปิด" disabled>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6" style="margin-top:10px;">
+					<h5 style="color:#6c757d;">บริเวณที่ต้องการแจ้งเตือน</h5>
+					<hr>
+					{% if data.PolygonID is defined and data.PolygonID != "" %}
+						<div class="form-group row">
+							<label for="NAMEGROUP" class="col-sm-2 col-form-label">ชื่อกลุ่ม</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="NAMEGROUP" value="{% for res in data.polygon %}{{res.Title}} {% endfor %}" disabled>
+							</div>
+						</div>
+					{% endif %}
+					{# <div id="viewDiv" style="height: 380px;width: 100%;margin-top: 15px;"></div> #}
+					<div class="mt-2 w-100" style="height:380px">
+						<div id="view_div" class="view-div"></div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<p class="font-weight-light">บัญชีที่สร้าง: {{data.CreateBy}} วัน-เวลาที่สร้าง: {{data.CreateDate|date("วันที่ j เดือน n ปี Y เวลา H:i")}}น.</p>
+			<p class="font-weight-light">บัญชีที่แก้ไข: {% if data.ModifyBy is defined and data.ModifyBy != "" %}{{data.ModifyBy}}{% else %}{{data.CreateBy}}{% endif %} วัน-เวลาที่แก้ไข: {{data.ModifyDate|date("วันที่ j เดือน n ปี Y เวลา H:i")}}น.</p>
+			<script>
+				document.write('<a href="' + document.referrer + '" class="btn btn-primary mt-2" style="margin-bottom:30px;"><i class="fas fa-reply"></i> <span>ย้อนกลับ</span></a>');
+			</script>
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="show_img" tabindex="-1" aria-labelledby="show_img_Label" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-lg">
+			<div class="modal-content">
+				<img src="data:image/png;base64,{{data.Photo}}" class="img-fluid" style="cursor: zoom-out;" data-dismiss="modal" aria-label="Close">
+			</div>
+		</div>
+	</div>
+
+	{% include 'lbs/script_alert.html.twig' %}
+	{% include 'lbs/script_esri_map.html.twig' %}
+</body>
+</html>

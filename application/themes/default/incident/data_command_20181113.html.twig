@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ข้อมูลสั่งการ</title>
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-metro.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-responsive.css{{VERSIONING}}">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/themes/light.css{{VERSIONING}}" id="style_color">
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/style-custom.css{{VERSIONING}}">
+	<style type="text/css">
+		.panel-group .panel .panel-heading {
+			border: 1px solid #ddd !important;
+		}
+		.alert {
+			padding: 5px 15px !important;
+		}
+		.vehicle-number {
+			background-color: #ddd !important;
+			border-top: 0 !important;
+			-webkit-border-top-left-radius: .4rem !important;
+			-moz-border-top-left-radius: .4rem !important;
+			-ms-border-top-left-radius: .4rem !important;
+			-o-border-top-left-radius: .4rem !important;
+			border-top-left-radius: .4rem !important;
+			-webkit-border-top-right-radius: .4rem !important;
+			-moz-border-top-right-radius: .4rem !important;
+			-ms-border-top-right-radius: .4rem !important;
+			-o-border-top-right-radius: .4rem !important;
+			border-top-right-radius: .4rem !important;
+		}
+		.msg-container {
+			margin-top: 5px !important;
+		}
+		.msg-detail {
+			background-color: #ddd !important;
+			-webkit-border-radius: .4rem !important;
+			-moz-border-radius: .4rem !important;
+			-ms-border-radius: .4rem !important;
+			-o-border-radius: .4rem !important;
+			border-radius: .4rem !important;
+			padding: 5px !important;
+		}
+		.msg-datetime {
+			font-size: 85% !important;
+		}
+	</style>
+	{{FONT_SIZING}}
+</head>
+<body{% if FONT_SIZING == '' %} class="mobile-frame"{% endif %}>
+	<div class="container-fluid container-frame">
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="panel-group" id="accordion_case_responsible" role="tablist" aria-multiselectable="true">
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="accordion_case_responsible_heading">
+							<h4 class="panel-title">
+								<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_case_responsible" data-target="#collapse_case_responsible" aria-expanded="true" aria-controls="collapse_case_responsible" style="padding:10px 15px!important">
+									<strong><i class="fa fa-bars" aria-hidden="true"></i> หน่วยงานรับผิดชอบ</strong>
+								</a>
+							</h4>
+						</div>
+						<div id="collapse_case_responsible" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_case_responsible_heading">
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+										<div class="table-responsive table-min table-non-margin -bottom">
+											<table class="table table-striped table-hover table-condensed table-noborder" cellspacing="0" width="100%">
+												<thead>
+													<tr>
+														<th class="text-center">หน่วยงาน</th>
+														<th class="text-center">พื้นที่ สน.</th>
+														<th class="text-center">เขตตรวจ</th>
+														<th class="text-center">กลุ่มสั่งการ</th>
+													</tr>
+												</thead>
+												<tbody class="text-center">
+													{% for query_responsible in case_responsible if case_responsible is defined and case_responsible is not empty %}
+														<tr>
+															<td>{{query_responsible.department_name}}</td>
+															<td>{{query_responsible.police_station_name}}</td>
+															<td>{{query_responsible.inspection_area_name}}</td>
+															<td>{{query_responsible.command_name}}</td>
+														</tr>
+													{% endfor %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel-group" id="accordion_case_vehicle" role="tablist" aria-multiselectable="true">
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="accordion_case_vehicle_heading">
+							<h4 class="panel-title">
+								<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_case_vehicle" data-target="#collapse_case_vehicle" aria-expanded="true" aria-controls="collapse_case_vehicle" style="padding:10px 15px!important">
+									<strong><i class="fa fa-bars" aria-hidden="true"></i> รถที่ปฏิบัติการ</strong>
+								</a>
+							</h4>
+						</div>
+						<div id="collapse_case_vehicle" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_case_vehicle_heading">
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+										<div class="form-horizontal">
+											<table class="table table-striped table-hover table-condensed table-noborder" cellspacing="0" width="100%">
+												<tbody class="text-left">
+													{% for query_transaction in case_transaction|reverse if case_transaction is defined and case_transaction is not empty %}
+														{% if case_transaction|length > 1 %}
+															<tr>
+																<th colspan="2" class="vehicle-number">คันที่ {{loop.index}}</th>
+															</tr>
+														{% endif %}
+														<tr>
+															<td>เลขรถ</td>
+															<td>{{query_transaction.police_vehicle_number}}</td>
+														</tr>
+														<tr>
+															<td>หน่วยงาน</td>
+															<td>{{query_transaction.command_name}}{{query_transaction.police_station_name != '' ? [' / ', query_transaction.police_station_name]|join : ''}}</td>
+														</tr>
+														<tr>
+															<td>เจ้าหน้าที่สั่งการ</td>
+															<td>{{query_transaction.first_name != '' ? [query_transaction.first_name, query_transaction.last_name != '' ? [' ', query_transaction.last_name]|join : '']|join : ''}}</td>
+														</tr>
+														<tr>
+															<td>สั่งการ</td>
+															<td>{{query_transaction.created_modify|replace({' ระยะเวลา': '<br>ระยะเวลา'})}}</td>
+														</tr>
+														<tr>
+															<td>ตอบรับ</td>
+															<td>{{query_transaction.receive_date|replace({' ระยะเวลา': '<br>ระยะเวลา'})}}</td>
+														</tr>
+														<tr>
+															<td>ถึงจุดเกิดเหตุ</td>
+															<td>{{query_transaction.arrive_date|replace({' ระยะเวลา': '<br>ระยะเวลา'})}}</td>
+														</tr>
+														<tr>
+															<td>เสร็จสิ้น</td>
+															<td>{{query_transaction.close_date|replace({' ระยะเวลา': '<br>ระยะเวลา'})}}</td>
+														</tr>
+														<!--
+														<div class="form-group non-margin -bottom">
+															<label class="col-sm-2 control-label">เลขรถ</label>
+															<div class="col-sm-10">
+																<p class="form-control-static">{{query_transaction.police_vehicle_number}}</p>
+															</div>
+														</div>
+														<div class="form-group non-margin -bottom">
+															<label class="col-sm-2 control-label">หน่วยงาน</label>
+															<div class="col-sm-10">
+																<p class="form-control-static">{{query_transaction.command_name}}{{query_transaction.police_station_name != '' ? [' / ', query_transaction.police_station_name]|join : ''}}</p>
+															</div>
+														</div>
+														<div class="form-group non-margin -bottom">
+															<label class="col-sm-2 control-label">เจ้าหน้าที่สั่งการ</label>
+															<div class="col-sm-10">
+																<p class="form-control-static">{{query_transaction.first_name != '' ? [query_transaction.first_name, query_transaction.last_name != '' ? [' ', query_transaction.last_name]|join : '']|join : ''}}</p>
+															</div>
+														</div>
+														<div class="form-group non-margin -bottom">
+															<label class="col-sm-2 control-label">สั่งการ</label>
+															<div class="col-sm-10">
+																<p class="form-control-static">{{query_transaction.created_modify}}</p>
+															</div>
+														</div>
+														<div class="form-group non-margin -bottom">
+															<label class="col-sm-2 control-label">ตอบรับ</label>
+															<div class="col-sm-10">
+																<p class="form-control-static">{{query_transaction.receive_date}}</p>
+															</div>
+														</div>
+														<div class="form-group non-margin -bottom">
+															<label class="col-sm-2 control-label">ถึงจุดเกิดเหตุ</label>
+															<div class="col-sm-10">
+																<p class="form-control-static">{{query_transaction.arrive_date}}</p>
+															</div>
+														</div>
+														<div class="form-group non-margin -bottom">
+															<label class="col-sm-2 control-label">เสร็จสิ้น</label>
+															<div class="col-sm-10">
+																<p class="form-control-static">{{query_transaction.close_date}}</p>
+															</div>
+														</div>
+														-->
+														{#
+														{% if loop.index < case_transaction|length %}
+															<hr class="hr-sm">
+														{% endif %}
+														#}
+													{% endfor %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel-group" id="accordion_case_note" role="tablist" aria-multiselectable="true">
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="accordion_case_note_heading">
+							<h4 class="panel-title">
+								<a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion_case_note" data-target="#collapse_case_note" aria-expanded="true" aria-controls="collapse_case_note" style="padding:10px 15px!important">
+									<strong><i class="fa fa-bars" aria-hidden="true"></i> ข้อความสื่อสาร</strong>
+								</a>
+							</h4>
+						</div>
+						<div id="collapse_case_note" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="accordion_case_note_heading">
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+										{% for query_note in case_note if case_note is defined and case_note is not empty %}
+											<div class="alert non-margin -bottom" role="alert">
+												<div class="row">
+													{#
+													<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><p>{{query_note.user_modify}}: {{query_note.detail}}</p></div>
+													<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><span style="font-size:85%!important">{{query_note.modified_date}}</span></div>
+													#}
+													<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+														<strong>{{query_note.user_modify}}</strong>
+													</div>
+													<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+														<div class="msg-container">
+															<span class="msg-detail">{{query_note.detail}}</span>
+														</div>
+														<div class="msg-container">
+															<span class="msg-datetime">{{query_note.modified_date}}</span>
+														</div>
+													</div>
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="{{base_url()}}assets/js/bootstrap.min.js"></script>
+</body>
+</html>

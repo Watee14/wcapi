@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Incident Storage</title>
+	{% include 'lbs/style.html.twig' %}
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/plugins/datatables-1.10.21/css/datatables.min.css">
+	<style type="text/css">
+		#btn_search{-webkit-border-top-left-radius:0;-moz-border-top-left-radius:0;-ms-border-top-left-radius:0;-o-border-top-left-radius:0;border-top-left-radius:0;-webkit-border-bottom-left-radius:0;-moz-border-bottom-left-radius:0;-ms-border-bottom-left-radius:0;-o-border-bottom-left-radius:0;border-bottom-left-radius:0;height:31px;margin-bottom:3px;padding-bottom:0;padding-top:0}
+		#btn_search .svg-inline--fa{height:.875rem;width:.875rem}
+		#btn_search:focus{box-shadow:none}
+		.dataTables_filter input{border-right:0;-webkit-border-top-right-radius:0;-moz-border-top-right-radius:0;-ms-border-top-right-radius:0;-o-border-top-right-radius:0;border-top-right-radius:0;-webkit-border-bottom-right-radius:0;-moz-border-bottom-right-radius:0;-ms-border-bottom-right-radius:0;-o-border-bottom-right-radius:0;border-bottom-right-radius:0}
+		.form-control:focus,.page-link:focus{box-shadow:none}
+	</style>
+</head>
+<body>
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col">
+					<div class="float-left">
+						<h5 class="h5 form-text mt-0 mb-0">Incident Storage</h5>
+					</div>
+					<div class="float-right">
+						{% include 'lbs/navigation.html.twig' %}
+					</div>
+					<div class="clearfix"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div class="table-responsive mt-2 mb-2">
+						<table id="example" class="display table table-bordered table-hover table-sm table-striped" style="width:100%">
+							<thead>
+								<tr>
+									<th class="text-center">#</th>
+									<th class="text-center">Mapping ID</th>
+									<th class="text-center">Incident ID</th>
+									<th class="text-center">Citizen Phone Number</th>
+									<th class="text-center">Modify Date</th>
+									<th class="text-center">Inident Status</th>
+									<th class="text-center">Data</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_data_viewer" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<h5 class="modal-title text-white"></h5>
+				</div>
+				<div class="modal-body"></div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/datatables-1.10.21/js/datatables.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			$('#example').DataTable( {
+				ajax:{
+					url:"{{base_url()}}lbs/incident/display",
+					type:"POST",
+				},
+				columnDefs:[
+					{targets:0,className:'text-center',orderable:false,searchable:false,visible:true},
+					{targets:1,className:'text-center',orderable:false,searchable:true,visible:true},
+					{targets:2,className:'text-center',orderable:false,searchable:false,visible:true},
+					{targets:3,className:'text-center',orderable:false,searchable:true,visible:true},
+					{targets:4,className:'text-center',orderable:false,searchable:false,visible:true},
+					{targets:5,className:'text-center',orderable:false,searchable:false,visible:true},
+					{targets:-1,className:'text-center',orderable:false,searchable:false,visible:true,render:function(data,type,row){
+						return '<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#modal_data_viewer" data-id="' + row[1] + '">View</button>';
+					}}
+				],
+				initComplete:function(){
+					var input=$('.dataTables_filter input').unbind(),
+						self=this.api(),
+						$searchButton=$('<button id="btn_search" class="btn btn-secondary border-left-0 text-white" role="button" title="Search"></button>').html('<i class="fas fa-search"></i>').click(function(){
+							self.search(input.val()).draw();
+						});
+					$('.dataTables_filter input').on('keydown keypress keyup',function(e){
+						if(e.keyCode==13){
+							e.preventDefault();
+							self.search(input.val()).draw();
+						}
+					});
+					$('.dataTables_filter label').append($searchButton);
+				},
+				lengthMenu:[[10,25,50,100],[10,25,50,100]],
+				order:false,
+				paging:true,
+				pagingType:'full_numbers',
+				processing:true,
+				serverSide:true
+			});
+			$('#modal_data_viewer').on('show.bs.modal',function(e){
+				$('#modal_data_viewer .modal-body').html('<i class="fas fa-spinner fa-spin"></i> Loading...');
+			});
+			$('#modal_data_viewer').on('shown.bs.modal',function(e){
+				var id=$(e.relatedTarget).data('id');
+				if(id!=''){
+					$('#modal_data_viewer .modal-title').html(id);
+					$.ajax({
+						url:"{{def_url.incident}}?mapping_id="+id,
+						method:"GET",
+						dataType:"html",
+						timeout:10000,
+					}).done(function(msg){
+						var content='';
+						var data=$.parseJSON(msg);
+						content+='<ul class="mb-0">';
+						$.each(data,function(is,posts){
+							if(typeof(posts)=='object'&&posts!=null){
+								content+='<li class="text-break">'+is+': <ul class="mb-0">';
+								$.each(posts,function(i,post){
+									content+='<li class="text-break">'+i+': '+post+'</li>';
+								});
+								content+='</ul></li>';
+							}
+							else
+								content+='<li class="text-break">'+is+': '+posts+'</li>';
+						});
+						content+='</ul>';
+						$('#modal_data_viewer .modal-body').html(content);
+					}).fail(function(jqXHR,textStatus){
+						$('#modal_data_viewer .modal-body').html('No records available');
+					}).always(function(){});
+				}
+			});
+			$('#modal_data_viewer').on('hidden.bs.modal',function(e){
+				$('#modal_data_viewer .modal-title').html(null);
+				$('#modal_data_viewer .modal-body').html(null);
+			});
+		});
+	</script>
+</body>
+</html>

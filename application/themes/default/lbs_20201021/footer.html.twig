@@ -1,0 +1,26 @@
+<footer class="fixed-bottom bg-light pt-1 pb-1 border-top">
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<div class="clearfix">
+					<div class="float-sm-left text-center text-sm-left">
+						{% if functions == 'create' or sub_functions == 'read' %}
+							<a class="btn btn-link btn-lg text-decoration-none pl-0 pr-0" href="{{base_url()}}lbs/signin"><small>ลงชื่อเข้าใช้ / Sign in</small></a>
+						{% else %}
+							<a class="btn btn-link btn-lg text-decoration-none pl-0 pr-0" href="{{base_url()}}lbs/signout"><small>ลงชื่อออกจากระบบ / Logout</small></a>
+						{% endif %}
+					</div>
+					{% if (functions == 'create' or functions == 'update') and sub_functions != 'read' %}
+						<div class="float-sm-right text-center text-sm-right">
+							<button class="btn btn-primary btn-lg" type="button" data-toggle="modal" data-target="#modal_confirm"><i class="fas fa-chevron-circle-right"></i> ดำเนินการต่อ / Continue</button>
+						</div>
+					{% elseif sub_functions == 'news_list' %}
+						<div class="float-sm-right text-center text-sm-right">
+							<a class="btn btn-primary btn-lg" href="{{base_url()}}lbs/news/create" type="button"><i class="fas fa-plus-circle"></i> สร้างข่าวสาร / Create news</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>

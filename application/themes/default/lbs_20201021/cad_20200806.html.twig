@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>LBS Monitor</title>
+	{% include 'lbs/style.html.twig' %}
+	<style type="text/css">
+		body{height:100%;margin:0}
+		#form_text_result_request_cad{height:41vh}
+		#form_text_result_callers_cad{height:18vh}
+		#map{height:92vh}
+	</style>
+</head>
+<body onload="init()">
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xl">
+					<h5 class="h5 form-text mt-0 mb-0">LBS Monitor</h5>
+					<label class="form-text lead h5 mt-2 mb-0">Requesting caller's current location.</label>
+					<div class="form-group mb-0">
+						<label class="mt-2 mb-0">Service <abbr title="Uniform Resource Locator">URL</abbr>: </label>
+						<input type="text" id="form_control_url_cad" name="form_control_url_cad" class="form-control mt-0" value="{{def_url.cad}}" placeholder="Enter service's URL">
+						<label class="mt-2 mb-0"><abbr title="Automatic number identification">ANI</abbr>: </label>
+						<input type="text" id="form_control_ani_cad" name="form_control_ani_cad" class="form-control mt-0 mb-0" value="{{def_ani}}" placeholder="Enter caller's ANI">
+						<label class="mt-2 mb-0">Protocol: </label>
+						<div class="mt-0 mb-0">
+							<div class="custom-control custom-radio">
+								<input type="radio" id="form_control_protocol_cad_db" name="form_control_protocol_cad" class="custom-control-input" value="-1" checked>
+								<label for="form_control_protocol_cad_db" class="custom-control-label">Database</label>
+							</div>
+							<div class="custom-control custom-radio">
+								<input type="radio" id="form_control_protocol_cad_https" name="form_control_protocol_cad" class="custom-control-input" value="1">
+								<label for="form_control_protocol_cad_https" class="custom-control-label">Send request to <abbr title="Telephone company">TELCO</abbr> via <abbr title="Hypertext Transfer Protocol Secure">HTTPS</abbr></label>
+							</div>
+							<div class="custom-control custom-radio">
+								<input type="radio" id="form_control_protocol_cad_sms" name="form_control_protocol_cad" class="custom-control-input" value="2">
+								<label for="form_control_protocol_cad_sms" class="custom-control-label">Send GEOLink to caller's mobile via <abbr title="Short message service">SMS</abbr></label>
+							</div>
+						</div>
+						<button type="button" id="btn_send_cad" class="btn btn-primary mt-2 mb-0">
+							<i class="fas fa-reply"></i>
+							<span>Request</span>
+						</button>
+						<div>
+							<label class="mt-2 mb-0">Result of request: </label>
+							<span id="form_text_result_request_cad" class="form-control-plaintext text-break mt-0 mb-0 p-0 overflow-auto border rounded"></span>
+							<div id="result_from_caller" class="d-none">
+								<label class="mt-1 mb-0">
+									<span>Result from caller:</span>
+									<button type="button" id="btn_reload_result_from_caller" class="btn btn-secondary btn-sm pt-0 pr-1 pb-0 pl-1 mb-1" title="Reload result from caller">
+										<i class="fas fa-sync-alt"></i>
+									</button>
+								</label>
+								<span id="form_text_result_callers_cad" class="form-control-plaintext text-break mt-0 mb-0 p-0 overflow-auto border rounded"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xl">
+					<div class="float-right">
+						{% include 'lbs/navigation.html.twig' %}
+					</div>
+					<div class="clearfix"></div>
+					<div id="map" class="mt-1 border rounded">
+						<div class="m-2"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+					</div>
+				</div>
+				<div aria-live="polite" aria-atomic="true" style="min-height:200px">
+					<div id="toast_location_updated" style="bottom:1rem;position:absolute;right:2rem"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript" src="https://api.longdo.com/map/?key={{_MAP_KEY}}"></script>
+	<script type="text/javascript">
+		var btn_reload_result_from_caller=document.getElementById('btn_reload_result_from_caller');
+		var d;
+		var dd,mm,yyyy,hh,ii,ss;
+		var date;
+		var jd={ani:"",ptl:"",timekey:""};
+		var map;
+		var sms_puller=null;
+		var taddr='';
+		var tmp_timestamp=null;
+		var wgs84_lat=0;
+		var wgs84_lon=0;
+		function init(){
+			map=new longdo.Map({layer:[longdo.Layers.GRAY_EN],placeholder:document.getElementById('map')});
+			map.Ui.Crosshair.visible(false);
+			map.Ui.Geolocation.visible(false);
+			map.Ui.LayerSelector.visible(false);
+			map.Ui.Toolbar.visible(false);
+			map.location({lon:'{{def_loc.lon}}',lat:'{{def_loc.lat}}'},true).zoom(15,true);
+		}
+		function sms_pulling() {
+			$.ajax({
+				url:'{{def_url.sms}}',
+				method:'POST',
+				data:{ani:$('[name="form_control_ani_cad"]').val()},
+				dataType:'html'
+			}).done(function(msg){
+				var data=$.parseJSON(msg);
+				try{
+					if(data.status==1){
+						wgs84_lat=new Number(parseFloat(data.data.latitude)).toFixed(6);
+						wgs84_lon=new Number(parseFloat(data.data.longitude)).toFixed(6);
+						if (wgs84_lat!=0&&wgs84_lon!=0){
+							if(tmp_timestamp!=null&&tmp_timestamp!=data.data.timestamp){
+								taddr=''+
+									'<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">'+
+										'<div class="toast-header bg-primary">'+
+											'<label class="text-white mr-auto mb-0">Location information</label>'+
+											'<button type="button" class="ml-1 mb-1 close" data-dismiss="toast" aria-label="Close">'+
+												'<span aria-hidden="true">&times;</span>'+
+											'</button>'+
+										'</div>'+
+										'<div class="toast-body bg-light">'+
+											'<ul class="list-unstyled mb-0">';$.each(data.data,function(i,a){
+								taddr+=			'<li style="max-width:300px">'+i+': '+a+'</li>';});
+								taddr+=		'</ul>'+
+										'</div>'+
+									'</div>';
+								var td=new Date(data.data.timestamp*1000);
+								var thh=td.getHours(),tii='0'+td.getMinutes(),tss='0'+td.getSeconds();
+								var tformat=thh+':'+tii.substr(-2)+':'+tss.substr(-2);
+								$('#toast_location_updated').html(''+
+									'<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000">'+
+										'<div class="toast-header bg-success">'+
+											'<label class="text-white mb-0">Location updated '+tformat+'</label>'+
+										'</div>'+
+									'</div>'+taddr);
+								$('.toast').toast('show');
+								map.Overlays.clear().add(new longdo.Marker({lon:wgs84_lon,lat:wgs84_lat}));
+								map.location({lon:wgs84_lon,lat:wgs84_lat},true);
+								var content='';
+								$.each(data,function(i,a){
+									if(typeof a==='object'&&a!==null){
+										content+='<li>'+i+': <ul>';
+										$.each(a,function(j,b){
+											content+='<li>'+j+': '+b+'</li>';
+										});
+										content+='</ul></li>';
+									}
+									else
+										content+='<li>'+i+': '+a+'</li>';
+								});
+								$("#form_text_result_callers_cad").html('<ul class="mb-0">'+content+'</ul>');
+								clearInterval(sms_puller);
+							}
+							else{
+								$('#toast_location_updated').html(taddr);
+								$('.toast').toast('hide');
+							}
+							tmp_timestamp=data.data.timestamp;
+						}
+					}
+				}
+				catch(err){
+					alert('Invalid location');
+				}
+			}).fail(function(jqXHR, textStatus) {
+				alert("Request failed: "+textStatus);
+				$("#form_text_result_callers_cad").html(textStatus);
+				$('#toast_location_updated').html(null);
+				$('.toast').toast('hide');
+			}).always(function(){
+				$("#btn_reload_result_from_caller").html('<i class="fas fa-sync-alt"></i>');
+				$("#btn_reload_result_from_caller").attr('disabled',false).removeClass('disabled');
+				$('[name="form_control_url_cad"]').attr('readonly',false).removeClass('readonly');
+				$('[name="form_control_ani_cad"]').attr('readonly',false).removeClass('readonly');
+				$('[name="form_control_protocol_cad"]').attr('disabled',false).removeClass('disabled');
+				$("#btn_send_cad").attr('disabled',false).removeClass('disabled');
+			});
+		}
+		btn_reload_result_from_caller.onclick=function(){
+			btn_reload_result_from_caller.innerHTML='<i class="fas fa-sync-alt fa-spin"></i>';
+			btn_reload_result_from_caller.setAttribute('disabled','disabled');
+			btn_reload_result_from_caller.classList.add('disabled');
+			sms_pulling();
+		}
+		$(function(){
+			$("#btn_send_cad").on('click',function(){
+				clearInterval(sms_puller);
+				map.Overlays.clear();
+				d=new Date();
+				dd=d.getDate();mm=('0'+(d.getMonth()+1)).slice(-2);yyyy=d.getFullYear();hh=d.getHours();ii=d.getMinutes();ss=d.getSeconds();
+				date=dd+mm+yyyy+hh+ii+ss;
+				jd={ani:$('[name="form_control_ani_cad"]').val(),ptl:$('[name="form_control_protocol_cad"]:checked').val(),timekey:date};
+				$('.toast').toast('hide');
+				$('#toast_location_updated').html(null);
+				$("#form_text_result_request_cad").html(null);
+				$('#form_text_result_callers_cad').html(null);
+				$("#btn_send_cad").attr('disabled',true).addClass('disabled');
+				$("#btn_reload_result_from_caller").attr('disabled',true).addClass('disabled');
+				$('[name="form_control_url_cad"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_ani_cad"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_protocol_cad"]').attr('disabled',true).addClass('disabled');
+				$.ajax({
+					url:$('[name="form_control_url_cad"]').val(),
+					method:"POST",
+					data:JSON.stringify(jd),
+					contentType:"application/json;charset=utf-8",
+					dataType:"html"
+				}).done(function(msg){
+					wgs84_lat=0;
+					wgs84_lon=0;
+					var content='';
+					var data=$.parseJSON(msg);
+					taddr=''+
+						'<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">'+
+							'<div class="toast-header bg-primary">'+
+								'<label class="text-white mr-auto mb-0">Location information</label>'+
+								'<button type="button" class="ml-1 mb-1 close" data-dismiss="toast" aria-label="Close">'+
+									'<span aria-hidden="true">&times;</span>'+
+								'</button>'+
+							'</div>'+
+							'<div class="toast-body bg-light">'+
+								'<ul class="list-unstyled mb-0">';
+					$.each(data,function(i,a){
+						if(typeof a==='object'&&a!==null){
+							content+='<li>'+i+': <ul>';
+							$.each(a,function(j,b){
+								if(typeof b==='object'&&b!==null){
+									content+='<li>'+j+': <ul>';
+									$.each(b,function(k,c){
+										if(j=='address'){
+											taddr+='<li style="max-width:300px">'+k+': '+c+'</li>';
+										}
+										if(typeof c==='object'&&c!==null){
+											content+='<li>'+k+': <ul>';
+											$.each(c,function(l,d){
+												content+='<li>'+l+': '+d+'</li>';
+											});
+											content+='</ul></li>';
+										}
+										else
+											content+='<li>'+k+': '+c+'</li>';
+									});
+									content+='</ul></li>';
+								}
+								else{
+									content+='<li>'+j+': '+b+'</li>';
+									if(j=='latitude'&&wgs84_lat==0)
+										wgs84_lat=new Number(parseFloat(b)).toFixed(6);
+									else if(j=='longitude'&&wgs84_lon==0)
+										wgs84_lon=new Number(parseFloat(b)).toFixed(6);
+								}
+							});
+							content+='</ul></li>';
+						}
+						else
+							content+='<li>'+i+': '+a+'</li>';
+							if(i=='latitude'&&wgs84_lat==0)
+								wgs84_lat=new Number(parseFloat(b)).toFixed(6);
+							else if(i=='longitude'&&wgs84_lon==0)
+								wgs84_lon=new Number(parseFloat(b)).toFixed(6);
+					});
+					$("#form_text_result_request_cad").html('<ul class="mb-0">'+content+'</ul>');
+					if (wgs84_lat!=0&&wgs84_lon!=0){
+						try{
+							map.Overlays.clear().add(new longdo.Marker({lon:wgs84_lon,lat:wgs84_lat}));
+							map.location({lon:wgs84_lon,lat:wgs84_lat},true);
+						}
+						catch(err){
+							alert('Invalid location');
+						}
+					}
+					if($('[name="form_control_protocol_cad"]:checked').val()==2){
+						$('[name="form_control_url_cad"]').attr('readonly',true).addClass('readonly');
+						$('[name="form_control_ani_cad"]').attr('readonly',true).addClass('readonly');
+						$('[name="form_control_protocol_cad"]').attr('disabled',true).addClass('disabled');
+						$("#btn_send_cad").attr('disabled',true).addClass('disabled');
+						$("#btn_reload_result_from_caller").attr('disabled',true).addClass('disabled');
+						$('#form_text_result_callers_cad').html('<i class="ml-1 fas fa-spinner fa-spin"></i> Waiting caller press GEOLink...');
+						sms_puller=setInterval(sms_pulling,2000);
+					}
+					else if($('[name="form_control_protocol_cad"]:checked').val()==-1){
+						$('#toast_location_updated').html(taddr);
+						$('.toast').toast('show');
+					}
+					else{
+						$('#toast_location_updated').html(null);
+						$('.toast').toast('hide');
+					}
+				}).fail(function(jqXHR,textStatus){
+					alert("Request failed: "+textStatus);
+					$("#form_text_result_request_cad").html(textStatus);
+					$('[name="form_control_url_cad"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_ani_cad"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_protocol_cad"]').attr('disabled',false).removeClass('disabled');
+					$("#btn_send_cad").attr('disabled',false).removeClass('disabled');
+					$("#btn_reload_result_from_caller").attr('disabled',false).removeClass('disabled');
+					$('#form_text_result_callers_cad').html(null);
+					$('#toast_location_updated').html(null);
+					$('.toast').toast('hide');
+				}).always(function(){
+					if($('[name="form_control_protocol_cad"]:checked').val()!=2){
+						$('[name="form_control_url_cad"]').attr('readonly',false).removeClass('readonly');
+						$('[name="form_control_ani_cad"]').attr('readonly',false).removeClass('readonly');
+						$('[name="form_control_protocol_cad"]').attr('disabled',false).removeClass('disabled');
+						$("#btn_send_cad").attr('disabled',false).removeClass('disabled');
+						$("#btn_reload_result_from_caller").attr('disabled',false).removeClass('disabled');
+						$('#form_text_result_callers_cad').html(null);
+					}
+				});
+			});
+			$('[name="form_control_protocol_cad"]').on('change',function(){
+				if($(this).val()==2){
+					$('#form_text_result_request_cad').css('height','18vh');
+					$('#result_from_caller').removeClass('d-none');
+				}
+				else{
+					$('#result_from_caller').addClass('d-none');
+					$('#form_text_result_request_cad').css('height','41vh');
+				}
+			});
+		});
+	</script>
+</body>
+</html>

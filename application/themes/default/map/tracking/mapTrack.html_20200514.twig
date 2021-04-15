@@ -1,0 +1,456 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../../../assets/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/plugins/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/style-metro.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/style.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/style-responsive.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/themes/light.css{{VERSIONING}}" id="style_color">
+<link rel="stylesheet" type="text/css" href="../../../assets/plugins/map/longdo/css/style.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/plugins/map/longdo/css/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/style-custom.css{{VERSIONING}}">
+<link rel="stylesheet" type="text/css" href="../../../assets/toggle/bootstrap-toggle.min.css{{VERSIONING}}">
+<style type="text/css">
+.ldmap_placeholder .ldmap_navigation{
+	top: 50px !important ;
+	display: none ;
+}
+.ldmap_placeholder .ldmap_topleft{
+	top: 50px !important ;
+	display: none ;
+}
+.ldmap_placeholder .ldmap_topright{
+	top: 50px !important ;
+	display: none ;
+}
+.blink-image {
+    -moz-animation: blink normal 1s infinite ease-in-out; /* Firefox */
+    -webkit-animation: blink normal 1s infinite ease-in-out; /* Webkit */
+    -ms-animation: blink normal 1s infinite ease-in-out; /* IE */
+    animation: blink normal 1s infinite ease-in-out; /* Opera and prob css3 final iteration */
+}
+@-moz-keyframes blink {
+    0% { opacity:1;  }
+    50% {  opacity:0; }
+    100% {  opacity:1;  }
+} 
+
+@-webkit-keyframes blink {
+    0% { opacity:1; }
+    50% { opacity:0; }
+    100% { opacity:1; }
+}
+/* IE */
+@-ms-keyframes blink {
+    0% { opacity:1; }
+    50% { opacity:0;  }
+    100% {  opacity:1; }
+} 
+/* Opera and prob css3 final iteration */
+@keyframes blink {
+    0% { opacity:1; }
+    50% { opacity:0; }
+    100% { opacity:1; }
+} 
+</style> 
+<div id="container"></div>
+<div class="container-fluid container-frame form-191">
+	<div class="row">
+		<div class="">
+			<div class="form-group non-margin">
+				<div style="/*left:50%;*/position:absolute">
+					<div id="filters" style="height:auto;/*left:-50%;margin:5px;*/position:relative;width:auto;z-index:256">
+						<div class="form-inline">
+							<div class="form-group" style="margin-bottom:0!important">
+								<label class="control-label" style="margin-top:0;margin-bottom:0px">
+									<!-- <span class="glyphicon glyphicon-map-marker small"></span>
+									<span class="small">ค้นหาสถานที่:</span> -->
+								</label>
+								<div class="input-group">
+									<!-- <input type="text" id="q" class="form-control input-sm" placeholder="ใส่ชื่อสถานที่ หรือชื่อถนน" onkeyup="searchLocation()" style="font-size:12px!important;margin-top:0">
+									<a class="glyphicon glyphicon-remove form-control-feedback text-muted small" aria-hidden="true" role="button" onclick="$('#q').val(null);$('#q').focus();" style="pointer-events:auto;right:43px;top:0!important;z-index:1000" title="ล้างข้อมูล"></a>
+									<a class="input-group-addon btn blue" role="button" onclick="searchLocation()" style="border:0!important">
+										<span class="glyphicon glyphicon-search small"></span>
+									</a> -->
+									<input type="text" id="q" class="form-control input-sm" placeholder="ใส่ชื่อสถานที่ หรือชื่อถนน"  style="font-size:12px!important;margin-top:0">
+									<a class="glyphicon glyphicon-remove form-control-feedback text-muted small" aria-hidden="true" role="button" onclick="$('#q').val(null);$('#q').focus();" style="pointer-events:auto;right:43px;top:0!important;z-index:1000" title="ล้างข้อมูล"></a>
+									<a class="input-group-addon btn blue" role="button" onclick="searchLocation()" style="border:0!important">
+										<span class="glyphicon glyphicon-search small"></span>
+									</a>
+								</div>
+								<div id="searchSelect">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="desc" hidden>
+			{# ที่อยู่ : <textarea rows="3" cols="30" id="address"></textarea><br> #}
+			ถนน : <input type="text" id="road"><br>
+			เขต : <input type="text" id="district"><br>
+			แขวง : <input type="text" id="subdistrict"><br>
+			จังหวัด : <input type="text" id="province"><br>
+			รหัสไปรษณีย์ : <input type="text" id="postcode">
+		</div>
+		<div id="map"></div>
+	</div>
+</div>
+<div class="modal fade record-manage modal-frame" tabindex="-1" role="dialog" aria-labelledby="record-manage-label" id="modalwindow">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+				<h4 class="modal-title" id="record-manage-label"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="form-group">
+							<button class="btn pull-left" data-dismiss="modal" id="cancel">ยกเลิก</button>
+							<button class="btn green pull-right" id="save">ยืนยัน</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>  
+<script type="text/javascript" src="../../../assets/plugins/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../assets/plugins/map/longdo/js/jquery-3.1.1.js"></script>
+<script type="text/javascript" src="../../../assets/js/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="../../../assets/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../assets/plugins/map/longdo/js/html2canvas.js"></script>
+<script type="text/javascript" src="{{_SECURE}}api.longdo.com/map/?key={{_MAP_KEY}}"></script>
+<script src="{{_MAP_SERVER}}?key={{_MAP_KEY}}"></script>
+<script type="text/javascript" src="../../../assets/plugins/map/longdo/js/jquery-ui.js"></script>
+<script type="text/javascript" src="../../../assets/toggle/bootstrap-toggle.min.js"></script>
+<script type="text/javascript" src="../../../assets/map/stdScript_SMH.js{{VERSIONING}}"></script>
+<script type="text/javascript" src="../../../assets/map/opencaseScript_SMH.js{{VERSIONING}}"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+	var base_url = '../../../';
+	// alert(base_url);
+	// $('.validate-alert').fadeOut('fast');
+	var poli = [];
+  	var poliInterval;
+	init();
+	//renderArea();
+	//getPoliceCar();
+	var element_case_id     = "{{element_case_id}}";
+	var element_address     = "{{element_address}}";
+	var element_latitude    = "{{element_latitude}}";
+	var element_longitude   = "{{element_longitude}}";
+	// var case_lat   		= "{{case_lat}}";
+	// var case_lon   		= "{{case_lon}}";
+	// var case_direction   = "{{case_direction}}";
+	var smh_lat = '{{_smh_lat}}' ;
+	var smh_lon = '{{_smh_lon}}' ;
+	var smh_end_lat = "";
+	var smh_end_lon = "";
+	var smh_address = "";
+	var smh_distance = "0";
+	var smh_time = "0";
+	var lineString = '{{lineString}}' ;
+	var stage = '{{stage}}' ;
+	console.log('{{_smh_lat}}');
+	 
+	if( smh_lat!='' ){
+
+		addMarker(  smh_lon ,smh_lat  , "" , "userIcon.png" , "citizen");
+		map.location({
+            lon: smh_lon ,
+            lat: smh_lat ,
+           }, true);
+        map.zoom(13);
+	}
+	if( stage=='view' ){
+		obj = $.parseJSON(lineString);
+		var geom1 = new longdo.Polyline( obj,{  lineColor: 'rgba(56, 56, 224, 0.8)',});
+		map.Overlays.add(geom1);
+		addMarker('{{end_lon}}', '{{end_lat}}', {"type":"case"}, 'flag.png' , "destinate");
+	}
+	if (typeof setLocations === 'function' || (element_case_id != null && element_case_id != '')) {
+		setLocations(element_case_id);
+	}
+	function getAddress(lonLat) {
+		$.ajax({
+			url: base_url + "mapApi/address",
+			data: {
+				"lat": lonLat['lat'],
+				"lon": lonLat['lon']
+			}
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			var road = '';
+			var province = '';
+			var district = '';
+			var subdistrict = '';
+			var postcode = '';
+			var address = '';
+			if (obj['road'] != undefined) 	{ road 			= obj['road']; 			}
+			if (obj['province'])			{ province 		= obj['province']; 		}
+			if (obj['district'])			{ district 		= obj['district']; 		}
+			if (obj['subdistrict'])			{ subdistrict 	= obj['subdistrict']; 	}
+			if (obj['postcode'])			{ postcode 		= obj['postcode']; 		}
+			address = road + ' ' + subdistrict + ' ' + district + ' ' + province + ' ' + postcode;
+			/*if (element_address != '' && element_latitude != '' && element_longitude != '') {
+				window.opener.return2elements(element_address,		(address        != 'undefined' ? address        : ''));
+				window.opener.return2elements(element_latitude,		(lonLat['lat']  != 'undefined' ? lonLat['lat']  : ''));
+				window.opener.return2elements(element_longitude,	(lonLat['lon']  != 'undefined' ? lonLat['lon']  : ''));
+			}*/
+			//var mData =  {} ;
+			//mData['address'] = address ;
+			//mData['time'] = "0" ;
+			//mData['distance'] = "0" ;
+			//console.log(    JSON.stringify(mData) );
+			smh_end_lat = lonLat['lat'] ;
+			smh_end_lon = lonLat['lon'] ;
+			smh_address = address;
+
+	 
+			window.ReactNativeWebView.postMessage( lonLat['lat']+"|||"+lonLat['lon']+"|||"+address +"|||0|||0" );
+			//window.ReactNativeWebView.postMessage( lonLat['lat']+"|||"+lonLat['lon']+"|||"+address +"|||"+obj['est_distance']+"|||--"+obj['est_time'] );
+			//document.getElementById("container").innerHTML +=  address ;
+		});
+	}
+	function getPolyLines() {
+		var ds = [];
+		var i = 0;
+		$.each(map.Overlays.list(), function(key, value) {
+			if (value instanceof longdo.Polyline == true) {
+				ds[i] = value.location();
+				i++;
+			}
+		});
+		window.opener.return2elements('case_direction',	JSON.stringify(ds) != 'undefined' ? JSON.stringify(ds) : '');
+	}
+	/*function getPoliceCar() {
+ 		clearInterval(poliInterval);
+		$.ajax({
+			url: base_url + "patrol/monPatrol",
+			data: {}
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			//console.log(obj);
+			$.each( obj['data'] , function(key, value) {
+				//console.log(value);
+				if(value['police_vehicle_lon']>1){
+					var re = clearMarker_mark( value['id'] , value['police_vehicle_lat']+'_'+value['police_vehicle_lon']+'_'+value['police_vehicle_status_code'] ) ;
+					console.log(poli[ value['id'] ]);
+					if(re==true || poli[ value['id'] ]== undefined ){
+						addMarker_track(value['police_vehicle_lon'], value['police_vehicle_lat'], value , 'police_car.png');
+					}
+
+				}
+
+			});
+			// addMarker(lonLat['lon'], lonLat['lat'], '', 'marker.png');
+			poliInterval = setInterval(function(){
+				getPoliceCar();
+			}, 5000);
+		});
+	}*/
+
+	/*function addMarker_track(lon, lat, desc, icon) {
+		console.log('add');
+		// alert(base_url);
+		// var marker1 = new longdo.Marker({ lon: lon, lat: lat });
+		var detail = "<b>หน่วยงาน : </b>"+desc['department_name']+'<br><b>กลุ่มสั่งการ :</b>'+desc['command_name']+'<br><b>สถานีตำรวจ : '+desc['police_station_name']+'</b><hr><b>สถานะ :</b> '+desc['police_vehicle_status_name']  ;
+		if(desc['case_id']!='' && desc['case_id']!=null){
+			detail += "<br><b>หมายเลขเหตุ :</b> "+desc['case_id']+'<br><b>ระยะเวลา :</b> '+ desc['duration'] ;
+		}
+		marker = new longdo.Marker({
+			lon: lon,
+			lat: lat
+		}, {
+			title: desc['police_vehicle_number'],
+			icon: {
+				url: base_url + '/assets/icon/' + icon,
+				//html: '<img src="'+ base_url + '/assets/icon/' + icon+'" width="24">' ,
+				//offset: { x: 12, y: 45 }
+				// offset: { x: 12, y: 45 }
+				//size: { width: 300, height: 200 },
+			},
+			detail: detail,
+			size: { width: 250, height: 170 },
+			//visibleRange: { min: 7, max: 8 },
+			// draggable: true,
+			weight: longdo.OverlayWeight.Top
+		});
+		marker['type'] = 'police_car' ;
+		marker['id'] = desc['id'] ;
+		marker['latlon'] = desc['police_vehicle_lat']+'_'+desc['police_vehicle_lon']+'_'+desc['police_vehicle_status_code'] ;
+		poli[ desc['id'] ] = desc['police_vehicle_lat']+'_'+desc['police_vehicle_lon']+'_'+desc['police_vehicle_status_code'] ;
+
+		map.Overlays.add(marker);
+	}*/
+
+	function addMarker(lon, lat, desc, icon , type) {
+		console.log('add');
+		// alert(base_url);
+		// var marker1 = new longdo.Marker({ lon: lon, lat: lat });
+		/*var detail = "<b>หน่วยงาน : </b>"+desc['department_name']+'<br><b>กลุ่มสั่งการ :</b>'+desc['command_name']+'<br><b>สถานีตำรวจ : '+desc['police_station_name']+'</b><hr><b>สถานะ :</b> '+desc['police_vehicle_status_name']  ;
+		if(desc['case_id']!='' && desc['case_id']!=null){
+			detail += "<br><b>หมายเลขเหตุ :</b> "+desc['case_id']+'<br><b>ระยะเวลา :</b> '+ desc['duration'] ;
+		}*/
+		var icon_X="";
+		if(type=="citizen"){
+			icon_X = '<img class="blink-image" src="'+ base_url + '/assets/icon/' + icon+'" width="24">' ;
+		}else{
+			icon_X = '<img  src="'+ base_url + '/assets/icon/' + icon+'" width="30">' ;
+		}
+		marker = new longdo.Marker({
+			lon: lon,
+			lat: lat
+		}, {
+			title: desc['police_vehicle_number'],
+			icon: {
+				//url: base_url + '/assets/icon/' + icon,
+				html:  icon_X  ,
+				//offset: { x: 12, y: 45 }
+				// offset: { x: 12, y: 45 }
+				//size: { width: 300, height: 200 },
+			},
+			detail: desc,
+			size: { width: 250, height: 170 },
+			//visibleRange: { min: 7, max: 8 },
+			// draggable: true,
+			weight: longdo.OverlayWeight.Top
+		});
+		marker['type'] = type ; 
+
+		map.Overlays.add(marker);
+		$('#ui-id-1').hide();
+	}
+
+	function clearMarker_mark( id , latlon ) {
+		var have = false ;
+		var mark = map.Overlays.list();
+		// console.log(mark) ;
+		var i = 0;
+		$.each(mark, function(key, value) {
+			//console.log(value instanceof longdo.Marker);
+
+			if(value instanceof longdo.Marker == true && value.hd==0){
+				//map.Overlays.remove(value);
+
+				if(  value['id'] ==  id  ){
+					console.log("xx-->"+ value['id'] +'---'+  id );
+					if( value['latlon'] !=  latlon  ){
+						console.log("yy"+value['latlon'] +'--'+  latlon);
+						console.log('Delete');
+						map.Overlays.remove(value);
+						have = true ;
+					}
+				}
+			}
+
+			i++;
+		});
+		return have ;
+	}
+	 
+</script>
+
+<script type="text/javascript">
+
+var xxx = '';
+var myVar;
+var event ;
+myVar = setInterval(function(){ 
+	//window.ReactNativeWebView.postMessage("Hello React Native! From web");
+	clearInterval(myVar);
+ }, 10000);
+window.addEventListener("message", message => {
+	//alert(JSON.stringify(message));
+	//document.getElementById("container").innerHTML +=   "<br>"+message.data+"<br>"   ;
+	event = message.data.split("|") ;
+	if(event[0]=="Route"){
+		//document.getElementById("container").innerHTML += "<br>"+xxx+"-"+'{{_smh_lat}}'+","+'{{_smh_lat}}' + " --TO-- " + destLL['lat']+","+destLL['lon'] ;
+		//map.Route.clear();
+	  	//map.Route.placeholder(document.getElementById('result'));
+		//map.Route.add({ lon: '{{_smh_lon}}' , lat:  '{{_smh_lat}}'  });
+		//map.Route.add({ lon: destLL['lon'] , lat: destLL['lat'] });
+		//map.Route.search();
+		//map.Route.auto(true);
+		 
+          
+ 		//document.getElementById("container").innerHTML +=   "<br>GET DISTANCE<br>"   ;
+		$.ajax({
+			url: base_url + "SMH/routeDetail",
+			data: {
+				"start_lat": smh_lat,
+				"start_lon": smh_lon,
+				"end_lat": smh_end_lat ,
+				"end_lon": smh_end_lon ,
+				"mode": event[1] ,
+				"type": event[2] ,
+			}
+		}).done(function(data) {
+			obj = data;
+			 //document.getElementById("container").innerHTML +=   obj["est_distance"]+"--"+obj["est_time"]+"--"+data.url   ;
+			 //document.getElementById("container").innerHTML +=   JSON.stringify(obj['lineString'])   ;
+			//obj = $.parseJSON(res);
+			
+			//address = road + ' ' + subdistrict + ' ' + district + ' ' + province + ' ' + postcode;
+			 
+
+			//var mData =  {} ;
+			//mData['address'] = address ;
+			//mData['time'] = "0" ;
+			//mData['distance'] = "0" ;
+			//console.log(    JSON.stringify(mData) );
+			try {
+			   window.ReactNativeWebView.postMessage( smh_end_lat+"|||"+smh_end_lon+"|||"+smh_address +"|||"+obj['est_distance']+"|||"+obj['est_time'] );
+			    
+			    
+				//setPolyLine( JSON.stringify( obj['lineString']) ) ;
+				clearLine();
+				var geom1 = new longdo.Polyline( obj['lineString'] ,{  lineColor: 'rgba(56, 56, 224, 0.8)',});
+				map.Overlays.add(geom1);
+			}
+			catch(err) {
+			  document.getElementById("container").innerHTML = err.message;
+			}
+			 
+			//window.ReactNativeWebView.postMessage( lonLat['lat']+"|||"+lonLat['lon']+"|||"+address +"|||-----0|||0" );
+			//document.getElementById("container").innerHTML +=   obj["est_distance"]   ;
+			//smh_distance  = obj['est_distance'] ;
+			//getRoute() ;
+
+		});
+
+		   
+
+
+	}else{
+
+		//document.getElementById("container").innerHTML += "<br>"+xxx  ;
+	}
+  	
+});
+
+function clearLine() {
+	var mark = map.Overlays.list();
+	// console.log(mark) ;
+	var i = 0;
+	$.each(mark, function(key, value) {
+		// console.log(value instanceof longdo.Marker);
+
+		if(value instanceof longdo.Polyline == true ){
+			map.Overlays.remove(value);
+		}
+
+		 
+		i++;
+	});
+}
+ 
+</script>
+
+ 

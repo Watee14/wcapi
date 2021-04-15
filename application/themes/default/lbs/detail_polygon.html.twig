@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Polygon</title>
+	{% include 'lbs/style_alert.html.twig' %}
+	{% include 'lbs/style_esri_map.html.twig' %}
+</head>
+<body>
+	<div class="preload"></div>
+	<div class="loader"></div>
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<blockquote class="blockquote">
+				<h2 class="mb-0">รายละเอียด พื้นที่การแจ้งเตือน</h2>
+			</blockquote>
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<div class="form-group">
+							<label for="NAMEGROUP">ชื่อกลุ่ม</label>
+							<input type="text" class="form-control" id="NAMEGROUP" name="Title" value="{{data.Title}}" disabled>
+						</div>
+					</div>
+					{# <div class="col-6">
+						<div class="form-group">
+							<label for="NAMEGROUP">ชื่อกลุ่ม</label>
+							<input type="text" class="form-control" id="NAMEGROUP" name="Title" value="{{data.Title}}" disabled>
+						</div>
+					</div>
+					<div class="col-6">
+						<div class="form-group">
+							<label for="BOUNDARY_LATLON">ละติจูด ลองจิจูด</label>
+							<input type="text" class="form-control" id="BOUNDARY_LATLON" name="Description" value="{{data.Description}}" disabled>
+						</div>
+					</div> #}
+				</div>
+				{# <div id="viewDiv" style="height: 550px;width: 100%;margin-top: 15px;"></div> #}
+				<div class="mt-2 w-100" style="height:550px">
+					<div id="view_div" class="view-div"></div>
+				</div>
+				<div class="form-group mt-2">
+					<label for="BOUNDARY_LATLON">ละติจูด ลองจิจูด</label>
+					<input type="hidden" class="form-control" id="BOUNDARY_DESC" name="Description" value="{{data.Description}}" disabled>
+					<textarea class="form-control" rows="3" id="BOUNDARY_LATLON" name="LatLon" disabled>{{data.LatLon}}</textarea>
+				</div>
+				<div class="form-group">
+					<label for="BOUNDARY_GROUP">ขอบเขต</label>
+					<textarea class="form-control" id="BOUNDARY_GROUP" name="Polygon" rows="3" disabled>{{data.Polygon}}</textarea>
+				</div>
+				<div class="form-group">
+					<label class="mt-2 mb-0 user-select-none">สถานะ:</label>
+					<input type="checkbox" name="IsActive" id="IsActive" {% if data.IsActive == 1 %}checked{% endif %} data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-on="เปิด" data-off="ปิด" disabled>
+				</div>
+				<hr>
+				<div style="margin-bottom:30px;">
+					<p class="font-weight-light">บัญชีที่สร้าง: {{data.CreateBy}} วัน-เวลาที่สร้าง: {{data.CreateDate|date("วันที่ j เดือน n ปี Y เวลา H:i")}}น.</p>
+					<p class="font-weight-light">บัญชีที่แก้ไข: {% if data.ModifyBy is defined and data.ModifyBy != "" %}{{data.ModifyBy}}{% else %}{{data.CreateBy}}{% endif %} วัน-เวลาที่แก้ไข: {{data.ModifyDate|date("วันที่ j เดือน n ปี Y เวลา H:i")}}น.</p>
+					<a href="{{base_url()}}polygon/list_polygon" class="btn btn-primary">
+						<i class="fas fa-reply"></i>
+						<span>ย้อนกลับ</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% include 'lbs/script_alert.html.twig' %}
+	{% include 'lbs/script_esri_map.html.twig' %}
+</body>
+</html>

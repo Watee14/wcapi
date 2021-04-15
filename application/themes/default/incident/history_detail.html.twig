@@ -1,0 +1,45 @@
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#modal_caselist_detail').on('show.bs.modal', function(event) {
+			$(this).find('.modal-title').html('รายละเอียดเหตุ ' + $(event.relatedTarget).data('caseid'));
+			$('#modal_caselist_detail').find('.panel-group').hide();
+			$('#modal_caselist_detail').find('.help-block.warning').hide();
+			$('#modal_caselist_detail').find('.help-block.loading').fadeIn('fast');
+			$.ajax({
+				url: "{{base_url()}}opencase/case_data",
+				method: "POST",
+				data: { case_id: $(event.relatedTarget).data('caseid') },
+				dataType: "html",
+			}).done(function(msg) {
+				$.each(JSON.parse(msg), function(idxs, objs) {
+					$.each(objs, function(idx, obj) {
+						if (idxs == 'table_history_responsible') {
+							$('#' + idxs).find('table tbody').html(null);
+							$('#' + idxs).find('table tbody').append(obj);
+						}
+						else {
+							if (idxs == 'table_history_case' && idx == 7) {
+								$('#' + idxs).find('table tbody tr td#command_results').html(obj);
+							}
+							else if (idxs == 'table_history_command' && idx == 0) {
+								$('#' + idxs).find('table tbody tr td#command_vehicles').html(obj);
+							}
+							else if (idxs == 'table_history_command' && idx == 1) {
+								$('#' + idxs).find('table tbody tr td#command_messages').html(obj);
+							}
+							else {
+								$('#' + idxs).find('table tbody tr td').eq(idx).html(obj);
+							}
+						}
+					});
+				});
+				$('#modal_caselist_detail').find('.help-block.warning').hide();
+				$('#modal_caselist_detail').find('.panel-group').fadeIn('fast');
+			}).fail(function(jqXHR, textStatus) {
+				$('#modal_caselist_detail').find('.help-block.warning').fadeIn('fast');
+			}).always(function() {
+				$('#modal_caselist_detail').find('.help-block.loading').hide();
+			});
+		});
+	});
+</script>

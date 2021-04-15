@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+ <meta charset="UTF-8">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS Mobile MAP</title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      .search,
+      .logo {
+        position: absolute;
+        right: 15px;
+      }
+
+      .search {
+        top: 15px;
+      }
+
+      .logo {
+        bottom: 30px;
+      }
+      .button {
+        background-color: #555555; /* Green */
+        border: none;
+        color: white;
+        padding: 10px 25px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        /*border-radius: 12px;*/
+        margin-top : 20px ;
+      }
+    </style>
+    <link rel="stylesheet" href="/191ws/assets/arcgis/themes/light/main.css">
+  <script src="/191ws/assets/arcgis/init.js"></script>
+  <script>
+
+  require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/tasks/RouteTask",
+        "esri/tasks/support/RouteParameters",
+        "esri/tasks/support/FeatureSet",
+        "esri/Graphic",
+        "esri/widgets/Directions",
+        "esri/layers/TileLayer",
+        "esri/tasks/Locator",
+        "esri/widgets/Legend",
+        "esri/views/SceneView",
+        "esri/widgets/LayerList",
+        "esri/WebScene",
+        "esri/layers/MapImageLayer",
+        "esri/symbols/PictureMarkerSymbol",
+    ], function(Map, MapView, RouteTask, RouteParameters, FeatureSet, Graphic, Directions, TileLayer, Locator, Legend, SceneView, LayerList, WebScene, MapImageLayer , PictureMarkerSymbol ) {
+        
+
+        layerUrl = "{{ARCGIS_MAPTILE}}";
+        layerMap = new TileLayer(layerUrl, null);
+        var routeType = "{{routeType}}";
+        //map.layers.add(layerMap);
+
+      /*var map = new Map({
+            basemap: "topo-vector" ,
+            layers: [layerMap]
+        });*/
+
+       // layerUrl = "https://arcgis-wa.191poc.local/arcgis/rest/services/Data/Call_Unit/MapServer",
+        //layer = new MapImageLayer(layerUrl, null);
+        //map.layers.add(layer);
+
+
+        layer = new MapImageLayer({
+        url: "{{ARCGIS_POI_LAYER}}",
+
+  
+          sublayers: [
+          {
+             id: 24, visible: false , title: "พื้นที่รับผิดชอบการไฟฟ้าส่วนภูมิภาค",
+           },
+          {
+             id: 23, visible: false , title: "พื้นที่รับผิดชอบการไฟฟ้านครหลวง",
+           },
+          {
+             id: 21, visible: false , title: "พื้นที่รับผิดชอบการประปานครหลวง",
+           },
+           {
+             id: 20, visible: false , title: "พื้นที่รับผิดชอบการประปานครหลวง",
+           },
+          {
+             id: 18, visible: false , title: "พื้นที่รับผิดชอบกรมป้องกันและบรรเทาสาธารณภัย",
+           },
+          {
+             id: 17, visible: false , title: "พื้นที่รับผิดชอบหน่วยบริการเหตุฉุกเฉิน ทางการดับเพลิง",
+           },
+          {
+             id: 16, visible: false , title: "พื้นที่รับผิดชอบหน่วยบริการเหตุฉุกเฉิน ทางการแพทย์",
+           },
+          {
+             id: 15, visible: false , title: "พื้นที่รับผิดชอบตำรวจรถไฟ",
+           },
+          {
+             id: 14, visible: false , title: "พื้นที่รับผิดชอบตำรวจน้ำ",
+           },
+           {
+             id: 13, visible: false , title: "พื้นที่รับผิดชอบตำรวจทางหลวง",
+           },
+          {
+             id: 12, visible: false , title: "พื้นที่รับผิดชอบสถานีตำรวจนครบาล/ภูธร",
+           },
+          {
+             id: 11, visible: false , title: "พื้นที่รับผิดชอบตำรวจนครบาล/ภูธร ภาค",
+           },
+          {
+             id: 10, visible: false , title: "กล้อง CCTV ทางหลวงชนบท",
+           },
+          {
+             id: 9, visible: false , title: "การไฟฟ้าส่วนภูมิภาค",
+           },
+          {
+             id: 8, visible: false , title: "การไฟฟ้านครหลวง",
+           },
+          {
+             id: 7, visible: false , title: "การประปานครหลวง",
+           },
+           {
+             id: 6,  visible: false , title: "โรงพยาบาล",
+           },
+           {
+             id: 5, visible: false , title: "หน่วยบริการทางการแพทย์ฉุกเฉินแห่งชาติ"
+           },
+           {
+             id: 4, visible: false , title: "หน่วยป้องกันและบรรเทาสาธารณภัย"
+           },
+           {
+             id: 3, visible: false , title: "สถานีดับเพลิง"
+           }, 
+           {
+             id: 2, visible: false , title : "สถานีตำรวจรถไฟ"
+           }, 
+           {
+             id: 1, visible: false, title : "สถานีตำรวจน้ำ"
+           }, 
+           {
+             id: 0, visible: false, title : "สถานีตำรวจ" 
+           }
+         ]
+        });
+        //map.layers.add(layer);
+
+
+        var map = new Map({
+            //basemap: "topo-vector" ,
+            layers: [layerMap , layer]
+        });
+
+        var scene = new WebScene({
+            portalItem: {
+                // autocasts as new PortalItem()
+                //  id: "adfad6ee6c6043238ea64e121bb6429a"
+            }
+        });
+
+        var view = new MapView({
+            container: "viewDiv",
+            map: map,
+            center: ["{{start_lon}}", "{{start_lat}}"], // longitude, latitude
+            zoom: 13
+        });
+ 
+
+
+
+        /*
+          view.on("click", function (event) {
+          if (view.graphics.length === 0) {
+            addGraphic("start", event.mapPoint);
+          } else if (view.graphics.length === 1) {
+            addGraphic("finish", event.mapPoint);
+            getRoute()
+          } else {
+            view.graphics.removeAll();
+            addGraphic("start", event.mapPoint);
+          }
+        });*/
+
+
+        
+        
+        var point = {
+            type: "point",
+            longitude: "{{start_lon}}",
+            latitude: "{{start_lat}}"
+        };
+        addGraphic("start", point);
+
+
+        var point = {
+            type: "point",
+            longitude: "{{end_lon}}",
+            latitude: "{{end_lat}}"
+        };
+
+        if(routeType=="Event"){
+          addGraphic("finish", point);
+        }
+        if(routeType=="Staging"){
+          addGraphic("staging", point);
+        }
+        getRoute();
+        if(routeType=="Staging"){
+          var point = {
+              type: "point",
+              longitude: "{{event_lon}}",
+              latitude: "{{event_lat}}"
+          };
+          addGraphic("finish", point);
+        }
+
+
+
+
+        var staging = '{{staging}}' ;
+        if(staging!=""){
+            var obj = JSON.parse( staging );
+          //console.log(obj);
+
+          obj.forEach(function(result) {
+              
+              console.log( result );
+              var point = {
+                  type: "point",
+                  longitude: result.longitude ,
+                  latitude: result.latitude 
+              };
+              addGraphic("staging", point);
+
+          });
+        }
+        
+
+
+         
+
+
+        function addGraphic(type, point) {
+            console.log(point);
+            var url = 'https://js.arcgis.com/3.28/esri/dijit/Search/images/search-pointer.png' ;
+            var width = "30px";
+            var height = "30px";
+            if(type=="start"){
+               url =  "/191ws/assets/icon/avail-mobile.png" ;
+            }
+            if(type=="finish"){
+               url =  "/191ws/assets/icon/arrived.png" ;
+            }
+            if(type=="staging"){
+               url =  "/191ws/assets/icon/StagingArea-Icon.png" ;
+               width = "40px";
+               height = "40px";
+            }
+            var pms = new PictureMarkerSymbol({
+              //url: 'images/search-pointer.png', //this does not for a sublayer symbol
+              url:  url , //this works
+              width: width ,
+              height: height
+            });
+            var graphic = new Graphic({
+                /*symbol: {
+                    type:  "simple-marker" ,
+                    color: type === "staging" ? "red" : "black",
+                    size: "8px"
+                },*/
+                symbol: pms ,
+                geometry: point
+            });
+            view.graphics.add(graphic);
+        }
+
+
+       // console.log( view.graphics.toArray()  );
+        function getRoute() {
+            var routeTask = new RouteTask({
+                url: "{{ARCGIS_ROUTE}}" , 
+                //directionsLengthUnits : "esriMeters"
+            });
+            // Setup the route parameters
+            var routeParams = new RouteParameters({
+                stops: new FeatureSet({
+                    features: view.graphics.toArray(), // Pass the array of graphics
+                   
+                }),
+                returnDirections: true,
+                // directionsTimeAttribute: true ,
+                //directionsLengthUnits : "esriMeters"
+                //Routing_ND : "millimeters"
+                //stops : new FeatureSet() 
+            });
+            // Get the route
+            routeTask.solve(routeParams).then(function(data) {
+                // Display the route
+
+                data.routeResults.forEach(function(result) {
+                    result.route.symbol = {
+                        type: "simple-line",
+                        color: [5, 150, 255],
+                        width: 3
+                    };
+                    //console.log( result );
+                    view.graphics.add(result.route);
+                });
+
+                //*** ADD ***//
+
+                // Display the directions
+                var directions = document.createElement("ol");
+                directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
+                directions.style.marginTop = 0;
+                directions.style.paddingTop = "15px";
+ 
+                // Show the directions
+                var features = data.routeResults[0].directions.features;
+                features.forEach(function(result, i) {
+                   //console.log(result);
+                    var direction = document.createElement("li");
+                    direction.innerHTML = result.attributes.text + " (" + result.attributes.length.toFixed(2) + " miles)";
+                    directions.appendChild(direction);
+                });
+
+                // Add directions to the view
+                view.ui.empty("top-right");
+                view.ui.add(directions, "top-right");
+            });
+        }
+        // view.ui.add(logo, "bottom-right");
+
+        /* var directions = new Directions({
+        view: view,
+         url: "https://utility.arcgis.com/usrsvcs/appservices/zR4zHkOcADTUkh7s/rest/services/World/Route/NAServer/Route_World/solve"
+      });
+      
+     view.ui.add(directions, "top-right");*/
+
+
+
+
+        view.when(function() {
+            console.log('===');
+            // get the first layer in the collection of operational layers in the WebMap
+            // when the resources in the MapView have loaded.
+            var featureLayer = map.layers.getItemAt(0);
+            var featurePOI = map.layers.getItemAt(1);
+            var legend = new Legend({
+                view: view,
+                layerInfos: [{
+                    layer: featureLayer,
+                    title: "Arcgis Maptile"
+                },{
+                    layer: featurePOI,
+                    title: "POI"
+                }]
+            });
+
+            // Add widget to the bottom right corner of the view
+            view.ui.add(legend, "bottom-right");
+
+
+            //---------------- Layer POI---------------------------
+            var layerList = new LayerList({
+                view: view
+            });
+
+            // Add widget to the top right corner of the view
+            view.ui.add(layerList, "top-left");
+
+
+
+        });
+ 
+        
+    });
+var directDiv = true ;
+function direct(){
+  var sty = 'none' ;
+  if(directDiv==false){
+      sty = 'block';
+      directDiv = true ;
+  }else{
+    directDiv = false ;
+  }
+
+  document.getElementsByClassName('esri-widget esri-widget--panel esri-directions__scroller esri-component')[0].style.display =  sty ;
+}
+var layerDiv = true ;
+function layerInfo(){
+  var sty = 'none' ;
+  if(layerDiv==false){
+      sty = 'block';
+      layerDiv = true ;
+  }else{
+    layerDiv = false ;
+  }
+
+  document.getElementsByClassName('esri-component esri-legend esri-widget esri-widget--panel')[0].style.display =  sty ;
+}
+
+var layerContDiv = true ;
+function layerControl(){
+  var sty = 'none' ;
+  if(layerContDiv==false){
+      sty = 'block';
+      layerContDiv = true ;
+  }else{
+    layerContDiv = false ;
+  }
+
+  document.getElementsByClassName('esri-component esri-layer-list esri-widget esri-widget--panel')[0].style.display =  sty ;
+}
+
+ 
+let stateCheck = setInterval(() => {
+  if (document.readyState === 'complete') {
+    clearInterval(stateCheck);
+   direct() ;
+layerInfo() ;
+layerControl() ;
+  }
+}, 100);
+</script>
+  </head>
+  <body>
+
+    <button class="button" onclick="direct();">Direction</button>
+    <button class="button" onclick="layerControl();">Layer control</button>
+    <button class="button" onclick="layerInfo();">LayerInfo</button>
+    <div id="viewDiv"></div>
+    
+  </body>
+  
+</html>

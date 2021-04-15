@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Get location</title>
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<script src="{{base_url}}/assets/plugins/jquery-1.12.4.min.js" type="text/javascript"></script>
+<style>
+  html { height: 100% }
+      /*body { height: 90%; margin: 0; padding: 0; font: 12px/1.2 Meiryo, Tahoma, sans-serif; }
+      #header { background: #2086f3; font-size: 15px; color: #ffffff; padding: 12px; }*/
+      /*#map { width: calc(100% - 8px); height: calc(30% - 0px); margin: 4px; }*/
+ #map { width: 700px !important; height: 700px !important; margin: 0px; }
+/*html, body {
+        height: 100%;
+        margin: 0px;
+    }*/
+    
+</style>
+ 
+	
+	
+	<!-- <button type="button" onclick="showPosition();">Show Position</button> -->
+	
+	<!-- <center> <div class="c">  ส่งสำเร็จ</div> </center> -->
+
+ 
+
+</head>
+<body >
+    <input type="hidden" id="nameMobile" value="{{nameMobile}}">
+     <div id="map"></div>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://api.longdo.com/map/?key={{_MAP_KEY}}"></script>
+<script>
+    // Set up global variable
+    var map ;
+    var base_url = '{{base_url}}';
+    var inteval ;
+    var lat = "";
+    var lon = "";
+     init();
+     function init() {
+        // สร้างแผนที่
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(19, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(18, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(17, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(16, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(15, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(14, 1);
+      longdo.MapTheme.ui.layerSelectorOption.th.button.splice(2, 1);
+       longdo.MapTheme.ui.layerSelectorOption.th.button.splice(1, 1);
+        longdo.MapTheme.ui.layerSelectorOption.th.button.splice(0, 1);
+        map = new longdo.Map({
+          layer: [
+           longdo.Layers.GRAY_EN,
+            //longdo.Layers.ARCGIS_WORLD_STREET_MAP,
+            // longdo.Layers.TRAFFIC
+          ],
+          placeholder: document.getElementById('map'),
+          language: 'th'
+        });
+        /*map.Event.bind('overlayClick', function(overlay) {
+          //alert("--");
+           //console.log(overlay['data']['myid']);
+           if(overlay['data']['myid']!=""){
+            var myid = overlay['data']['myid'] ;
+              var txt = "<font size=\"4\">Event list@"+objectArea[myid]['title']+'</font><br>' ;
+              txt += objectArea[ myid ]['detail'] ;
+              $('#eventShow').html( txt   ) ;
+           }
+
+        });*/
+         map.Ui.DPad.visible(false);
+            map.Ui.Zoombar.visible(false);
+            map.Ui.Geolocation.visible(false);
+            map.Ui.Toolbar.visible(false);
+            map.Ui.LayerSelector.visible(false);
+            map.Ui.Fullscreen.visible(true);
+            map.Ui.Crosshair.visible(true);
+            map.Ui.Scale.visible(true);
+      map.location({
+          lon: '100.496065',
+          lat: '14.584188'
+        }, true);
+        map.zoom(6);
+
+        //shortDetail() ;
+         inteval = setInterval( function(){ getLocation( )  }  , 2000 );
+      }
+
+      function getLocation( ) {
+        clearInterval(inteval);
+        //result.innerHTML = base_url + "MapLocation/saveLocation" ;
+        var parameter = {};
+        parameter['name'] = $('#nameMobile').val() ;
+        
+      $.ajax({
+       // url: base_url + "MapLocation/getTracking",
+        url:   "../getTracking/"  + $('#nameMobile').val() ,
+        //url: "http://43.255.240.22:8500/sms",
+        method:'POST' ,
+        data: parameter
+      }).done(function(data) {
+        res = data;
+        obj = $.parseJSON(res);
+        if(obj['date'] != ""){
+            
+            
+            if( lat!=obj['latitude'] || lon!=obj['longitude']){
+              map.location({
+              lon: obj['longitude'] ,
+              lat: obj['latitude']
+            }, true);
+            map.zoom(15);
+              clearMarker_mark( "", "" ) ;
+              addMarker( obj['longitude'] , obj['latitude'] , "", "marker.png");
+              lat=obj['latitude'] ;
+              lon=obj['longitude'];
+            }
+            inteval = setInterval( function(){ getLocation( )  }  , 4000 );
+        }else{
+           
+        }
+       
+      });
+    }
+
+    function addMarker(lon, lat, desc, icon) {
+   
+    marker_ = new longdo.Marker({
+      lon: lon,
+      lat: lat
+    }, {
+      //title: desc['name'],
+      icon: {
+       // url: base_url + '/assets/icon/' + icon,
+        html: '<img src="'+ base_url + '/assets/icon/' + icon+'" width="24">' ,
+        //offset: { x: 12, y: 45 }
+        // offset: { x: 12, y: 45 }
+        size: { width: 200, height: 200 },
+      },
+      detail: desc['detail'],
+      // visibleRange: { min: 7, max: 8 },
+      // draggable: true,
+      weight: longdo.OverlayWeight.Top
+    });
+    //marker['type'] = desc['type'] ;
+    map.Overlays.add(marker_);
+    //polygonList.push(marker);
+  }
+  function clearMarker_mark( id , latlon ) {
+    var have = false ;
+    var mark = map.Overlays.list();
+    // console.log(mark) ;
+    var i = 0;
+    $.each(mark, function(key, value) {
+      //console.log(value instanceof longdo.Marker);
+
+      if(value instanceof longdo.Marker == true  ){
+        //map.Overlays.remove(value);
+
+        //if(  value['id'] ==  id  ){
+          //console.log("xx-->"+ value['id'] +'---'+  id );
+          //if( value['latlon'] !=  latlon  ){
+            //console.log("yy"+value['latlon'] +'--'+  latlon);
+            //console.log('Delete');
+            map.Overlays.remove(value);
+            //have = true ;
+          //}
+        //}
+      }
+
+      i++;
+    });
+    return have ;
+  }
+</script>
+</body>
+</html>

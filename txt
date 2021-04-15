@@ -1,0 +1,3 @@
+python C:\inetpub\wwwroot\191ws\pyChkArea\innerPoint.py C:\inetpub/wwwroot/191ws/assets/map 13.783607298414685
+
+C:\Program Files\Python38\python.exe C:\inetpub\wwwroot\191ws\pyChkArea\innerPoint.py C:\inetpub\wwwroot\191ws\assets\map 13.783607298414685 100.5031456053257

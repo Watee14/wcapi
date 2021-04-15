@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>ลงชื่อเข้าใช้ / Sign in</title>
+	{% include 'lbs/style.html.twig' %}
+	<link rel="stylesheet" type="text/css" href="{{base_url()}}assets/css/prompt-style-font.css">
+	<style type="text/css">
+		.bd-placeholder-img{font-size:1.125rem;text-anchor:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+		@media (min-width:768px){.bd-placeholder-img-lg{font-size:3.5rem}}
+		body{height:100%}
+		.body,html{height:100%}
+		/*.body{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;padding-top:40px;padding-bottom:40px}*/
+		.body{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center}
+		.form-signin{width:100%;max-width:420px;padding:15px;margin:auto}
+		/*.form-label-group{position:relative;margin-bottom:1rem}*/
+		.form-label-group{position:relative;margin-bottom:.5rem}
+		/*.form-label-group>input,.form-label-group>label{height:3.125rem;padding:.75rem}*/
+		.form-label-group>input,.form-label-group>label{padding:.75rem}
+		.form-label-group>label{position:absolute;top:0;left:0;display:block;width:100%;margin-bottom:0;line-height:1.5;color:#495057;pointer-events:none;cursor:text;border:1px solid transparent;border-radius:.25rem;transition:all .1s ease-in-out}
+		.form-label-group input::-webkit-input-placeholder{color:transparent}
+		.form-label-group input:-ms-input-placeholder{color:transparent}
+		.form-label-group input::-ms-input-placeholder{color:transparent}
+		.form-label-group input::-moz-placeholder{color:transparent}
+		.form-label-group input::placeholder{color:transparent}
+		.form-label-group input:not(:placeholder-shown){padding-top:1.25rem;padding-bottom:.25rem}
+		.form-label-group input:not(:placeholder-shown)~label{padding-top:.25rem;padding-bottom:.25rem;font-size:12px;color:#777}
+		@supports (-ms-ime-align:auto){.form-label-group>label{display:none}
+		.form-label-group input::-ms-input-placeholder{color:#777}}
+		@media all and (-ms-high-contrast:none),(-ms-high-contrast:active){.form-label-group>label{display:none}.form-label-group input:-ms-input-placeholder{color:#777}}
+	</style>
+</head>
+<body class="bg-light">
+	<div class="position-absolute" style="top:.25rem;right:.25rem">
+		{% include 'lbs/navigation.html.twig' %}
+	</div>
+	<div class="body">
+		<form class="form-signin" method="POST">
+			<div class="text-center mb-2">
+				<img class="mb-2" src="{{base_url()}}assets/icon/rtp-logo-sm.png" width="140">
+				<h4 class="h4 mb-1 font-weight-normal user-select-none">ลงชื่อเข้าใช้ / Sign in</h4>
+			</div>
+			<div class="alert alert-{{status is defined and status == 1 ? 'success' : 'danger'}} alert-dismissible fade show {{status is defined ? 'd-block' : 'd-none'}}" role="alert">
+				<span class="alert-message">{{message}}</span>
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="form-label-group mb-0">
+				<button class="btn btn-lg btn-facebook btn-block text-white mb-1" href="#"><i class="fab fa-facebook-square fa-lg"></i> Continue with Facebook</button>
+				<button class="btn btn-lg btn-line btn-block text-white mb-1" href="#"><i class="fab fa-line fa-lg"></i> Continue with LINE</button>
+			</div>
+			<div class="form-label-group">
+				<hr class="mt-2 mb-2">
+				<small class="form-text text-center user-select-none">หรือ ลงชื่อเข้าใช้ด้วยหมายเลขโทรศัพท์</small>
+				<small class="form-text text-center user-select-none">Or sign in using phone number.</small>
+			</div>
+			<div class="form-label-group">
+				<input type="text" id="citizen_phone_number" name="citizen_phone_number" class="form-control form-control-lg" placeholder="หมายเลขโทรศัพท์" autofocus required value="{{citizen_phone_number}}">
+				<label for="citizen_phone_number"><i class="fas fa-phone"></i> หมายเลขโทรศัพท์ / Phone number</label>
+			</div>
+			<div class="form-label-group">
+				<input type="password" id="citizen_password" name="citizen_password" class="form-control form-control-lg" placeholder="รหัสผ่าน" required>
+				<label for="citizen_password"><i class="fas fa-key"></i> รหัสผ่าน / Password</label>
+			</div>
+			<div class="text-center mb-2">
+				<button class="btn btn-lg btn-primary btn-block" type="submit"><i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าใช้ / Sign in</button>
+			</div>
+			<div class="text-center mb-0">
+				<a class="btn btn-link text-decoration-none p-0" href="{{base_url()}}lbs/signup">สมัครใช้งาน / Register</a>
+			</div>
+			<div class="text-center mb-0">
+				<a class="btn btn-link text-decoration-none p-0" href="">ลืมรหัสผ่าน / Forgot password?</a>
+			</div>
+		</form>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript">
+		$(function(){});
+	</script>
+</body>
+</html>

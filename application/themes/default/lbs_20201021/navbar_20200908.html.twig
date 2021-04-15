@@ -1,0 +1,22 @@
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+	<div class="container">
+		<span class="navbar-brand user-select-none pt-0 pb-0" href="#">
+			<img src="{{base_url()}}assets/icon/rtp-logo-sm.png" height="40">
+			{% if functions == 'create' %}
+				<span>{{title}}</span>
+			{% endif %}
+		</span>
+		{% if functions != 'create' %}
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#citizen_nav" aria-controls="citizen_nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="citizen_nav">
+				<ul class="navbar-nav">
+					<li class="nav-item{{active == 'profile' ? ' active' : ''}}">
+						<a class="nav-link" href="{{base_url()}}lbs/profile">ข้อมูลส่วนตัว / Profile</a>
+					</li>
+				</ul>
+			</div>
+		{% endif %}
+	</div>
+</nav>

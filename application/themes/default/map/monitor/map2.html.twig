@@ -1,0 +1,542 @@
+<!--<link href="{{base_url()}}assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/plugins/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/style-metro.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/style.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/style-responsive.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/css/themes/light.css{{VERSIONING}}" rel="stylesheet" type="text/css" id="style_color">  
+<link href="{{base_url()}}assets/plugins/map/longdo/css/style.css" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/plugins/map/longdo/css/jquery-ui.css" rel="stylesheet" type="text/css">  
+<link href="{{base_url()}}assets/css/style-custom.css{{VERSIONING}}" rel="stylesheet" type="text/css">
+<link href="{{base_url()}}assets/toggle/bootstrap-toggle.min.css{{VERSIONING}}" rel="stylesheet" type="text/css">-->
+<style type="text/css">
+
+</style>
+<div id="map" class="map"></div>
+<div class="modal fade record-manage modal-frame" tabindex="-1" role="dialog" aria-labelledby="record-manage-label" id="modalwindow">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+				<h4 class="modal-title" id="record-manage-label"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<div class="form-group">
+								<button class="btn pull-left" data-dismiss="modal" id="cancel">ยกเลิก</button>
+								<button class="btn green pull-right" id="save">ยืนยัน</button>
+							</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="{{base_url()}}assets/plugins/jquery-1.12.4.min.js" type="text/javascript"></script> {% if MAPTYPE == 3 %}
+<script src="{{base_url()}}assets/plugins/map/longdo/js/jquery-3.1.1.js" type="text/javascript"></script> {% endif %}
+<script src="{{base_url()}}assets/js/jquery.ui.widget.js" type="text/javascript"></script>
+<script src="{{base_url()}}assets/js/bootstrap.min.js" type="text/javascript"></script> {% if MAPTYPE == 2 %}
+<script src="{{base_url()}}assets/plugins/openlayers/js/ol.js" type="text/javascript"></script> {% elseif MAPTYPE == 3 %}
+<script src="{{base_url()}}assets/plugins/map/longdo/js/html2canvas.js" type="text/javascript"></script>
+<script src="{{_SECURE}}api.longdo.com/map/?key={{MAPCONF.longdo.key}}" type="text/javascript"></script>
+<script src="{{base_url()}}assets/plugins/map/longdo/js/jquery-ui.js" type="text/javascript"></script> {% endif %}
+<script src="{{base_url()}}assets/toggle/bootstrap-toggle.min.js" type="text/javascript"></script>
+<script src="{{base_url()}}assets/map/stdScript.js" type="text/javascript"></script>
+<!--<script src="{{base_url()}}assets/map/monitor/patrolMonitorScript.js" type="text/javascript"></script>-->
+<script type="text/javascript">
+	
+var map;
+var marker;
+var areaNumber = 0;
+var zoomArea = [];
+var areaCase = [];
+var base_url  ;
+
+resize = function  () {
+/*	var style = document.getElementById('map').style
+	style.height = (window.innerHeight ) + 'px';
+	style.width = (window.innerWidth ) + 'px';*/
+}
+
+var ov = '';
+function init() {
+     
+     base_url = base_url ; 
+     resize();
+     window.addEventListener('resize', resize);
+
+     map = new longdo.Map({
+         layer: [
+             longdo.Layers.GRAY,
+             //longdo.Layers.TRAFFIC
+         ],
+         zoom: 11,
+         placeholder: document.getElementById('map'), 
+         lastView: false
+     });
+
+     map.Event.bind('overlayClick', function(overlay) {
+      /*   clearMarker();
+         var lonLat = map.location(longdo.LocationMode.Pointer);
+         addMarker(lonLat['lon'], lonLat['lat'], '', 'marker.png'); 
+      
+        getAddress(lonLat);*/
+         
+         
+         ov = overlay; 
+         if(ov.type= 'marker'){
+            
+          
+         //var detail = ov.popup().detail(); 
+         setTimeout(function(){
+             //$(detail).html('<div id="ov_dt"></div>');
+             //[['Complete', r()], ['Pending', r()],['Cancel', r()]]
+             var columns = Array();
+             var dd =  Array();
+             $.each(ov.data, function(kk, vv) {
+                 
+                vv['casetype'] = vv['casetype'].substr(0,20);
+                 var r = Array(vv['casetype']+' '+vv['total']+' เหตุ',vv['total']);
+                 columns.push(r);
+                 dd.push(vv['casetype']+' '+vv['total']+' เหตุ');
+					//det += rec + '. ' + vv['casetype'] + ' [' + vv['total'] + ']<br>';
+					//rec++;
+             })
+             
+                 var chart = c3.generate({
+                    // title: title,
+                      padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0,
+                    },
+                     
+                    bindto: "#ov_dt2",
+                     size: {
+                        height: 300,
+                        width: 400
+                    },
+                    legend: {
+                        /*hide: true*/
+                        position: 'right',
+                         
+                    },
+                    data: {
+                        // iris data from R
+                        columns: columns,
+                        type: 'pie',
+                        onclick: function (d, i) {
+                            console.log("onclick", d, i);
+                            //opencaselist(d.id);
+                            //window.parent.opencaselist('2');
+                            /*var tab_ = 'caselist_tab';
+                            var activeTabIndex = window.parent.tabPanel.items.findIndex('id', tab_);
+                            window.parent.tabPanel.setActiveTab(activeTabIndex);
+
+                            window.parent.Ext.get(tab_).dom.src = '{{ site_url() }}caselist/index/'+d.id;
+                            window.parent.document.getElementById(tab_).contentWindow.focus();*/
+
+                         },
+                    },
+                    color: {
+                        pattern: ['#1bc98e', '#FFDA33', '#1ca8dd']
+                    },
+                });
+             /*$('.c3-legend-item text').html('sssssss');
+              d3.selectAll('.c3-legend-item')
+                .data(dd)
+              .enter().append('span')
+                .attr('data-id', function (id) { return id; })
+                .html(function (id) { return id; })
+                .each(function (id) {
+                    d3.select(this).style('background-color', chart.color(id));
+                })
+                .on('mouseover', function (id) {
+                    chart.focus(id);
+                })
+                .on('mouseout', function (id) {
+                    chart.revert();
+                })
+                .on('click', function (id) {
+                    chart.toggle(id);
+                }); */
+             
+             
+         },100);
+             
+         }
+          
+	 
+         /*marker.title = desc['name'];
+        marker.total = desc['total'];
+        marker.data = desc['data'];*/
+         /*if(ov.popup().active()){
+            alert();
+         }*/
+         //$(ov.popup().element()).html('xxx')
+         //$(ov.popup().detail()).html('xxx') 
+         
+
+     });
+    
+    $('#map').css('margin', '0');
+    $('#map').css('width', '100%');
+    $('#map').css('height', (($('.portlet--right').height() - $('.portlet--bottom').height()) + 10) + 'px');
+    // renderArea();
+    //renderArea2();
+    
+    getCaseSummary();
+    
+    $(window).on('resize', function() {
+		setTimeout(function() {
+			$('#map').css('margin', '0');
+			$('#map').css('width', '100%');
+			//if (fn == 'case-monitor-c') {
+				$('#map').css('height', (($('.portlet--right').height() - $('.portlet--bottom').height()) + 10) + 'px');
+			//}
+		}, 1000);
+	});
+    
+    
+     
+
+ }
+    
+    
+  
+  
+ 
+    
+	var base_url = '{{base_url()}}';
+	//alert(base_url);
+	//$('.validate-alert').fadeOut('fast');
+	 
+  
+    $(document).ready(function() {
+        init();
+        //renderArea();
+    });
+
+  
+
+ 	function getPoliceCar() {
+		$.ajax({
+			url: base_url + "patrol/monPatrol",
+			data: {}
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			console.log(obj);
+			$.each( obj['data'] , function(key, value) {
+				console.log(value);
+				addMarker(value['police_vehicle_lon'], value['police_vehicle_lat'], 'ssss', 'police_car.png');
+			});
+			// addMarker(lonLat['lon'], lonLat['lat'], '', 'marker.png');
+		});
+	}
+
+</script>  
+
+
+<script type="text/javascript">
+	var datatmp = '';
+	function getCaseSummary(force_reload) {
+		 
+         //dataUpdate();
+        //renderArea_X_2();
+		$.ajax({
+			method:'POST',
+			url: "{{base_url()}}/monitorcase/sum_2",
+			data: searchData
+		}).done(function(data) {
+
+			if(force_reload!=true){
+				setTimeout_ = setTimeout(function(){ getCaseSummary( ); }, 5000); 
+			}
+
+			if(data==datatmp){
+				datatmp = data;
+				return false;
+			}
+			clearMarker();
+			areaCase = Array();
+			//renderArea2();
+			datatmp = data;
+
+			desc = '<pre>';
+			res = data;
+			obj = $.parseJSON(res);
+			desc += '<button style="background-color:' + obj['color']['green']['icon'] 	+ '">' + obj['color']['green']['title'] 	+ '</button>';
+			desc += '<button style="background-color:' + obj['color']['yellow']['icon'] + '">' + obj['color']['yellow']['title'] 	+ '</button>';
+			desc += '<button style="background-color:' + obj['color']['red']['icon'] 	+ '">' + obj['color']['red']['title'] 		+ '</button>';
+			desc += '<br>';
+
+			 
+			$('#case_type_c').html('');
+			$.each(obj['casetypes'], function(key, value) {
+				 $('#case_type_c').append('<li> '+key+' '+value.name+'</li>');
+			});
+			$.each(obj['description'], function(key, value) {
+				desc += key + ": " + value;
+				desc += "<br>";
+				areaCase['areaID_']
+			})
+			$.each(obj['caselist'], function(key, value) {
+				var rec = 1;
+				var xs = [];
+				xs['areaid'] = value['areaid'];
+				xs['color'] = value['color'];
+				xs['total'] = value['total'];
+                xs['data'] = value['data'];
+				var det = '<div id="ov_dt"  style="width:420px;"><table class="tb_v"><tr><td class="ch_tb_v"><div id="ov_dt2" style="width_:130pxc;"></div></td><td></td></tr></table></div>';
+                
+                 //det += 'Total: '+value['total'] + '<br>--------------<br>';
+				$.each(value['data'], function(kk, vv) {
+				    //det += rec + '. ' + vv['casetype'] + ' [' + vv['total'] + ']<br>';
+					rec++;
+				})
+                det +='';
+				xs['detail'] = det;
+				areaCase['areaID_' + value['areaid']] = xs;
+			});
+            //renderArea_X_2();
+			 renderArea_X(areaCase);
+            
+			$("#desc").html(desc);
+		}).fail(function(){
+			if(force_reload!=true){
+				 setTimeout_ = setTimeout(function(){ getCaseStatus( ); }, 5000); 
+			}
+		});
+	}
+</script>
+
+<script type="text/javascript">
+	function clearMarker() {
+		var mark = map.Overlays.list();
+		var i = 0;
+		$.each(mark, function(key, value) {
+			//if (fn != 'case-monitor-b' && fn != 'case-monitor-c') {
+				console.log(value instanceof longdo.Marker);
+			//}
+			//if (fn == 'case-monitor-b' || fn == 'case-monitor-c' || value instanceof longdo.Marker == true || value instanceof longdo.Circle == true) {
+				map.Overlays.remove(value);
+			//}
+			i++;
+		})
+	}
+
+var area_r = [];
+
+function renderArea2_new(data) {
+	 
+		res = data;
+        //area_r = data;
+		obj = $.parseJSON(res);
+        area_r = obj;
+		var area = [];
+		$.each(obj['data'], function(key, value) {
+			area = '';
+			var latlon = value['latlng'].split('|');
+			var latlon_2 = [];
+			$.each(latlon, function(k, v) {
+				var ll = v.split(',');
+				// var ll2 = { lon: parseFloat(ll[1]), lat: parseFloat(ll[0]) };
+				var ll2 = { lon : parseFloat(ll[0]), lat: parseFloat(ll[1]) };
+				latlon_2.push(ll2);
+			});
+			// console.log(latlon_2);
+			var hex = hexToRgb(value['bg_color']);
+			var geom2 = new longdo.Polygon(latlon_2, {
+				title: value['area_code']+"" ,
+				// title: '' ,
+				detail: '',
+				//label: value['name'],
+				lineWidth: 0.7,
+				lineColor: 'rgba(' + hex.r + ',' + hex.g + ',' + hex.b + ', 0.8)',
+				fillColor: 'rgba(' + hex.r + ',' + hex.g + ',' + hex.b + ', 0.4)',
+				// editable: true,
+			});
+			// console.log(geom2);
+			map.Overlays.add(geom2);
+			areaNumber++;
+		});
+      
+}
+
+function renderArea2() {
+	// alert(base_url + "assets/map/data.txt");
+	$.ajax({
+		//url: base_url + "assets/map/data.txt",
+         url: 'https://demo.123welcome.com/portal191b/assets/map/data.txt' ,
+		data: {}
+	}).done(function(data) {
+		res = data;
+        //area_r = data;
+		obj = $.parseJSON(res);
+        area_r = obj;
+		var area = [];
+		$.each(obj['data'], function(key, value) {
+			area = '';
+			var latlon = value['latlng'].split('|');
+			var latlon_2 = [];
+			$.each(latlon, function(k, v) {
+				var ll = v.split(',');
+				// var ll2 = { lon: parseFloat(ll[1]), lat: parseFloat(ll[0]) };
+				var ll2 = { lon : parseFloat(ll[0]), lat: parseFloat(ll[1]) };
+				latlon_2.push(ll2);
+			});
+			// console.log(latlon_2);
+			var hex = hexToRgb(value['bg_color']);
+			var geom2 = new longdo.Polygon(latlon_2, {
+				title: value['area_code']+"" ,
+				// title: '' ,
+				detail: '',
+				//label: value['name'],
+				lineWidth: 0.7,
+				lineColor: 'rgba(' + hex.r + ',' + hex.g + ',' + hex.b + ', 0.8)',
+				fillColor: 'rgba(' + hex.r + ',' + hex.g + ',' + hex.b + ', 0.4)',
+				// editable: true,
+			});
+			// console.log(geom2);
+			map.Overlays.add(geom2);
+			areaNumber++;
+		});
+        
+	});
+}
+    
+function renderArea_X(areaCase) {
+	// alert(base_url + "assets/map/data.txt");
+	$.ajax({
+		url: base_url + "assets/map/data.txt",
+        url: 'https://demo.123welcome.com/portal191b/assets/map/data.txt',
+		data: {}
+	}).done(function(data) {
+		renderArea2_new(data);
+		res = data;
+		obj = $.parseJSON(res);
+		var area = [];
+
+		$.each(obj['data'], function(key, value) {
+            
+            try {
+                value['t_id'] = value['area_code'];
+                    
+            //console.log('areaID_' + value['t_id']);  
+            var aio = areaCase['areaID_' + value['t_id']];
+            if (value['t_id'] == aio['areaid']) {  
+                 
+                area = '';
+                var latlon = value['latlng'].split('|');
+                var latlon_2 = [];
+                $.each(latlon, function(k, v) {
+                    var ll = v.split(',');
+                    // var ll2 = { lon: parseFloat(ll[1]), lat: parseFloat(ll[0]) };
+                    var ll2 = { lon : parseFloat(ll[0]), lat: parseFloat(ll[1]) };
+                    latlon_2.push(ll2);
+                });
+                // console.log(latlon_2);
+                var hex = hexToRgb(value['bg_color']);
+                var geom2 = new longdo.Polygon(latlon_2, {
+                    title: value['area_code']+"" ,
+                    // title: '' ,
+                    detail: '',
+                    label: value['name'],
+                    lineWidth: 0.7,
+                    lineColor: 'rgba(' + hex.r + ',' + hex.g + ',' + hex.b + ', 0.8)',
+                    fillColor: 'rgba(' + hex.r + ',' + hex.g + ',' + hex.b + ', 0.4)',
+                    // editable: true,
+                });
+                // console.log(geom2);
+                //map.Overlays.add(geom2);
+                
+                var center = geom2.pivot();
+						var det = [];
+						det['name'] = value['name'];
+						det['detail'] = aio['detail'];
+						det['color'] = aio['color']['bg'];
+						det['total'] = aio['total'];
+                        det['data'] = aio['data'];
+                        //console.log(det);     
+						addMarker(center['lon'], center['lat'], det, 'police_car.png'); 
+                
+             }
+            }catch(err) {  }
+			areaNumber++;
+		});
+	});
+}
+    
+    
+   
+    
+    
+    var fn = 'case-monitor-c';
+   addMarker =  function  (lon, lat, desc, icon) {
+       
+		marker = new longdo.Marker({
+			lon: lon,
+			lat: lat
+		}, {
+            //total:desc['total'],
+			title: desc['name']+ ' <small>เหตุเกิดจำนวน '+desc['total']+' เหตุ</small>',
+			icon: {
+				html: '<svg height="100" width="100"><circle cx="50" cy="50" r="' + (fn == 'case-monitor-a' ? '8' : '12') + '" stroke="#555" stroke-width="' + (fn == 'case-monitor-a' ? '0' : '0') + '"  fill-opacity="0.7" fill="' + (desc['color']) + '" />' + (fn == 'case-monitor-b' || fn == 'case-monitor-c' ? '<text fill="#555" x="50%" y="50%" text-anchor="middle" stroke="" stroke-width="1px" dy=".3em">' + desc['total'] + '</text>' : '') + '</svg>',
+				//url: 'https://policeemergencycc.123welcome.com/portal191b/assets/plugins/map/longdo/icons/' + icon,
+			},
+			detail: desc['detail'],
+			weight: longdo.OverlayWeight.Top
+		});
+        marker.title = desc['name'];
+        marker.total = desc['total'];
+        marker.data = desc['data'];
+        marker.type = 'marker';
+        //console.log(marker);
+		map.Overlays.add(marker);
+	}
+    
+    
+</script>
+
+<style>
+.ldmap_placeholder .ldmap_frame .ldmap_popup {
+    max-width: none !important ;
+    
+}
+    .ldmap_placeholder .ldmap_frame .ldmap_popup_detail{
+         overflow-y: unset !important ;
+    }
+        
+    .tb_v {
+        width: 100%;
+        background-color: white !important;
+        color: black !important;
+    }
+    .tb_v td{
+         background-color: white !important;
+        color: black !important;
+    }
+    .ch_tb_v{
+        /*width: 50%;*/
+    }
+    
+    .ldmap_placeholder .ldmap_frame .ldmap_popup_detail {
+     max-height:none;
+    }
+
+    .tb_v td {
+    background-color: white !important;
+    color: #555 !important;
+	}
+
+	.ov_dt2,.ldmap_overlay {
+		 color: #555 !important;
+	}
+
+	.c3-legend-item {
+   fill: #555  !important;
+	}
+</style>

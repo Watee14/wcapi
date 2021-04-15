@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Location Simulation</title>
+	{% include 'lbs/style.html.twig' %}
+	<style type="text/css">
+		body{height:100%;margin:0;}
+		#form_text_result_https{height:18.5vh}
+		#form_text_result_sms{height:18.5vh}
+		#map{height:60vh}
+		#map_result{height:18.5vh}
+	</style>
+</head>
+<body onload="init()" style="background-color:#595959;">
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xl">
+					<h5 class="h5 form-text mt-0 mb-0 user-select-none" id="titleE" style="color: white">Ecall Simulation</h5>
+					<!-- <label class="form-text lead h5 mt-2 mb-0 user-select-none">Sending caller's current location to <abbr title="Location Base Service">LBS</abbr> via <abbr title="Short message service">SMS</abbr> or <abbr title="Hypertext Transfer Protocol Secure">HTTPS</abbr>.</label> -->
+				<!-- 	<ul class="nav nav-tabs mt-2 mb-0" role="tablist">
+						<li class="nav-item" role="presentation">
+							<a id="nav_link_https" class="nav-link text-uppercase active user-select-none" data-toggle="tab" data-target="#tab_https" role="tab" aria-selected="true">ECall</a>
+						</li>
+						<li class="nav-item" role="presentation">
+							<a id="nav_link_sms" class="nav-link text-uppercase user-select-none" data-toggle="tab" data-target="#tab_sms" role="tab" aria-selected="false">Scenario 8</a>
+						</li>
+						
+					</ul> -->
+					<div class="tab-content" style="color: white">
+						<div class="form-group mb-2">
+							
+						</div>
+						<div id="tab_sms" class="tab-pane show " role="tabpanel">
+							<div class="form-group">
+								<button type="button" id="sim20" class="btn btn-primary mt-2 mb-0">
+									<i class="fas fa-share"></i>
+									<span>20 Case (E100)</span>
+								</button><br>
+								<button type="button" id="sim10" class="btn btn-primary mt-2 mb-0">
+									<i class="fas fa-share"></i>
+									<span>10 Case (E102)</span>
+								</button>
+							</div>
+						</div>
+						<div id="tab_https" class="tab-pane active" role="tabpanel">
+							<div class="form-group mb-0">
+								<!-- <label class="mt-2 mb-0 user-select-none">Service <abbr title="Uniform Resource Locator">URL</abbr>: </label>
+								<input type="text" id="form_control_url" name="form_control_url" class="form-control mt-0" value="{{def_url.aml}}" placeholder="Enter service's URL"> -->
+								<div class="row">
+
+
+
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">EventType</abbr>: </label>
+										<select class="form-control mt-0 mb-0"  id="form_control_eventType" onchange="changeSub();">
+										  <option value="eCall">eCall : eCall</option>
+										  <option value="iOT">iOT : iOT alert</option>
+										</select>
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">SubType</abbr>: </label>
+										<select class="form-control mt-0 mb-0"  id="form_control_subType">
+										  	<option value="default">Default</option>
+										</select>
+									</div>
+
+
+									<div class="col-4">
+										<div class="form-row">
+											<div class="col-5">
+												<label class="mt-2 mb-0 user-select-none">
+													<span data-toggle="modal" data-target="#modal_location_format">Latitude: </span> 
+												</label>
+												<input type="text" id="form_control_lat" name="form_control_lat" class="form-control mt-0 mb-0" value="13.729987" placeholder="Enter latitude">
+											</div>
+											<div class="col-5">
+												<label class="mt-2 mb-0 user-select-none">
+													<span data-toggle="modal" data-target="#modal_location_format">Longitude: </span>
+												</label>
+												<input type="text" id="form_control_lon" name="form_control_lon" class="form-control mt-0 mb-0" value="100.532800" placeholder="Enter longitude">
+											</div>
+											<div class="col">
+												<label class="mt-2 mb-0">&nbsp;</label>
+												<button type="button" id="btn_searching_coordinate" class="btn btn-secondary btn-block">
+													<i class="fas fa-sync-alt"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+									
+									
+								</div>
+								
+								<div class="row" id="forEcall">
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">Call Type</abbr>: </label>
+										<select class="form-control mt-0 mb-0"  id="form_control_callType">
+										  <option value="Alarm">Alarm</option>
+										  <option value="ANI/ALI">ANI/ALI</option>
+										  <option value="Officer">Officer</option>
+										  <option value="Phone">Phone</option>
+										  <option value="Radio">Radio</option>
+										  <option value="Walk-In">Walk-In</option>
+										</select>
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">ANI</abbr>: </label>
+										<input type="text" id="form_control_callerNo" name="form_control_callerNo" class="form-control mt-0 mb-0" value="0809955502" placeholder="Enter caller's ANI">
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">Caller Name</abbr>: </label>
+										<input type="text" id="form_control_callerName" name="form_control_callerName" class="form-control mt-0 mb-0" value="Jane" placeholder="Enter caller's Name">
+									</div>
+									<div class="col-12"><hr></div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">Position Confidence</abbr>: </label>
+										<input type="text" id="form_control_positionConfidence" name="form_control_positionConfidence" class="form-control mt-0 mb-0" value="CAN_BE_TRUSTED" placeholder="Enter caller's ANI">
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">Vehicle Type</abbr>: </label>
+										<input type="text" id="form_control_vehicleType" name="form_control_vehicleType" class="form-control mt-0 mb-0" value="LIGHT_COMMERCIAL_VEHICLES_N1" placeholder="Enter caller's ANI">
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">VIN</abbr>: </label>
+										<input type="text" id="form_control_vin" name="form_control_vin" class="form-control mt-0 mb-0" value="ECALLEXAMPLE2020" placeholder="Enter caller's ANI">
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">Propulsion</abbr>: </label>
+										<select class="form-control mt-0 mb-0"  id="form_control_propulsion">
+										  <option value="Diesel">Diesel</option>
+										  <option value="Electric">Electric</option> 
+										</select>
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">Vehicle Direction</abbr>: </label>
+										<input type="text" id="form_control_vehicleDirection" name="form_control_vehicleDirection" class="form-control mt-0 mb-0" value="174" placeholder="Enter caller's ANI">
+									</div>
+									<div class="col-4">
+										<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">Number of Passenger</abbr>: </label>
+										<input type="number" id="form_control_noPassenger" name="form_control_noPassenger" class="form-control mt-0 mb-0" value="2" placeholder="Enter caller's ANI">
+									</div>
+									<div class="col-12">
+										<label class="mt-0 mb-0 user-select-none"> <span>Optional Additional Data OID:</span> </label>
+										<textarea id="form_control_additionalOID" name="form_control_additionalOID" class="form-control mt-0 mb-0" rows="2" placeholder="Enter input message"></textarea>
+									</div>
+									<div class="col-12">
+										<label class="mt-0 mb-0 user-select-none"> <span>Optional Additional Data:</span> </label>
+										<textarea id="form_control_additionalData" name="form_control_additionalData" class="form-control mt-0 mb-0" rows="2" placeholder="Enter input message"> </textarea>
+									</div>
+								</div>
+								
+								
+								<button type="button" id="btn_send_event" class="btn btn-primary mt-2 mb-0" onclick="sendEvent();">
+									<i class="fas fa-share"></i>
+									<span>Send</span>
+								</button> <font id="loadingRes"> Loading... </font>
+								<div>
+									<label class="mt-2 mb-0 user-select-none">Result: </label>
+									<div id="form_text_result" class="form-control-plaintext text-break mt-0 mb-0 p-0 overflow-auto border rounded" style="color: white !important;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xl">
+					<div class="float-left">
+						<label class="mt-2 mb-0">
+							<span class="user-select-none">Click on map to get location: </span>
+							<span id="province" class="user-select-none"></span>
+						</label>
+					</div>
+					 
+					<div class="clearfix"></div>
+					<div id="map" class="mt-1 border rounded">
+						<div class="m-2 user-select-none"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+					</div>
+					<div class="form-group mb-0">
+						<label class="mt-2 mb-0 user-select-none">Location search: </label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="map_search" placeholder="Enter at least 3 characters">
+							<div class="input-group-append">
+								<button id="map_submit" class="btn btn-secondary" type="button" title="Search">
+									<i class="fas fa-search"></i>
+								</button>
+							</div>
+						</div>
+						<input type="hidden" id="map_area">
+						<input type="hidden" id="map_tag">
+						<input type="hidden" id="map_span">
+						<input type="hidden" id="map_limit" value="20">
+						<div id="map_result" class="mt-2 rounded border overflow-auto"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_msg_example_https" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-body">
+					{% for key, value in def_ipt.https %}
+						<div class="form-group{{loop.last == true ? 'mb-0' : ''}}">
+							<div class="input-group">
+								<textarea id="form_control_example_https" name="form_control_example_https" class="form-control mt-0 mb-0" rows="4" readonly>{{value}}</textarea>
+								<div class="input-group-append">
+									<button type="button" class="btn btn-info" onclick="copy_2_clipboard('form_control_example_https','form_control_copied_https')">
+										<i class="fas fa-copy"></i>
+										<span>Copy to clipboard</span>
+									</button>
+								</div>
+							</div>
+							<div class="float-right">
+								<small id="form_control_copied_https" class="form-text text-success label-copied"></small>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_msg_example_sms" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-body">
+					{% for key, value in def_ipt.sms %}
+						<div class="form-group{{loop.last == true ? 'mb-0' : ''}}">
+							<div class="input-group">
+								<textarea id="form_control_example_sms_{{key}}" name="form_control_example_sms_{{key}}" class="form-control mt-0 mb-0" rows="2" readonly>{{value}}</textarea>
+								<div class="input-group-append">
+									<button type="button" class="btn btn-info" onclick="copy_2_clipboard('form_control_example_sms_{{key}}','form_control_copied_sms_{{key}}')">
+										<i class="fas fa-copy"></i>
+										<span>Copy to clipboard</span>
+									</button>
+								</div>
+							</div>
+							<div class="float-right">
+								<small id="form_control_copied_sms_{{key}}" class="form-text text-success label-copied"></small>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_location_format" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<h5 class="modal-title text-white">Try other location format</h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group mb-0">
+						<label class="mt-0 mb-0"><abbr title="Degrees/Minutes/Seconds">DMS</abbr>: </label>
+						<div class="input-group">
+							<input type="text" id="form_control_dms2wgs84" name="form_control_dms2wgs84" class="form-control mb-0" placeholder="Enter DMS for convert to latitude and longitude">
+							<div class="input-group-append">
+								<button type="button" class="btn btn-primary" onclick="dms2wgs84(document.getElementById('form_control_dms2wgs84').value)">Convert</button>
+							</div>
+						</div>
+						<div class="float-left">
+							<small class="form-text text-muted mt-0">Example: 55° 51' 26" N 4° 15' 48" W</small>
+						</div>
+						<div class="float-right">
+							<small id="form_control_location_format_error" class="form-text text-danger mt-0"></small>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/proj4/dist/proj4.js"></script>
+	<script type="text/javascript" src="{{_MAP_SERVER}}?key={{_MAP_KEY}}"></script>
+	<script type="text/javascript">
+		var btn_searching_coordinate=document.getElementById('btn_searching_coordinate');
+		var d;
+		var dd,mm,yyyy,hh,ii,ss;
+		var date;
+		var form_control_ani=document.getElementById('form_control_ani');
+		var form_control_url=document.getElementById('form_control_url');
+		var jd={ani:"",msg:"",ptl:"",timekey:""};
+		var map;
+		var map_search=document.getElementById('map_search');
+		var map_submit=document.getElementById('map_submit');
+		var pv='';
+		//var store_coordinate_ani=form_control_ani.value;
+		//var store_coordinate_url=form_control_url.value;
+		var wgs84_lat=0;
+		var wgs84_lon=0;
+		$('#loadingRes').hide();
+		/*function dms2wgs84(dms){
+			var str=dms;
+			var res=str.split(' ');
+			var latlon={lat:0.000000,lon:0.000000}
+			if(res.length==8){
+				for(var i=0;i<res.length;i++){
+					if(i!=3&&i!=7)
+						res[i]=parseFloat(res[i]);
+				}
+				latlon.lat=new Number(parseFloat(res[0])+parseFloat(res[1]/60)+parseFloat(res[2]/3600)).toFixed(6);
+				latlon.lon=new Number(parseFloat(res[4])+parseFloat(res[5]/60)+parseFloat(res[6]/3600)).toFixed(6);
+				if(latlon.lat!='NaN'&&latlon.lon!='NaN'){
+					latlon.lat=parseFloat((res[3]=='S'?'-':'')+latlon.lat);
+					latlon.lon=parseFloat((res[7]=='W'?'-':'')+latlon.lon);
+					document.getElementById('form_control_location_format_error').innerHTML='';
+					document.getElementById('form_control_lat').value=latlon.lat;
+					document.getElementById('form_control_lon').value=latlon.lon;
+					$('#modal_location_format').modal('hide');
+				}
+				else
+					document.getElementById('form_control_location_format_error').innerHTML='Invalid format!';
+			}
+			else
+				document.getElementById('form_control_location_format_error').innerHTML='Invalid format!';
+		}*/
+		function copy_2_clipboard(elem_text_id,elem_copy_id){
+			var copy_text=document.getElementById(elem_text_id);
+			copy_text.select();
+			copy_text.setSelectionRange(0,99999);
+			document.execCommand('copy');
+			var lc=document.getElementsByClassName('label-copied');
+			var i;
+			for(i=0;i<lc.length;i++)
+				lc[i].innerHTML='';
+			document.getElementById(elem_copy_id).innerHTML='Copied';
+		}
+		/*function filling_msg_txtbox(){
+			if(wgs84_lat==0)wgs84_lat='{{def_loc.https.lat}}';
+			if(wgs84_lon==0)wgs84_lon='{{def_loc.https.lon}}';
+			var tmp_msg='{{def_msg}}';
+			tmp_msg=tmp_msg.replace('A"ML','A\\"ML');
+			//var message_str=JSON.parse('{{def_msg}}');
+			var message_str=JSON.parse(tmp_msg);
+			document.getElementById('form_control_lat').value=wgs84_lat;
+			document.getElementById('form_control_lon').value=wgs84_lon;
+			message_str.https=message_str.https.replace('[lat]',wgs84_lat);
+			message_str.https=message_str.https.replace('[lon]',wgs84_lon);
+			message_str.https=message_str.https.replace('[si]','52003'+form_control_ani.value);
+			message_str.https=message_str.https.replace('[dn]','+66'+(form_control_ani.value).substring(1));
+			message_str.sms=message_str.sms.replace('[lat]',(Math.sign(wgs84_lat)==1?'+'+wgs84_lat:wgs84_lat));
+			message_str.sms=message_str.sms.replace('[lon]',wgs84_lon);
+			message_str.sms=message_str.sms.replace('[si]','52003'+form_control_ani.value);
+			message_str.sms=message_str.sms.replace('[dn]','+66'+(form_control_ani.value).substring(1));
+			document.getElementsByName('form_control_msg_https')[0].value=message_str.https;
+			document.getElementsByName('form_control_msg_sms')[0].value=message_str.sms;
+			transforming_coordinate(wgs84_lat,wgs84_lon);
+		}*/
+		function searching_coordinate(options){
+			wgs84_lat=new Number(document.getElementById('form_control_lat').value).toFixed(6);
+			wgs84_lon=new Number(document.getElementById('form_control_lon').value).toFixed(6);
+			btn_searching_coordinate.innerHTML='<i class="fas fa-sync-alt"></i>';
+			try{
+				map.Overlays.clear().add(new longdo.Marker({lon:wgs84_lon,lat:wgs84_lat}));
+				map.location({lon:wgs84_lon,lat:wgs84_lat},true);
+				//filling_msg_txtbox();
+			}
+			catch(err){
+				document.getElementById('province').innerHTML='';
+				alert('Invalid location!');
+			}
+		}
+		function searching_place(){
+			map.Search.search(map_search.value,{
+				area:document.getElementById('map_area').value,
+				tag:document.getElementById('map_tag').value,
+				span:document.getElementById('map_span').value,
+				limit:document.getElementById('map_limit').value
+			});
+		}
+		function store_coordinate(){
+			store_coordinate_ani=form_control_ani.value;
+			store_coordinate_url=form_control_url.value;
+			d=new Date();
+			dd=d.getDate();mm=('0'+(d.getMonth()+1)).slice(-2);yyyy=d.getFullYear();hh=d.getHours();ii=d.getMinutes();ss=d.getSeconds();
+			date=dd+mm+yyyy+hh+ii+ss;
+			jd={ani:store_coordinate_ani,lt:wgs84_lat,lg:wgs84_lon,ptl:99,province:pv,timekey:date,url:store_coordinate_url};
+			$.ajax({
+				url:"{{base_url()}}lbs/sender",
+				method:"POST",
+				data:jd,
+				dataType:"html",
+				timeout:10000,
+			}).done(function(msg){}).fail(function(jqXHR,textStatus){}).always(function(){});
+		}
+		function transforming_coordinate(lat,lon){
+			map.Ui.Mouse.enableClick(false);
+			if(lat!=''&&lon!=''){
+				document.getElementById('province').innerHTML='<i class="fas fa-spinner fa-spin"></i> Province loading...';
+				$.ajax({
+					url:"{{def_url.addr}}"+lat+'/'+lon,
+					method:"GET",
+					headers:{Authorization:"bXlabkZsMWZXVFhDK2NsMWgvMm9GZz09"},
+					contentType:"application/json;charset=utf-8",
+					dataType:"json",
+					timeout:10000,
+				}).done(function(msg){
+					if(msg.province!=undefined)
+						document.getElementById('province').innerHTML='<span class="border border-success rounded text-white bg-success p-1 text-nowrap">'+msg.province+'</span>';
+					else
+						document.getElementById('province').innerHTML='';
+					if(pv!=''){
+						pv=msg.province;
+						store_coordinate();
+					}
+					else
+						pv=msg.province;
+				}).fail(function(jqXHR,textStatus){
+					document.getElementById('province').innerHTML='<span class="border border-danger rounded text-white bg-danger p-1 text-nowrap">Can not load province!</span>';
+				}).always(function(){
+					map.Ui.Mouse.enableClick(true);
+				});
+			}
+		}
+		function init(){
+			// สร้างแผนที่
+	       // base_url = base_url;
+				//resize();
+				//window.addEventListener('resize', resize);
+
+				// console.log(longdo.MapTheme.ui.layerSelectorDropdown.splice(19, 1)   );
+				// console.log(longdo.MapTheme.ui.layerSelectorDropdown.splice(18, 1)   );
+				// console.log(longdo.MapTheme.ui.layerSelectorDropdown.splice(17, 1)   );
+				// console.log(longdo.MapTheme.ui.layerSelectorDropdown.splice(16, 1)   );
+				// console.log(longdo.MapTheme.ui.layerSelectorDropdown.splice(15, 1)   );
+				// console.log(longdo.MapTheme.ui.layerSelectorDropdown.splice(14, 1)   );
+				// console.log(longdo.MapTheme.ui.layerSelectorOption.th.button.splice(2, 1) );
+				longdo.MapTheme.ui.layerSelectorDropdown.splice(19, 1);
+				longdo.MapTheme.ui.layerSelectorDropdown.splice(18, 1);
+				longdo.MapTheme.ui.layerSelectorDropdown.splice(17, 1);
+				longdo.MapTheme.ui.layerSelectorDropdown.splice(16, 1);
+				longdo.MapTheme.ui.layerSelectorDropdown.splice(15, 1);
+				longdo.MapTheme.ui.layerSelectorDropdown.splice(14, 1);
+				longdo.MapTheme.ui.layerSelectorOption.th.button.splice(2, 1);
+				longdo.Util.isHD = function() { return 0 }
+				map = new longdo.Map({
+					layer: [
+						longdo.Layers.GRAY,
+						// longdo.Layers.TRAFFIC
+					],
+					zoom: 12,
+					placeholder: document.getElementById('map'),
+					lastView: false
+				});
+				map.Event.bind('click', function(overlay) {
+					var lonLat = map.location(longdo.LocationMode.Pointer);
+					$('#form_control_lat').val( lonLat['lat'].toFixed(6)  )   ;
+					$('#form_control_lon').val( lonLat['lon'].toFixed(6) )   ;
+					clearMarker();
+					addMarker(lonLat['lon'], lonLat['lat'], { "type": "case" }, 'marker.png');
+				});
+
+			 
+				map.location({
+						    lon: "100.532800",
+						    lat: "13.729987" ,
+						   }, true);
+				map.zoom(12);
+				addMarker( "100.532800" ,  "13.729987" , { "type": "case" }, 'marker.png');		
+				map.Event.bind('overlayClick', function(overlay) {
+
+
+
+					/*var clickedPolygon = polygonList.filter(p => { return longdo.Util.contains(map.location(longdo.LocationMode.Pointer), p.location());});
+					//console.log(clickedPolygon);
+					var areaLayer;
+					$.each(clickedPolygon, function(key, value) {
+						if(value instanceof longdo.Polygon == true    ){
+
+							if(value.type == "inspection"){
+								console.log(value.inspection);
+								areaLayer = value.inspection.split('-');
+							}
+						}
+					});
+
+					if(overlay.type=='police_car' && overlay.type!=undefined){
+						return ;
+					}
+					if (typeof(_command_page) != undefined && _command_page == '1') {
+						return ;
+					}
+		 
+					clearMarker();
+					var lonLat = map.location(longdo.LocationMode.Pointer);
+					addMarker(lonLat['lon'], lonLat['lat'], {"type":"case"} , 'marker.png');
+					markCircle(lonLat['lon'], lonLat['lat']);
+					getNearBy(lonLat);
+					if (typeof getAddress === 'function') {
+						_tab_non_render = 0;
+						window.opener.return2latlon(lonLat['lat'], lonLat['lon']);
+						console.log('%cLatLon sender success: ' + lonLat['lat'] + ', ' + lonLat['lon'], 'color:green');
+						getAddress(lonLat);
+					}
+					else if (typeof getAddressTab === 'function') {
+						_tab_non_render = 1;
+						getAddressTab(lonLat);
+						return2dropdown('inspection_area_code', areaLayer[1] != '' ? areaLayer[1] : '');
+						return2dropdown('police_station_code', 	areaLayer[0] != '' ? areaLayer[0] : '');
+					}
+
+					if(_command==1 && _c_id!=''){
+						 
+
+					}
+					else {
+						try {
+							console.log("OpenCase latlon: " + areaLayer[0] + '--' + areaLayer[1]);
+							console.log(areaLayer);
+							window.opener.return2dropdown('inspection_area_code', 	areaLayer[1] 	!= '' ? areaLayer[1] 	: '');
+							window.opener.return2dropdown('police_station_code', 	areaLayer[0] 	!= '' ? areaLayer[0] 	: '');
+						}
+						catch(err) {
+						   
+						}
+					}
+					if (clickedPolygon.length <= 0) {
+						window.opener.return2dropdown('inspection_area_code', null);
+						window.opener.return2dropdown('police_station_code', PROVINCIAL_POLICE_STATION);
+					}
+
+				
+					var cc = $('#casetype_code').val();*/
+				
+				});
+
+				map.Event.bind('doubleClick', function(overlay) {
+					if (typeof getPolyLines === 'function') {
+						getPolyLines();
+					}
+				});
+
+ 			map.Search.placeholder(document.getElementById('map_result')).language('en');
+		}
+		btn_searching_coordinate.onclick=function(){
+			if(document.getElementById('form_control_lat').value!=''&&document.getElementById('form_control_lon').value!=''){
+				btn_searching_coordinate.innerHTML='<i class="fas fa-sync-alt fa-spin"></i>';
+				searching_coordinate();
+			}
+		}
+		/*form_control_ani.onkeyup=function(e){
+			store_coordinate_ani=form_control_ani.value;
+			wgs84_lat=document.getElementById('form_control_lat').value;
+			wgs84_lon=document.getElementById('form_control_lon').value;
+			//filling_msg_txtbox();
+		}*/
+		/*form_control_url.onkeyup=function(e){
+			store_coordinate_url=form_control_url.value;
+			wgs84_lat=document.getElementById('form_control_lat').value;
+			wgs84_lon=document.getElementById('form_control_lon').value;
+			//filling_msg_txtbox();
+		}*/
+		map_search.onkeypress=function(e){
+			if(map_search.value.length>=3&&e.keyCode==13)
+				searching_place();
+		}
+		map_submit.onclick=function(){
+			if(map_search.value.length>=3)
+				searching_place();
+		}
+		function addMarker(lon, lat, desc, icon) {
+			// alert(base_url);
+			// var marker1 = new longdo.Marker({ lon: lon, lat: lat });
+			// console.log("DDDDD");
+			// console.log(desc);
+			// console.log("YYYY");
+			marker = new longdo.Marker({
+				lon: lon,
+				lat: lat
+			}, {
+				title: desc['name'],
+				icon: {
+					url:  '/191ws/assets/icon/' + icon,
+					html: '<img src="/191ws/assets/icon/' + icon+'" width="24" height="24">' ,
+					//offset: { x: 12, y: 45 }
+					// offset: { x: 12, y: 45 }
+					//size: { width: 200, height: 200 },
+				},
+				detail: desc['detail'],
+				// visibleRange: { min: 7, max: 8 },
+				// draggable: true,
+				weight: longdo.OverlayWeight.Top
+			});
+			//marker['type'] = desc['type'] ;
+			map.Overlays.add(marker);
+
+			map.location({
+			    lon: lon  ,
+			    lat: lat ,
+			   }, true);
+			//map.zoom(13);
+			//polygonList.push(marker);
+		}
+
+		function clearMarker() {
+		var mark = map.Overlays.list();
+		// console.log(mark) ;
+		var i = 0;
+		$.each(mark, function(key, value) {
+			console.log(value instanceof longdo.Marker);
+
+			if(value instanceof longdo.Marker == true  ){
+
+				//if(value.type != 'police_car' && value.type != 'mark_line'){
+					map.Overlays.remove(value);
+				//}
+
+			}
+
+			//if(value instanceof longdo.Circle == true){
+				//map.Overlays.remove(value);
+			//}
+			i++;
+		});
+	}
+ 
+ 	function sendEvent(){
+ 		$('#form_text_result').html(  ""  ) ;
+ 		$('#loadingRes').show();
+ 		var ds = {} ;
+ 		ds['eventType'] = $('#form_control_eventType').val() ;
+ 		ds['subType'] = $('#form_control_subType').val() ;
+ 		ds['lat'] = $('#form_control_lat').val() ;
+ 		ds['lon'] = $('#form_control_lon').val() ;
+ 		ds['callType'] = $('#form_control_callType').val() ;
+ 		ds['callerNo'] = $('#form_control_callerNo').val() ;
+ 		ds['callerName'] = $('#form_control_callerName').val() ;
+ 		ds['positionConfidence'] = $('#form_control_positionConfidence').val() ;
+ 		ds['vehicleType'] = $('#form_control_vehicleType').val() ;
+ 		ds['vin'] = $('#form_control_vin').val() ;
+ 		ds['propulsion'] = $('#form_control_propulsion').val() ;
+ 		ds['vehicleDirection'] = $('#form_control_vehicleDirection').val() ;
+ 		ds['noPassenger'] = $('#form_control_noPassenger').val() ;
+ 		ds['additionalOID'] = $('#form_control_additionalOID').val() ;
+ 		ds['additionalData'] = $('#form_control_additionalData').val() ;
+ 		//console.log(ds);
+
+ 		$.post({
+			url:   "HexEvent/MakeEvent",
+			data: ds ,
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			 
+			$('#form_text_result').html(  res  ) ;
+			$('#loadingRes').hide();
+		});
+ 	}
+ 	function changeSub(){
+ 		//alert( $('#form_control_eventType').val()  ) ;
+ 		if( $('#form_control_eventType').val() == "iOT" ){
+ 			var str = '<option value="01">01 : Bomb Alert</option>'+
+					  '<option value="02">02 : Smart Water</option>'+
+					  '<option value="03">03 : Smart Gas</option>'+
+					  '<option value="04">04 : D</option>'+
+					  '<option value="05">05 : F</option>'+
+					  '<option value="06">06 : G</option>'+
+					  '<option value="07">07 : H</option>'+
+					  '<option value="08">08 : I</option>'+
+					  '<option value="09">09 : J</option>'+
+					  '<option value="10">10 : K</option>';
+			$('#form_control_subType').html(  str  ) ;
+			$('#forEcall').hide();
+			$('#titleE').html('iOT Simulation');
+ 		}else if( $('#form_control_eventType').val() == "eCall" ){
+ 			var str = '<option value="default">Default</option>' ;
+			$('#form_control_subType').html(  str  ) ;
+			$('#forEcall').show();
+			$('#titleE').html('Ecall Simulation');
+ 		}
+ 	}
+	</script>
+</body>
+</html>

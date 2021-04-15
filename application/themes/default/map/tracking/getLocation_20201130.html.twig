@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Get location</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="{{base_url}}/assets/plugins/jquery-1.12.4.min.js" type="text/javascript"></script>
+<style>
+  html { height: 100% }
+      /*body { height: 90%; margin: 0; padding: 0; font: 12px/1.2 Meiryo, Tahoma, sans-serif; }
+      #header { background: #2086f3; font-size: 15px; color: #ffffff; padding: 12px; }*/
+      #map { width: calc(100% - 8px); height: calc(30% - 0px); margin: 4px; }
+.a {
+  display: contents;
+  border: 1px solid red;
+  background-color: lightgrey;
+  padding: 10px;
+  width: 200px;
+}
+.b {
+  border: 1px solid #e8eaecb5;
+  background-color: #e8eaecb5;
+  padding: 10px;
+  margin: 15px ;
+  height: 90%;
+  /*background: #f0e68c;*/
+}
+.c {
+  border: 1px solid #e8eaecb5;
+  background-color: #17782c;
+  padding: 10px;
+  margin: 15px ;
+  height: 20px;
+  width: 100px ;
+  /*background: #f0e68c;*/
+}
+html, body {
+        height: 100%;
+        margin: 0px;
+    }
+    
+</style>
+<div class="b">
+<center>
+	<img src="/191ws/assets/icon/191logo.png" width="140px" ><br>
+	<font style="font-size:40px" color="#323233">การส่งพิกัด</font>
+</center><br>
+	- เปิด location service บนอุปกรณ์ <br>
+	- กดปุ่ม <b>กดเพื่อส่งพิกัด</b> {{mobileNo}} <br>
+	- กดปุ่ม <b>OK</b> เพื่ออนุญาต Allow permission (Location) บน Mobile <br>
+	
+	
+	<!-- <button type="button" onclick="showPosition();">Show Position</button> -->
+	
+	<!-- <center> <div class="c">  ส่งสำเร็จ</div> </center> -->
+  <div id="map"></div>
+  <br><br>
+  <div style="display: table;width: 100%">
+    <div style="display: table-cell;text-align: center;width: 100%">
+      <div id="selectLL" style="display:inline-block;padding:5px"><center><img src="/191ws/assets/icon/MIcon.png" width="50px" onclick="selectLocation();"><br>กดเลือกพิกัด</center></div> 
+      <div id="send" style="display:inline-block;padding:5px"><center><img src="/191ws/assets/icon/location.png" width="50px" onclick="showPosition();"><br>กดเพื่อส่งพิกัด</center></div> 
+      <div id="sendSuccess" style="display:inline-block;padding:5px"><center><img src="/191ws/assets/icon/check.png" width="50px"  ><br>สำเร็จ</center></div> 
+      <div id="sendFail" style="display:inline-block;padding:5px"><center><img src="/191ws/assets/icon/fail.png" width="50px" ><br>ไม่สำเร็จ</center></div> 
+    </div>
+  </div>
+</div>
+
+  
+ 
+ <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://api.longdo.com/map/?key={{_MAP_KEY}}"></script>
+<script>
+    // Set up global variable
+    var result;
+    var mobileNo = '{{mobileNo}}';
+    var timestamp = '{{timestamp}}';
+    var base_url = '{{base_url}}' ;
+    //var base_url = 'https://192.168.101.16/191ws/' ;
+    var link_expire = '{{_LOCATION_LINK_EXPIRE}}' ;
+    var parameter = jQuery.parseJSON( '{{parameter}}' );    
+    $('#sendSuccess').hide();
+    $('#sendFail').hide();
+    $('#map').hide();
+
+     function init() {
+        // สร้างแผนที่
+      /*longdo.MapTheme.ui.layerSelectorDropdown.splice(19, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(18, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(17, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(16, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(15, 1);
+      longdo.MapTheme.ui.layerSelectorDropdown.splice(14, 1);
+      longdo.MapTheme.ui.layerSelectorOption.th.button.splice(2, 1);
+       longdo.MapTheme.ui.layerSelectorOption.th.button.splice(1, 1);
+        longdo.MapTheme.ui.layerSelectorOption.th.button.splice(0, 1);*/
+        map = new longdo.Map({
+          layer: [
+           longdo.Layers.GRAY_EN,
+            //longdo.Layers.ARCGIS_WORLD_STREET_MAP,
+            // longdo.Layers.TRAFFIC
+          ],
+          placeholder: document.getElementById('map'),
+          language: 'th'
+        });
+        /*map.Event.bind('overlayClick', function(overlay) {
+          //alert("--");
+           //console.log(overlay['data']['myid']);
+           if(overlay['data']['myid']!=""){
+            var myid = overlay['data']['myid'] ;
+              var txt = "<font size=\"4\">Event list@"+objectArea[myid]['title']+'</font><br>' ;
+              txt += objectArea[ myid ]['detail'] ;
+              $('#eventShow').html( txt   ) ;
+           }
+
+        });*/
+         map.Ui.DPad.visible(false);
+            map.Ui.Zoombar.visible(false);
+            map.Ui.Geolocation.visible(false);
+            map.Ui.Toolbar.visible(false);
+            map.Ui.LayerSelector.visible(false);
+            map.Ui.Fullscreen.visible(true);
+            map.Ui.Crosshair.visible(true);
+            map.Ui.Scale.visible(true);
+        /*map.location({
+          lon: '100.496065',
+          lat: '14.584188'
+        }, true);
+        map.zoom(6);*/
+
+        //shortDetail() ;
+         
+      }
+
+    function selectLocation(){
+      init();
+       $('#map').show();
+       $('#selectLL').hide();
+
+       if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(successCallback2, errorCallback );
+            //result.innerHTML = "Getting the position information...";
+            //alert( "Getting the position information..." );
+        } else {
+            alert("Sorry, your browser does not support HTML5 geolocation.");
+        }
+
+    }
+
+    function successCallback2(position) {
+      lat = position.coords.latitude  ;
+          lon = position.coords.longitude ;
+     map.location({
+          lon: lon,
+          lat: lat
+        }, true);
+        map.zoom(6);
+        
+
+    }
+
+
+    function showPosition() {
+        // Store the element where the page displays the result
+        result = document.getElementById("result");
+        
+        // If geolocation is available, try to get the visitor's position
+        if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback );
+            //result.innerHTML = "Getting the position information...";
+            //alert( "Getting the position information..." );
+        } else {
+            alert("Sorry, your browser does not support HTML5 geolocation.");
+        }
+    };
+    
+    // Define callback function for successful attempt
+    function successCallback(position) {
+    	
+     /* result.innerHTML = '<a target="_blank" href="http://www.google.com/maps/place/'+position.coords.latitude+','+position.coords.longitude+'"> Google map</a>' ;
+        result.innerHTML += "<br>Your current position is (" + "Latitude: " + position.coords.latitude + ", " + "Longitude: " + position.coords.longitude + ",Altitude : "+ position.coords.altitude +")" ;*/
+
+
+
+        var lat ;
+        var lon ;
+        var alt ;
+        try {
+          var xx = map.location();
+          console.log( xx['lat'] );
+          lat = xx['lat'] ;
+          lon = xx['lon'] ;
+          alt = "" ;
+
+        }
+        catch(err) {
+          //document.getElementById("demo").innerHTML = err.message;
+          lat = position.coords.latitude  ;
+          lon = position.coords.longitude ;
+          alt = position.coords.altitude ;
+        }
+
+ 
+         result.innerHTML = '<a target="_blank" href="http://www.google.com/maps/place/'+lat+','+ lon +'"> Google map</a>' ;
+        result.innerHTML += "<br>Your current position is (" + "Latitude: " + lat + ", " + "Longitude: " + lon  + ",Altitude : "+ alt +")" ;
+         sendLocation( position.coords.latitude , position.coords.longitude , position.coords.altitude  );
+        //sendLocation( position.coords.latitude , position.coords.longitude , position.coords.altitude  );
+
+        
+
+    }
+    
+    // Define callback function for failed attempt
+    function errorCallback(error) {
+    	alert(error);
+        if(error.code == 1) {
+            result.innerHTML = "You've decided not to share your position, but it's OK. We won't ask you again.";
+        } else if(error.code == 2) {
+            result.innerHTML = "The network is down or the positioning service can't be reached.";
+        } else if(error.code == 3) {
+            result.innerHTML = "The attempt timed out before it could get the location data.";
+        } else {
+            result.innerHTML = "Geolocation failed due to unknown error.";
+        }
+        $('#sendFail').show();
+    	$('#send').hide();
+    }
+    function sendLocation(latitude , longitude , altitude ) {
+    	//result.innerHTML = base_url + "MapLocation/saveLocation" ;
+      console.log(parameter['ani']);
+      parameter['latitude'] = latitude ;
+      parameter['longitude'] = longitude ;
+      parameter['altitude'] = altitude ; 
+		$.ajax({
+			url: base_url + "MapLocation/saveLocation_2",
+      //url: "http://43.255.240.22:8500/sms",
+			method:'POST' ,
+			data: parameter
+		}).done(function(data) {
+			res = data;
+			obj = $.parseJSON(res);
+			if(obj['status']=="true"){
+				$('#sendSuccess').show();
+    			$('#send').hide();
+			}else{
+				$('#sendFail').show();
+    			$('#send').hide();
+			}
+			//obj = $.parseJSON(res);
+			// result.innerHTML = data ;
+      $('#selectLL').hide();
+		});
+	}
+</script>
+</head>
+<body >
+    <div id="result">
+        <!--Position information will be inserted here-->
+    </div>
+   
+</body>
+</html>

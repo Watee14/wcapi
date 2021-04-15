@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Location Simulation</title>
+	{% include 'lbs/style.html.twig' %}
+	<style type="text/css">
+		body{height:100%;margin:0}
+		#form_text_result_https{height:18.5vh}
+		#form_text_result_sms{height:18.5vh}
+		#map{height:60vh}
+		#map_result{height:18.5vh}
+	</style>
+</head>
+<body onload="init()">
+	<div class="mt-1 mb-1">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xl">
+					<h5 class="h5 form-text mt-0 mb-0 user-select-none">Location Simulation</h5>
+					<label class="form-text lead h5 mt-2 mb-0 user-select-none">Sending caller's current location to <abbr title="Location Base Service">LBS</abbr> via <abbr title="Short message service">SMS</abbr> or <abbr title="Hypertext Transfer Protocol Secure">HTTPS</abbr>.</label>
+					<ul class="nav nav-tabs mt-2 mb-0" role="tablist">
+						<li class="nav-item" role="presentation">
+							<a id="nav_link_sms" class="nav-link text-uppercase active user-select-none" data-toggle="tab" data-target="#tab_sms" role="tab" aria-selected="true">SMS</a>
+						</li>
+						<li class="nav-item" role="presentation">
+							<a id="nav_link_https" class="nav-link text-uppercase user-select-none" data-toggle="tab" data-target="#tab_https" role="tab" aria-selected="false">HTTPS</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="form-group mb-2">
+							<label class="mt-2 mb-0 user-select-none">Service <abbr title="Uniform Resource Locator">URL</abbr>: </label>
+							<input type="text" id="form_control_url" name="form_control_url" class="form-control mt-0" value="{{def_url.aml}}" placeholder="Enter service's URL">
+							<div class="row">
+								<div class="col-4">
+									<label class="mt-2 mb-0 user-select-none"><abbr title="Automatic number identification">ANI</abbr>: </label>
+									<input type="text" id="form_control_ani" name="form_control_ani" class="form-control mt-0 mb-0" value="{{def_ani}}" placeholder="Enter caller's ANI">
+								</div>
+								<div class="col-8">
+									<div class="form-row">
+										<div class="col-5">
+											<label class="mt-2 mb-0 user-select-none">
+												<span data-toggle="modal" data-target="#modal_location_format">Latitude: </span>
+											</label>
+											<input type="text" id="form_control_lat" name="form_control_lat" class="form-control mt-0 mb-0" value="{{def_loc.lat}}" placeholder="Enter latitude">
+										</div>
+										<div class="col-5">
+											<label class="mt-2 mb-0 user-select-none">
+												<span data-toggle="modal" data-target="#modal_location_format">Longitude: </span>
+											</label>
+											<input type="text" id="form_control_lon" name="form_control_lon" class="form-control mt-0 mb-0" value="{{def_loc.lon}}" placeholder="Enter longitude">
+										</div>
+										<div class="col">
+											<label class="mt-2 mb-0">&nbsp;</label>
+											<button type="button" id="btn_searching_coordinate" class="btn btn-secondary btn-block">
+												<i class="fas fa-sync-alt"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="tab_sms" class="tab-pane show active" role="tabpanel">
+							<div class="form-group">
+								<label class="mt-0 mb-0 user-select-none">
+									<span>Message:</span>
+									<button type="button" class="btn btn-link text-decoration-none border-0 m-0 p-0 mb-1" data-toggle="modal" data-target="#modal_msg_example_sms">
+										<small>Example</small>
+									</button>
+								</label>
+								<textarea id="form_control_msg_sms" name="form_control_msg_sms" class="form-control mt-0 mb-0" rows="6" placeholder="Enter input message">{{def_ipt.sms[0]}}</textarea>
+								<button type="button" id="btn_send_sms" class="btn btn-primary mt-2 mb-0">
+									<i class="fas fa-share"></i>
+									<span>Send</span>
+								</button>
+								<div>
+									<label class="mt-2 mb-0 user-select-none">Result: </label>
+									<span id="form_text_result_sms" class="form-control-plaintext text-break mt-0 mb-0 p-0 overflow-auto border rounded"></span>
+								</div>
+							</div>
+						</div>
+						<div id="tab_https" class="tab-pane" role="tabpanel">
+							<div class="form-group mb-0">
+								<label class="mt-0 mb-0 user-select-none">
+									<span>Message:</span>
+									<button type="button" class="btn btn-link text-decoration-none border-0 m-0 p-0 mb-1" data-toggle="modal" data-target="#modal_msg_example_https">
+										<small>Example</small>
+									</button>
+								</label>
+								<textarea id="form_control_msg_https" name="form_control_msg_https" class="form-control mt-0 mb-0" rows="6" placeholder="Enter input message">{{def_ipt.https[0]}}</textarea>
+								<button type="button" id="btn_send_https" class="btn btn-primary mt-2 mb-0">
+									<i class="fas fa-share"></i>
+									<span>Send</span>
+								</button>
+								<div>
+									<label class="mt-2 mb-0 user-select-none">Result: </label>
+									<span id="form_text_result_https" class="form-control-plaintext text-break mt-0 mb-0 p-0 overflow-auto border rounded"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xl">
+					<div class="float-left">
+						<label class="mt-2 mb-0">
+							<span class="user-select-none">Click on map to get location: </span>
+							<span id="province" class="user-select-none"></span>
+						</label>
+					</div>
+					<div class="float-right">
+						{% include 'lbs/navigation.html.twig' %}
+					</div>
+					<div class="clearfix"></div>
+					<div id="map" class="mt-1 border rounded">
+						<div class="m-2 user-select-none"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+					</div>
+					<div class="form-group mb-0">
+						<label class="mt-2 mb-0 user-select-none">Location search: </label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="map_search" placeholder="Enter at least 3 characters">
+							<div class="input-group-append">
+								<button id="map_submit" class="btn btn-secondary" type="button" title="Search">
+									<i class="fas fa-search"></i>
+								</button>
+							</div>
+						</div>
+						<input type="hidden" id="map_area">
+						<input type="hidden" id="map_tag">
+						<input type="hidden" id="map_span">
+						<input type="hidden" id="map_limit" value="20">
+						<div id="map_result" class="mt-2 rounded border overflow-auto"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_msg_example_https" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-body">
+					{% for key, value in def_ipt.https %}
+						<div class="form-group{{loop.last == true ? 'mb-0' : ''}}">
+							<div class="input-group">
+								<textarea id="form_control_example_https" name="form_control_example_https" class="form-control mt-0 mb-0" rows="4" readonly>{{value}}</textarea>
+								<div class="input-group-append">
+									<button type="button" class="btn btn-info" onclick="copy_2_clipboard('form_control_example_https','form_control_copied_https')">
+										<i class="fas fa-copy"></i>
+										<span>Copy to clipboard</span>
+									</button>
+								</div>
+							</div>
+							<div class="float-right">
+								<small id="form_control_copied_https" class="form-text text-success label-copied"></small>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_msg_example_sms" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-body">
+					{% for key, value in def_ipt.sms %}
+						<div class="form-group{{loop.last == true ? 'mb-0' : ''}}">
+							<div class="input-group">
+								<textarea id="form_control_example_sms_{{key}}" name="form_control_example_sms_{{key}}" class="form-control mt-0 mb-0" rows="2" readonly>{{value}}</textarea>
+								<div class="input-group-append">
+									<button type="button" class="btn btn-info" onclick="copy_2_clipboard('form_control_example_sms_{{key}}','form_control_copied_sms_{{key}}')">
+										<i class="fas fa-copy"></i>
+										<span>Copy to clipboard</span>
+									</button>
+								</div>
+							</div>
+							<div class="float-right">
+								<small id="form_control_copied_sms_{{key}}" class="form-text text-success label-copied"></small>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal_location_format" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<h5 class="modal-title text-white">Try other location format</h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group mb-0">
+						<label class="mt-0 mb-0"><abbr title="Degrees/Minutes/Seconds">DMS</abbr>: </label>
+						<div class="input-group">
+							<input type="text" id="form_control_dms2wgs84" name="form_control_dms2wgs84" class="form-control mb-0" placeholder="Enter DMS for convert to latitude and longitude">
+							<div class="input-group-append">
+								<button type="button" class="btn btn-primary" onclick="dms2wgs84(document.getElementById('form_control_dms2wgs84').value)">Convert</button>
+							</div>
+						</div>
+						<div class="float-left">
+							<small class="form-text text-muted mt-0">Example: 55° 51' 26" N 4° 15' 48" W</small>
+						</div>
+						<div class="float-right">
+							<small id="form_control_location_format_error" class="form-text text-danger mt-0"></small>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'lbs/script.html.twig' %}
+	<script type="text/javascript" src="{{base_url()}}assets/plugins/proj4/dist/proj4.js"></script>
+	<script type="text/javascript" src="https://api.longdo.com/map/?key={{_MAP_KEY}}"></script>
+	<script type="text/javascript">
+		var btn_searching_coordinate=document.getElementById('btn_searching_coordinate');
+		var d;
+		var dd,mm,yyyy,hh,ii,ss;
+		var date;
+		var form_control_ani=document.getElementById('form_control_ani');
+		var form_control_url=document.getElementById('form_control_url');
+		var jd={ani:"",msg:"",ptl:"",timekey:""};
+		var map;
+		var map_search=document.getElementById('map_search');
+		var map_submit=document.getElementById('map_submit');
+		var pv='';
+		var store_coordinate_ani=form_control_ani.value;
+		var store_coordinate_url=form_control_url.value;
+		var wgs84_lat=0;
+		var wgs84_lon=0;
+		function dms2wgs84(dms){
+			var str=dms;
+			var res=str.split(' ');
+			var latlon={lat:0.000000,lon:0.000000}
+			if(res.length==8){
+				for(var i=0;i<res.length;i++){
+					if(i!=3&&i!=7)
+						res[i]=parseFloat(res[i]);
+				}
+				latlon.lat=new Number(parseFloat(res[0])+parseFloat(res[1]/60)+parseFloat(res[2]/3600)).toFixed(6);
+				latlon.lon=new Number(parseFloat(res[4])+parseFloat(res[5]/60)+parseFloat(res[6]/3600)).toFixed(6);
+				if(latlon.lat!='NaN'&&latlon.lon!='NaN'){
+					latlon.lat=parseFloat((res[3]=='S'?'-':'')+latlon.lat);
+					latlon.lon=parseFloat((res[7]=='W'?'-':'')+latlon.lon);
+					document.getElementById('form_control_location_format_error').innerHTML='';
+					document.getElementById('form_control_lat').value=latlon.lat;
+					document.getElementById('form_control_lon').value=latlon.lon;
+					$('#modal_location_format').modal('hide');
+				}
+				else
+					document.getElementById('form_control_location_format_error').innerHTML='Invalid format!';
+			}
+			else
+				document.getElementById('form_control_location_format_error').innerHTML='Invalid format!';
+		}
+		function copy_2_clipboard(elem_text_id,elem_copy_id){
+			var copy_text=document.getElementById(elem_text_id);
+			copy_text.select();
+			copy_text.setSelectionRange(0,99999);
+			document.execCommand('copy');
+			var lc=document.getElementsByClassName('label-copied');
+			var i;
+			for(i=0;i<lc.length;i++)
+				lc[i].innerHTML='';
+			document.getElementById(elem_copy_id).innerHTML='Copied';
+		}
+		function filling_msg_txtbox(){
+			if(wgs84_lat==0)wgs84_lat='{{def_loc.https.lat}}';
+			if(wgs84_lon==0)wgs84_lon='{{def_loc.https.lon}}';
+			var tmp_msg='{{def_msg}}';
+			tmp_msg=tmp_msg.replace('A"ML','A\\"ML');
+			//var message_str=JSON.parse('{{def_msg}}');
+			var message_str=JSON.parse(tmp_msg);
+			document.getElementById('form_control_lat').value=wgs84_lat;
+			document.getElementById('form_control_lon').value=wgs84_lon;
+			message_str.https=message_str.https.replace('[lat]',wgs84_lat);
+			message_str.https=message_str.https.replace('[lon]',wgs84_lon);
+			message_str.https=message_str.https.replace('[si]','52003'+form_control_ani.value);
+			message_str.https=message_str.https.replace('[dn]','+66'+(form_control_ani.value).substring(1));
+			message_str.sms=message_str.sms.replace('[lat]',(Math.sign(wgs84_lat)==1?'+'+wgs84_lat:wgs84_lat));
+			message_str.sms=message_str.sms.replace('[lon]',wgs84_lon);
+			message_str.sms=message_str.sms.replace('[si]','52003'+form_control_ani.value);
+			message_str.sms=message_str.sms.replace('[dn]','+66'+(form_control_ani.value).substring(1));
+			document.getElementsByName('form_control_msg_https')[0].value=message_str.https;
+			document.getElementsByName('form_control_msg_sms')[0].value=message_str.sms;
+			transforming_coordinate(wgs84_lat,wgs84_lon);
+		}
+		function searching_coordinate(options){
+			wgs84_lat=new Number(document.getElementById('form_control_lat').value).toFixed(6);
+			wgs84_lon=new Number(document.getElementById('form_control_lon').value).toFixed(6);
+			btn_searching_coordinate.innerHTML='<i class="fas fa-sync-alt"></i>';
+			try{
+				map.Overlays.clear().add(new longdo.Marker({lon:wgs84_lon,lat:wgs84_lat}));
+				map.location({lon:wgs84_lon,lat:wgs84_lat},true);
+				filling_msg_txtbox();
+			}
+			catch(err){
+				document.getElementById('province').innerHTML='';
+				alert('Invalid location!');
+			}
+		}
+		function searching_place(){
+			map.Search.search(map_search.value,{
+				area:document.getElementById('map_area').value,
+				tag:document.getElementById('map_tag').value,
+				span:document.getElementById('map_span').value,
+				limit:document.getElementById('map_limit').value
+			});
+		}
+		function store_coordinate(){
+			store_coordinate_ani=form_control_ani.value;
+			store_coordinate_url=form_control_url.value;
+			d=new Date();
+			dd=d.getDate();mm=('0'+(d.getMonth()+1)).slice(-2);yyyy=d.getFullYear();hh=d.getHours();ii=d.getMinutes();ss=d.getSeconds();
+			date=dd+mm+yyyy+hh+ii+ss;
+			jd={ani:store_coordinate_ani,lt:wgs84_lat,lg:wgs84_lon,ptl:99,province:pv,timekey:date,url:store_coordinate_url};
+			$.ajax({
+				url:"{{base_url()}}lbs/sender",
+				method:"POST",
+				data:jd,
+				dataType:"html",
+				timeout:10000,
+			}).done(function(msg){}).fail(function(jqXHR,textStatus){}).always(function(){});
+		}
+		function transforming_coordinate(lat,lon){
+			map.Ui.Mouse.enableClick(false);
+			if(lat!=''&&lon!=''){
+				document.getElementById('province').innerHTML='<i class="fas fa-spinner fa-spin"></i> Province loading...';
+				$.ajax({
+					url:"{{def_url.addr}}"+lat+'/'+lon,
+					method:"GET",
+					headers:{Authorization:"bXlabkZsMWZXVFhDK2NsMWgvMm9GZz09"},
+					contentType:"application/json;charset=utf-8",
+					dataType:"json",
+					timeout:10000,
+				}).done(function(msg){
+					if(msg.province!=undefined)
+						document.getElementById('province').innerHTML='<span class="border border-success rounded text-white bg-success p-1 text-nowrap">'+msg.province+'</span>';
+					else
+						document.getElementById('province').innerHTML='';
+					if(pv!=''){
+						pv=msg.province;
+						store_coordinate();
+					}
+					else
+						pv=msg.province;
+				}).fail(function(jqXHR,textStatus){
+					document.getElementById('province').innerHTML='<span class="border border-danger rounded text-white bg-danger p-1 text-nowrap">Can not load province!</span>';
+				}).always(function(){
+					map.Ui.Mouse.enableClick(true);
+				});
+			}
+		}
+		function init(){
+			map=new longdo.Map({layer:[longdo.Layers.GRAY_EN],placeholder:document.getElementById('map')});
+			map.Ui.Crosshair.visible(false);
+			map.Ui.Geolocation.visible(false);
+			map.Ui.LayerSelector.visible(false);
+			map.Ui.Toolbar.visible(false);
+			map.Event.bind('click',function(){
+				var location=map.location(longdo.LocationMode.Pointer);
+				if(location){
+					//wgs84
+					//document.getElementById('wgs84').innerHTML=new Number(location.lon).toFixed(6)+', '+new Number(location.lat).toFixed(6);
+					wgs84_lat=new Number(location.lat).toFixed(6);
+					wgs84_lon=new Number(location.lon).toFixed(6);
+					var wgs84=wgs84_lat+', '+wgs84_lon;
+					//dms
+					var dms=longdo.Util.locationToDMS(location);
+					dms=dms.latDegree+'° '+dms.latMinute+'\' '+dms.latSecond+'" '+dms.latHemisphere+' '+dms.lonDegree+'° '+dms.lonMinute+'\' '+dms.lonSecond+'" '+dms.lonHemisphere;
+					//document.getElementById('dms').innerHTML=dms.latDegree+'° '+dms.latMinute+'\' '+dms.latSecond+'" '+dms.latHemisphere+' '+dms.lonDegree+'° '+dms.lonMinute+'\' '+dms.lonSecond+'" '+dms.lonHemisphere;
+					//utm
+					var utm;
+					var utmZone=longdo.Util.locationToUTMZone(location);
+					if(utmZone){
+						var utmProj='+proj=utm +zone='+utmZone.zone+(utmZone.hemisphere=='S'?' +south':'')+' +datum=WGS84 +units=m +no_defs';
+						var utmPoint=proj4(utmProj,[location.lon,location.lat]);
+						// document.getElementById('utm').innerHTML=utmZone.zone+utmZone.hemisphere+' '+parseInt(utmPoint[0])+' '+parseInt(utmPoint[1]);
+						utm=utmZone.zone+utmZone.hemisphere+' '+parseInt(utmPoint[0])+' '+parseInt(utmPoint[1]);
+					}
+					else{
+						// document.getElementById('utm').innerHTML='Out of bound';
+						utm='Out of bound';
+					}
+					//geohash
+					//document.getElementById('geohash').innerHTML=longdo.Util.locationToGeohash(location,Math.ceil((map.zoom()/3))+3);
+					var geohash=longdo.Util.locationToGeohash(location,Math.ceil((map.zoom()/3))+3);
+					map.Overlays.clear().add(new longdo.Marker({lon:location.lon,lat:location.lat}));
+					map.location({lon:wgs84_lon,lat:wgs84_lat},true);
+					filling_msg_txtbox();
+				}
+			});
+			map.Event.bind('overlayClick',function(){
+				var location=map.location(longdo.LocationMode.Pointer);
+				if(location){
+					wgs84_lat=new Number(location.lat).toFixed(6);
+					wgs84_lon=new Number(location.lon).toFixed(6);
+					var wgs84=wgs84_lat+', '+wgs84_lon;
+					var dms=longdo.Util.locationToDMS(location);
+					dms=dms.latDegree+'° '+dms.latMinute+'\' '+dms.latSecond+'" '+dms.latHemisphere+' '+dms.lonDegree+'° '+dms.lonMinute+'\' '+dms.lonSecond+'" '+dms.lonHemisphere;
+					var utm;
+					var utmZone=longdo.Util.locationToUTMZone(location);
+					if(utmZone){
+						var utmProj='+proj=utm +zone='+utmZone.zone+(utmZone.hemisphere=='S'?' +south':'')+' +datum=WGS84 +units=m +no_defs';
+						var utmPoint=proj4(utmProj,[location.lon,location.lat]);
+						utm=utmZone.zone+utmZone.hemisphere+' '+parseInt(utmPoint[0])+' '+parseInt(utmPoint[1]);
+					}
+					else{
+						utm='Out of bound';
+					}
+					var geohash=longdo.Util.locationToGeohash(location,Math.ceil((map.zoom()/3))+3);
+					map.Overlays.clear().add(new longdo.Marker({lon:location.lon,lat:location.lat}));
+					map.location({lon:wgs84_lon,lat:wgs84_lat},true);
+					filling_msg_txtbox();
+				}
+			});
+			map.location({lon:'{{def_loc.lon}}',lat:'{{def_loc.lat}}'},true).zoom(15,true);
+			map.Overlays.clear().add(new longdo.Marker({lon:'{{def_loc.lon}}',lat:'{{def_loc.lat}}'}));
+			map.Search.placeholder(document.getElementById('map_result')).language('en');
+			transforming_coordinate('{{def_loc.lat}}','{{def_loc.lon}}');
+		}
+		btn_searching_coordinate.onclick=function(){
+			if(document.getElementById('form_control_lat').value!=''&&document.getElementById('form_control_lon').value!=''){
+				btn_searching_coordinate.innerHTML='<i class="fas fa-sync-alt fa-spin"></i>';
+				searching_coordinate();
+			}
+		}
+		form_control_ani.onkeyup=function(e){
+			store_coordinate_ani=form_control_ani.value;
+			wgs84_lat=document.getElementById('form_control_lat').value;
+			wgs84_lon=document.getElementById('form_control_lon').value;
+			filling_msg_txtbox();
+		}
+		form_control_url.onkeyup=function(e){
+			store_coordinate_url=form_control_url.value;
+			wgs84_lat=document.getElementById('form_control_lat').value;
+			wgs84_lon=document.getElementById('form_control_lon').value;
+			filling_msg_txtbox();
+		}
+		map_search.onkeypress=function(e){
+			if(map_search.value.length>=3&&e.keyCode==13)
+				searching_place();
+		}
+		map_submit.onclick=function(){
+			if(map_search.value.length>=3)
+				searching_place();
+		}
+		$(function(){
+			$("#btn_send_https").on('click',function(){
+				d=new Date();
+				dd=d.getDate();mm=('0'+(d.getMonth()+1)).slice(-2);yyyy=d.getFullYear();hh=d.getHours();ii=d.getMinutes();ss=d.getSeconds();
+				date=dd+mm+yyyy+hh+ii+ss;
+				jd={ani:$('[name="form_control_ani"]').val(),msg:$('[name="form_control_msg_https"]').val(),ptl:1,timekey:date,url:$('[name="form_control_url"]').val()};
+				map.Ui.Mouse.enableClick(false);
+				$("#form_text_result_https").html(null);
+				$("#btn_send_https").attr('disabled',true).addClass('disabled');
+				$("#btn_searching_coordinate").attr('disabled',true).addClass('disabled');
+				$('[name="form_control_url"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_ani"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_msg_https"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_lat"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_lon"]').attr('readonly',true).addClass('readonly');
+				$.ajax({
+					url:"{{base_url()}}lbs/sender",
+					method:"POST",
+					data:jd,
+					dataType:"html",
+					timeout:10000,
+				}).done(function(msg){
+					var content='';
+					var data=$.parseJSON(msg);
+					content+='<ul class="mb-0">';
+					$.each(data,function(i,post){
+						content+='<li>'+i+': '+post+'</li>';
+					});
+					content+='</ul>';
+					$("#form_text_result_https").html(content);
+				}).fail(function(jqXHR,textStatus){
+					alert("Request failed: "+textStatus);
+					$("#form_text_result_https").html(textStatus);
+				}).always(function(){
+					$('[name="form_control_url"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_ani"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_msg_https"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_lat"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_lon"]').attr('readonly',false).removeClass('readonly');
+					$("#btn_searching_coordinate").attr('disabled',false).removeClass('disabled');
+					$("#btn_send_https").attr('disabled',false).removeClass('disabled');
+					map.Ui.Mouse.enableClick(true);
+				});
+			});
+			$("#btn_send_sms").on('click',function(){
+				d=new Date();
+				dd=d.getDate();mm=('0'+(d.getMonth()+1)).slice(-2);yyyy=d.getFullYear();hh=d.getHours();ii=d.getMinutes();ss=d.getSeconds();
+				date=dd+mm+yyyy+hh+ii+ss;
+				jd={ani:$('[name="form_control_ani"]').val(),msg:$('[name="form_control_msg_sms"]').val(),ptl:2,timekey:date,url:$('[name="form_control_url"]').val()};
+				map.Ui.Mouse.enableClick(false);
+				$("#form_text_result_sms").html(null);
+				$("#btn_send_sms").attr('disabled',true).addClass('disabled');
+				$("#btn_searching_coordinate").attr('disabled',true).addClass('disabled');
+				$('[name="form_control_url"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_ani"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_msg_sms"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_lat"]').attr('readonly',true).addClass('readonly');
+				$('[name="form_control_lon"]').attr('readonly',true).addClass('readonly');
+				$.ajax({
+					url:"{{base_url()}}lbs/sender",
+					method:"POST",
+					data:jd,
+					dataType:"html",
+					timeout:10000,
+				}).done(function(msg){
+					var content='';
+					var data=$.parseJSON(msg);
+					content+='<ul class="mb-0">';
+					$.each(data,function(i,post){
+						content+='<li>'+i+': '+post+'</li>';
+					});
+					content+='</ul>';
+					$("#form_text_result_sms").html(content);
+				}).fail(function(jqXHR,textStatus){
+					alert("Request failed: "+textStatus);
+					$("#form_text_result_sms").html(textStatus);
+				}).always(function(){
+					$('[name="form_control_url"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_ani"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_msg_sms"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_lat"]').attr('readonly',false).removeClass('readonly');
+					$('[name="form_control_lon"]').attr('readonly',false).removeClass('readonly');
+					$("#btn_searching_coordinate").attr('disabled',false).removeClass('disabled');
+					$("#btn_send_sms").attr('disabled',false).removeClass('disabled');
+					map.Ui.Mouse.enableClick(true);
+				});
+			});
+			$('a[data-toggle="tab"]').on('shown.bs.tab',function(e){
+				store_coordinate_ani=form_control_ani.value;
+				store_coordinate_url=form_control_url.value;
+			});
+		});
+	</script>
+</body>
+</html>
